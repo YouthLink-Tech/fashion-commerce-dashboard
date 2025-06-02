@@ -1,26 +1,712 @@
-@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --top-header-height: 28px;
+  --bottom-header-height-xs: 60px;
+  --bottom-header-height-sm: 64px;
+  --bottom-header-height-lg: 68px;
+  --section-padding: 20px;
+  --section-padding-double: calc(var(--section-padding) * 2);
+  --header-height-xs: calc(
+    var(--top-header-height) + var(--bottom-header-height-xs)
+  );
+  --header-height-sm: calc(
+    var(--top-header-height) + var(--bottom-header-height-sm)
+  );
+  --header-height-lg: calc(
+    var(--top-header-height) + var(--bottom-header-height-lg)
+  );
+  --product-default: #f0f0f0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-background-clip: text;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  @keyframes slide {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes scroll {
+    0%,
+    40% {
+      transform: translateY(0);
+    }
+    50%,
+    90% {
+      transform: translateY(-2.5rem);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes worm-length {
+    0% {
+      stroke-dasharray: 28.63 162.25;
+    }
+    25% {
+      stroke-dasharray: 0.1 190.88;
+    }
+    50% {
+      stroke-dasharray: 28.63 162.25;
+    }
+    75% {
+      stroke-dasharray: 0.1 190.88;
+    }
+    100% {
+      stroke-dasharray: 28.63 162.25;
+    }
+  }
+
+  @keyframes worm-move {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    25% {
+      stroke-dashoffset: -38.18;
+    }
+    50% {
+      stroke-dashoffset: -76.36;
+    }
+    75% {
+      stroke-dashoffset: -114.54;
+    }
+    100% {
+      stroke-dashoffset: -152.72;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Responsive section height (min) with a value of 100dvh and the full header height */
+  .min-h-dvh-header-h-full {
+    @apply min-h-[calc(100dvh-var(--header-height-xs))] sm:min-h-[calc(100dvh-var(--header-height-sm))] lg:min-h-[calc(100dvh-var(--header-height-lg))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the bottom header height */
+  .min-h-dvh-header-h-bottom {
+    @apply min-h-[calc(100dvh-var(--bottom-header-height-xs))] sm:min-h-[calc(100dvh-var(--bottom-header-height-sm))] lg:min-h-[calc(100dvh-var(--bottom-header-height-lg))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the full header height and section bottom padding */
+  .min-h-dvh-header-h-full-section-pb {
+    @apply min-h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:min-h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding)))] lg:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding)))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the bottom header height and section bottom padding */
+  .min-h-dvh-header-h-bottom-section-pb {
+    @apply min-h-[calc(100dvh-(var(--bottom-header-height-xs)+var(--section-padding)))] sm:min-h-[calc(100dvh-(var(--bottom-header-height-sm)+var(--section-padding)))] lg:min-h-[calc(100dvh-(var(--bottom-header-height-lg)+var(--section-padding)))];
+  }
+
+  /* Responsive top padding with a value of the full header height */
+  .pt-header-h-full {
+    @apply pt-[var(--header-height-xs)] sm:pt-[var(--header-height-sm)] lg:pt-[var(--header-height-lg)];
+  }
+
+  /* Responsive top padding with a value of the bottom header height */
+  .pt-header-h-bottom {
+    @apply pt-[var(--bottom-header-height-xs)] sm:pt-[var(--bottom-header-height-sm)] lg:pt-[var(--bottom-header-height-lg)];
+  }
+
+  /* Responsive top padding with a value of the full header height and section bottom padding */
+  .pt-header-h-full-section-pb {
+    @apply pt-[calc(var(--header-height-xs)+var(--section-padding))] sm:pt-[calc(var(--header-height-sm)+var(--section-padding))] lg:pt-[calc(var(--header-height-lg)+var(--section-padding))];
+  }
+
+  /* Responsive top padding with a value of the bottom header height and section bottom padding */
+  .pt-header-h-bottom-section-pb {
+    @apply pt-[calc(var(--bottom-header-height-xs)+var(--section-padding))] sm:pt-[calc(var(--bottom-header-height-sm)+var(--section-padding))] lg:pt-[calc(var(--bottom-header-height-lg)+var(--section-padding))];
+  }
+
+  /* For normal and on hover footer links (except for the social ones) */
+  footer div:not(:has(.social-links)) a {
+    @apply transition-[color] duration-300 ease-in-out hover:text-neutral-900;
+  }
+
+  /* For footer nav links and it's wrapper */
+  footer ul:not(:is(.social-links, .payment-method-partners)) {
+    @apply space-y-1.5 text-[13px] lg:text-sm;
+  }
+
+  /* For footer social links */
+  .social-links a {
+    @apply text-neutral-500 hover:text-neutral-900 [&>svg]:size-6 [&>svg]:transition-[color] [&>svg]:duration-300 [&>svg]:ease-in-out xl:[&>svg]:size-5;
+  }
+
+  /* For social icon links */
+  .social-icons a {
+    @apply flex size-6 items-center justify-center rounded-md bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out min-[450px]:size-7 [&>svg]:h-auto [&>svg]:w-3.5 min-[450px]:[&>svg]:w-4;
+  }
+
+  /* For mobile nav links and their icons */
+  nav.mobile :is(a:not(:has(img)), li:not(:has(a))) {
+    @apply flex items-center gap-x-2.5 rounded-md p-2.5 transition-all duration-100 ease-in-out [&>svg]:h-4 [&>svg]:w-auto;
+  }
+
+  /* For on hover and active mobile nav links */
+  nav.mobile :is(.active, a:not(:has(img)):hover, li:not(:has(a)):hover) {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .chat-sub-btn {
+    @apply absolute bottom-0 right-0 flex size-10 origin-center items-center justify-center rounded-full text-neutral-700 transition-[background-color,transform,opacity] duration-300 ease-out hover:text-neutral-900 [&>svg]:size-6 [&>svg]:transition-[color] [&>svg]:duration-300 [&>svg]:ease-out;
+  }
+
+  .filter-options {
+    @apply flex-wrap gap-3 text-sm font-semibold [&>div]:relative;
+  }
+
+  .quick-filter-options button {
+    @apply flex items-center gap-x-1.5 rounded-lg px-2.5 py-0.5 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out [&_p]:text-[13px];
+  }
+
+  .hero-images > div:is(:first-child, :last-child) {
+    @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-xl [&>img]:object-cover;
+  }
+
+  .hero-images > div:not(:is(:first-child, :last-child)) {
+    @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-xl [&>img]:object-cover [&>img]:object-bottom;
+  }
+
+  .payment-methods input {
+    @apply relative h-14 w-full appearance-none;
+  }
+
+  .payment-methods input::before {
+    @apply absolute inset-0 h-full w-full rounded-lg border-2 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''];
+  }
+
+  .payment-methods input:not(:disabled)::before {
+    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-[var(--color-primary-regular)] hover:border-neutral-300 [&:not(:checked):hover]:bg-[var(--color-primary-light)];
+  }
+
+  .payment-methods input:disabled::before {
+    @apply cursor-not-allowed border-transparent opacity-45 brightness-75;
+  }
+
+  .select-with-search [data-slot="input-wrapper"],
+  .select-without-search button {
+    @apply mt-2.5 h-10 min-h-10 px-4 transition-[padding-left,padding-right,height,border-color] duration-300 ease-in-out [&:has(input:disabled)]:mt-0 [&:has(input:disabled)_[data-slot='inner-wrapper']>div]:hidden [&:has(input:disabled)_input]:mt-5 [&:has(input:disabled)_input]:rounded-lg [&:has(input:disabled)_input]:text-neutral-700 [&>div>button]:bg-transparent;
+  }
+
+  .date-picker > div {
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75 md:text-[13px];
+  }
+
+  .select-with-search input,
+  .select-without-search span[data-slot="value"],
+  .date-picker > div {
+    @apply text-xs font-semibold text-neutral-700 placeholder:text-neutral-500 md:text-[13px];
+  }
+
+  .select-with-search label,
+  .select-without-search label {
+    @apply top-[calc(50%-6px)] text-sm text-neutral-500 transition-[top] duration-300 ease-in-out after:content-[''] md:text-base;
+  }
+
+  .user-info input {
+    @apply text-neutral-700 read-only:border-0;
+  }
+
+  .user-info input:not([data-slot]) {
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75;
+  }
+
+  .user-info input:not([data-slot]):is(:read-only):not(:disabled),
+  .select-with-search
+    :is([data-slot="main-wrapper"], [data-slot="input-wrapper"]):has(
+      input:is(:disabled, :read-only)
+    ),
+  .date-picker[data-disabled="true"] > div {
+    @apply pointer-events-none h-[26px] select-text !border-transparent !bg-transparent px-0 backdrop-blur-2xl !backdrop-opacity-0 [&_label]:top-[calc(50%+5px)] [&_label]:text-neutral-700 [&_svg]:hidden;
+  }
+
+  .select-with-search
+    :is([data-slot="main-wrapper"], [data-slot="input-wrapper"]):has(
+      input:is(:disabled, :read-only)
+    ) {
+    @apply -mt-1 !h-[22px] [&_label]:top-[calc(50%+8px)];
+  }
+
+  .user-into-form-buttons {
+    @apply flex gap-1.5 lg:gap-2.5 [&_svg]:text-base;
+  }
+
+  .user-into-form-buttons button {
+    @apply flex items-center gap-1.5 rounded-md p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-lg:[&_p]:hidden max-lg:[&_svg]:size-4;
+  }
+
+  .user-sidebar li a {
+    @apply flex w-full cursor-pointer items-center gap-2 rounded-md py-2 transition-[background-color] duration-300 ease-in-out hover:bg-green-100 hover:text-green-600 max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
+  }
+
+  .custom-desktop-scrollbar {
+    @apply xl:[&::-webkit-scrollbar-thumb:hover]:bg-neutral-600 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-neutral-300 xl:[&::-webkit-scrollbar-track]:rounded-full xl:[&::-webkit-scrollbar-track]:bg-neutral-100 xl:[&::-webkit-scrollbar]:w-[9px] xl:[&::-webkit-scrollbar]:rounded-full xl:[&::-webkit-scrollbar]:bg-neutral-100;
+  }
+
+  .animate-blob {
+    @apply pointer-events-none size-64 rounded-full mix-blend-multiply blur-[32px];
+  }
+}
+
+.custom-editor {
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: 1px solid #dbd3d1a1; /* Custom border */
+  border-radius: 5px; /* Custom border radius */
+  overflow: hidden; /* To ensure the border radius is applied correctly */
+}
+
+.custom-editor .ql-container {
+  height: 100%; /* Ensure the editor takes the full height */
+  border: none; /* Remove default border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor .ql-editor {
+  /* Custom styles for the editor input field */
+  min-height: 160px;
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: none; /* Remove default border */
+}
+
+.custom-editor .ql-toolbar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd; /* Custom border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-container img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  transition:
+    opacity 0.2s ease-in-out,
+    filter 0.2s ease-in-out;
+  filter: blur(1px); /* Add blur effect */
+}
+
+.image-container.selected {
+  transform: scale(1.05);
+  border: 1px solid #9f5216; /* Add a border when selected */
+}
+
+.image-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(159, 82, 22, 0.5);
+  opacity: 0; /* Initially no overlay */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.image-container.selected::after {
+  opacity: 0; /* No overlay when selected */
+}
+
+.image-container.selected img {
+  opacity: 1;
+  filter: blur(0); /* Remove blur effect */
+}
+
+.custom-number-input::-webkit-outer-spin-button,
+.custom-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.custom-number-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.modal-body-scroll {
+  max-height: 60vh; /* Control the maximum height of the modal body */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 1rem; /* Prevent scrollbar overlap */
+  scroll-behavior: smooth; /* Smooth scrolling behavior */
+  scrollbar-width: thin; /* For Firefox, makes the scrollbar thinner */
+  scrollbar-color: #888 #f1f1f1; /* Scrollbar color (thumb and track) */
+}
+
+/* Customize the scrollbar for Webkit browsers (Chrome, Safari) */
+.modal-body-scroll::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.modal-body-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Background of the scrollbar track */
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+  border: 2px solid #f1f1f1; /* Adds some space between the thumb and the track */
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h {
+  min-height: calc(100vh - 180px);
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-h {
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h-orders,
+.custom-max-h-order {
+  min-height: calc(100vh - 300px);
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-h-orders,
+  .custom-max-h-order {
+    min-height: calc(100vh - 225px);
+    max-height: calc(100vh - 225px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .custom-max-h-orders,
+  .custom-max-h-order {
+    min-height: calc(100vh - 210px);
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1440px) {
+  .custom-max-h-orders {
+    min-height: calc(100vh - 260px);
+    max-height: calc(100vh - 260px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1440px) {
+  .custom-max-h-order {
+    min-height: calc(100vh - 250px);
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+  }
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h-inventory {
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .custom-max-h-inventory {
+    min-height: calc(100vh - 180px);
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .custom-max-h-inventory {
+    min-height: calc(100vh - 210px);
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+  }
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-discount {
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-discount {
+    min-height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
+  }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 1024px) {
+  .custom-max-discount {
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h-variant {
+  max-height: calc(100vh - 120px);
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-h-variant {
+    max-height: calc(100vh - 80px);
+  }
+}
+
+.custom-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px; /* Reduced size */
+  height: 20px; /* Reduced size */
+}
+
+.custom-switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-switch-slider {
+  position: absolute;
+  cursor: pointer; /* Default cursor */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Default off color */
+  transition: 0.4s;
+  border-radius: 20px; /* Adjusted for smaller height */
+}
+
+.custom-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px; /* Reduced size */
+  width: 16px; /* Reduced size */
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.custom-switch-input:checked + .custom-switch-slider {
+  background-color: #0072f5; /* Primary color when on */
+}
+
+.custom-switch-input:checked + .custom-switch-slider:before {
+  transform: translateX(20px); /* Adjusted for smaller size */
+}
+
+/* Styles for expired state */
+.custom-switch-slider.expired {
+  cursor: not-allowed; /* Cursor for expired state */
+  background-color: #e0e0e0a8; /* Disabled color */
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px; /* Thin scrollbar */
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #a8a8a8; /* Scrollbar color */
+  border-radius: 10px; /* Rounded edges */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker color on hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Track color */
+}
+
+/* Add this style to restrict the image section height */
+.image-upload-container {
+  max-height: 700px; /* Adjust based on your layout */
+  overflow-y: auto; /* Allow scrolling */
+}
+
+/* Ensure the images are not too large */
+.uploaded-image {
+  max-height: 150px; /* Restrict image height */
+  object-fit: cover; /* Maintain aspect ratio */
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-prefix,
+.input-suffix {
+  position: absolute;
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Center adjustment */
+  font-size: 16px; /* Adjust font size */
+  color: #999; /* Color of the symbol */
+}
+
+.input-prefix {
+  left: 10px; /* Positioning for the dollar sign */
+}
+
+.input-suffix {
+  right: 10px; /* Positioning for the percentage sign */
+}
+
+.hero-images > div:is(:first-child, :last-child) {
+  @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-xl [&>img]:object-cover;
+}
+
+.hero-images > div:not(:is(:first-child, :last-child)) {
+  @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-xl [&>img]:object-cover [&>img]:object-bottom;
+}
+
+.custom-editor-legal-policies {
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: 1px solid #dbd3d1a1; /* Custom border */
+  border-radius: 5px; /* Custom border radius */
+}
+
+.custom-editor-legal-policies .ql-container {
+  height: 100%; /* Ensure the editor takes the full height */
+  border: none; /* Remove default border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-legal-policies .ql-editor {
+  /* Custom styles for the editor input field */
+  min-height: 100px;
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: none; /* Remove default border */
+}
+
+.custom-editor-legal-policies .ql-toolbar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd; /* Custom border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-legal-policies .ql-editor img {
+  max-width: 100%; /* Ensure the image scales responsively */
+  display: block; /* Display the image as a block to avoid inline styling issues */
+  margin: 10px 0; /* Add spacing around the image */
+}
+
+.custom-editor-faq {
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: 1px solid #dbd3d1a1; /* Custom border */
+  border-radius: 5px; /* Custom border radius */
+}
+
+.custom-editor-faq .ql-container {
+  height: 100%; /* Ensure the editor takes the full height */
+  border: none; /* Remove default border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-faq .ql-editor {
+  /* Custom styles for the editor input field */
+  min-height: 117px;
+  max-height: 117px;
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: none; /* Remove default border */
+}
+
+.custom-editor-faq .ql-toolbar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd; /* Custom border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-our-story {
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: 1px solid #dbd3d1a1; /* Custom border */
+  border-radius: 5px; /* Custom border radius */
+}
+
+.custom-editor-our-story .ql-container {
+  height: 100%; /* Ensure the editor takes the full height */
+  border: none; /* Remove default border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-our-story .ql-editor {
+  /* Custom styles for the editor input field */
+  height: 80px;
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: none; /* Remove default border */
+}
+
+.custom-editor-our-story .ql-toolbar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd; /* Custom border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
 }
