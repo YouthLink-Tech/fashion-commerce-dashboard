@@ -34,6 +34,8 @@ const StoryEditModal = ({
   handleRemoveMedia,
   setMediaUrls,
   isUploading,
+  isUploading2,
+  isUploading3,
   sizeError1,
   sizeError2,
   requiredFileErrors,
@@ -130,7 +132,7 @@ const StoryEditModal = ({
                       }}
                       previewUrl={staffImgUrl}
                       onRemove={handleRemoveStaffImage}
-                      isUploading={isUploading}
+                      isUploading={isUploading2}
                     />
                   </div>
 
@@ -187,7 +189,7 @@ const StoryEditModal = ({
                           requiredError={requiredFileErrors[index]}
                           previewUrl={[mediaUrls[index]]}
                           onRemove={() => handleRemoveMedia(index)}
-                          isUploading={isUploading}
+                          isUploading={isUploading3}
                         />
                       </div>
 

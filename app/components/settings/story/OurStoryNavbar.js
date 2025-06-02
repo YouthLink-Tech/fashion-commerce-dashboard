@@ -36,6 +36,8 @@ const OurStoryNavbar = () => {
   };
   const [requiredFileErrors, setRequiredFileErrors] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploading2, setIsUploading2] = useState(false);
+  const [isUploading3, setIsUploading3] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [, , refetch] = useOurStory();
   const [dateError, setDateError] = useState(false);
@@ -116,18 +118,18 @@ const OurStoryNavbar = () => {
   const handleStaffImgChange = async (file) => {
     if (!file) return;
 
-    setIsUploading(true); // Start Uploading
+    setIsUploading2(true); // Start Uploading
     if (file) setSizeError2(''); // ✅ clear error once file is selected
 
     const url = await uploadSingleFileToGCS(file);
     if (url) setStaffImgUrl(url);
-    setIsUploading(false); // Upload finished
+    setIsUploading2(false); // Upload finished
   };
 
   const handleMediaSelect = async (index, file) => {
     if (!file) return;
 
-    setIsUploading(true); // Start upload
+    setIsUploading3(true); // Start upload
 
     // Local preview using URL.createObjectURL
     const tempUrl = URL.createObjectURL(file);
@@ -149,7 +151,7 @@ const OurStoryNavbar = () => {
       setMediaUrls([...updatedUrls]);
     }
 
-    setIsUploading(false); // Upload finished
+    setIsUploading3(false); // Upload finished
   };
 
   const handleShowDateError = (date) => {
@@ -170,9 +172,17 @@ const OurStoryNavbar = () => {
     const { departmentName, workSummary, storyPublishDate, staffName } = data;
 
     if (isUploading) {
-      toast.error('Please wait until all uploads are complete.');
+      toast.error('Cover image is still uploading. Please wait...');
       return;
-    };
+    }
+    if (isUploading2) {
+      toast.error('Staff image is still uploading. Please wait...');
+      return;
+    }
+    if (isUploading3) {
+      toast.error('Media is still uploading. Please wait...');
+      return;
+    }
 
     try {
 
@@ -381,7 +391,7 @@ const OurStoryNavbar = () => {
                       }}
                       previewUrl={staffImgUrl}
                       onRemove={handleRemoveStaffImage}
-                      isUploading={isUploading}
+                      isUploading={isUploading2}
                     />
                   </div>
 
@@ -443,7 +453,7 @@ const OurStoryNavbar = () => {
                           requiredError={requiredFileErrors[index]}
                           previewUrl={[mediaUrls[index]]}
                           onRemove={() => handleRemoveMedia(index)}
-                          isUploading={isUploading}
+                          isUploading={isUploading3}
                         />
                       </div>
 
@@ -516,7 +526,7 @@ const OurStoryNavbar = () => {
                 <div className='flex gap-4 items-center'>
                   <Button
                     type="button"
-                    onClick={handleCancel}
+                    onPress={handleCancel}
                     color="danger"
                     variant="light"
                   >

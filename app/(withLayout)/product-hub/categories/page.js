@@ -271,10 +271,10 @@ const CategoriesOverview = () => {
 
           </ModalBody>
           <ModalFooter className='flex items-center justify-end border'>
-            <Button onClick={onClose} color="danger" variant='light' size='sm'>
+            <Button onPress={onClose} color="danger" variant='light' size='sm'>
               Close
             </Button>
-            <Button onClick={handleFeaturedCategorySave} color="primary" size='sm'>
+            <Button onPress={handleFeaturedCategorySave} color="primary" size='sm'>
               Save
             </Button>
           </ModalFooter>

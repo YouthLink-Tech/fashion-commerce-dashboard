@@ -465,7 +465,7 @@ export default function EditCategory() {
               />
               <Button
                 type="button"
-                onClick={handleAddSize}
+                onPress={handleAddSize}
                 disabled={!sizeInput}
                 className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >
@@ -582,7 +582,7 @@ export default function EditCategory() {
               />
               <Button
                 type="button"
-                onClick={handleAddSubCategory}
+                onPress={handleAddSubCategory}
                 disabled={!subCategoryInput}
                 className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >

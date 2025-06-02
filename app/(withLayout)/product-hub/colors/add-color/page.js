@@ -113,7 +113,7 @@ const AddColor = () => {
                     className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
                   />
                 </div>
-                <Button type="button" color="danger" onClick={() => removeColor(index)} variant="light">
+                <Button type="button" color="danger" onPress={() => removeColor(index)} variant="light">
                   Remove
                 </Button>
               </div>

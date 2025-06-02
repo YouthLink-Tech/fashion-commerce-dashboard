@@ -1192,14 +1192,14 @@ const RecentPromotions = () => {
             </ModalBody>
             <ModalFooter className='flex justify-between items-center'>
               <div className='flex items-center gap-2'>
-                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                <Button onPress={handleDeselectAll} size="sm" color="default" variant="flat">
                   Deselect All
                 </Button>
-                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                <Button onPress={handleSelectAll} size="sm" color="primary" variant="flat">
                   Select All
                 </Button>
               </div>
-              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
+              <Button variant="solid" color="primary" size='sm' onPress={handleSave}>
                 Save
               </Button>
             </ModalFooter>

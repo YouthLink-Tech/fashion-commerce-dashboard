@@ -110,7 +110,7 @@ const TagsPage = () => {
               </p>
 
               {isOwner &&
-                <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteTag(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+                <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => handleDeleteTag(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
               }
 
             </div>

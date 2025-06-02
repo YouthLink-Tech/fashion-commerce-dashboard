@@ -342,14 +342,14 @@ const Customers = () => {
             </ModalBody>
             <ModalFooter className='flex justify-between items-center'>
               <div className='flex items-center gap-2'>
-                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                <Button onPress={handleDeselectAll} size="sm" color="default" variant="flat">
                   Deselect All
                 </Button>
-                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                <Button onPress={handleSelectAll} size="sm" color="primary" variant="flat">
                   Select All
                 </Button>
               </div>
-              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
+              <Button variant="solid" color="primary" size='sm' onPress={handleSave}>
                 Save
               </Button>
             </ModalFooter>
@@ -515,7 +515,7 @@ const Customers = () => {
                   )}
               </ModalBody>
               <ModalFooter className={`flex justify-end border-gray-300 pt-2 ${selectedOrder.length > 1 ? "" : "border"}`}>
-                <Button onClick={onClose} color="danger" variant='flat' size='sm'>
+                <Button onPress={onClose} color="danger" variant='flat' size='sm'>
                   Close
                 </Button>
               </ModalFooter>

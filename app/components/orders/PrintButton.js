@@ -46,7 +46,7 @@ const PrintButton = ({ selectedOrder }) => {
     <Button
       color="primary"
       size="sm"
-      onClick={handlePreview}
+      onPress={handlePreview}
       isLoading={isLoading}
     >
       {isLoading ? 'Generating...' : 'Download Invoice'} <PiDownloadBold size={18} />

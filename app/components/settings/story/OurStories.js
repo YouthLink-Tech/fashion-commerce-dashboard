@@ -38,6 +38,8 @@ const OurStories = () => {
   };
   const [requiredFileErrors, setRequiredFileErrors] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploading2, setIsUploading2] = useState(false);
+  const [isUploading3, setIsUploading3] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState(false);
   const [storyPublishDate, setStoryPublishDate] = useState('');
@@ -207,18 +209,18 @@ const OurStories = () => {
   const handleStaffImgChange = async (file) => {
     if (!file) return;
 
-    setIsUploading(true); // Start Uploading
+    setIsUploading2(true); // Start Uploading
     if (file) setSizeError2(''); // ✅ clear error once file is selected
 
     const url = await uploadSingleFileToGCS(file);
     if (url) setStaffImgUrl(url);
-    setIsUploading(false); // Upload finished
+    setIsUploading2(false); // Upload finished
   };
 
   const handleMediaSelect = async (index, file) => {
     if (!file) return;
 
-    setIsUploading(true); // Start upload
+    setIsUploading3(true); // Start upload
 
     // Local preview using URL.createObjectURL
     const tempUrl = URL.createObjectURL(file);
@@ -240,7 +242,7 @@ const OurStories = () => {
       setMediaUrls([...updatedUrls]);
     }
 
-    setIsUploading(false); // Upload finished
+    setIsUploading3(false); // Upload finished
   };
 
   const handleStatusChange = (e) => {
@@ -253,9 +255,17 @@ const OurStories = () => {
     const { departmentName, workSummary, staffName } = data;
 
     if (isUploading) {
-      toast.error('Please wait until all uploads are complete.');
+      toast.error('Cover image is still uploading. Please wait...');
       return;
-    };
+    }
+    if (isUploading2) {
+      toast.error('Staff image is still uploading. Please wait...');
+      return;
+    }
+    if (isUploading3) {
+      toast.error('Media is still uploading. Please wait...');
+      return;
+    }
 
     try {
 
@@ -403,6 +413,8 @@ const OurStories = () => {
         handleRemoveMedia={handleRemoveMedia}
         setMediaUrls={setMediaUrls}
         isUploading={isUploading}
+        isUploading2={isUploading2}
+        isUploading3={isUploading3}
         sizeError1={sizeError1}
         sizeError2={sizeError2}
         requiredFileErrors={requiredFileErrors}

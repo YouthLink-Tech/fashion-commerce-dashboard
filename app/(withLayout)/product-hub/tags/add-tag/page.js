@@ -100,7 +100,7 @@ const AddTag = () => {
                   {...register(`tag.${index}.tag`, { required: 'Tag is required' })}
                   className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                 />
-                <Button type='button' color="danger" onClick={() => removeTag(index)} variant="light">
+                <Button type='button' color="danger" onPress={() => removeTag(index)} variant="light">
                   Remove
                 </Button>
               </div>

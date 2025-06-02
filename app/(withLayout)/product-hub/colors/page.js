@@ -120,7 +120,7 @@ const ColorsPage = () => {
               </p>
 
               {isOwner &&
-                <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteColor(color?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+                <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => handleDeleteColor(color?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
               }
             </div>
           ))}
