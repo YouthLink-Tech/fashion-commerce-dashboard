@@ -1,0 +1,226 @@
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { isValidImageFile } from '../../shared/upload/isValidImageFile';
+import { FiSave } from 'react-icons/fi';
+import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import useLogo from '@/app/hooks/useLogo';
+import Loading from '../../shared/Loading/Loading';
+
+const LogoSettings = () => {
+
+  const axiosPublic = useAxiosPublic();
+  const { handleSubmit } = useForm();
+  const [image, setImage] = useState(null);
+  const [sizeError, setSizeError] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [logoList, isLogoPending, refetch] = useLogo();
+
+  useEffect(() => {
+    if (logoList && logoList.length > 0) {
+      setImage(logoList[0]?.logoImgUrl);
+    }
+  }, [logoList]);
+
+  const handleImageRemove = () => {
+    setImage(null);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = async (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
+      setSizeError(false);
+    }
+  };
+
+  const uploadSingleFileToGCS = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
+      setSizeError(false);
+    }
+  };
+
+  const onSubmit = async () => {
+
+    if (!image) {
+      setSizeError("Please upload a logo.");
+      return;
+    }
+    setSizeError("");
+
+    if (logoList?.length > 0) {
+      const logoId = logoList[0]?._id;
+
+      const logoData = {
+        logoImgUrl: image
+      };
+
+      try {
+        const response = await axiosPublic.put(`/update-logo/${logoId}`, logoData);
+        if (response.data.modifiedCount > 0) {
+          toast.custom((t) => (
+            <div
+              className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="pl-6">
+                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+              </div>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="ml-3 flex-1">
+                    <p className="text-base font-bold text-gray-900">
+                      Logo updated!
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Logo has been successfully updated!
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                >
+                  <RxCross2 />
+                </button>
+              </div>
+            </div>
+          ), {
+            position: "bottom-right",
+            duration: 5000
+          })
+          refetch();
+        }
+        else {
+          toast.error('No changes detected.');
+        }
+      } catch (err) {
+        toast.error("Failed to logo!");
+      }
+
+    }
+  };
+
+  if (isLogoPending) return <Loading />
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className='mt-3'>
+
+      <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+        <div>
+          <input
+            id='imageUpload'
+            type='file'
+            className='hidden'
+            onChange={handleImageChange}
+          />
+          <label
+            htmlFor='imageUpload'
+            className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
+              } p-6 cursor-pointer`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <MdOutlineFileUpload size={60} />
+            <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+              <p className="text-[13px]">
+                <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                  Click to upload
+                </span>{" "}
+                or drag and drop
+              </p>
+              <p className="text-[11px]">Max image size is 10 MB</p>
+              <p className="text-[11px]"></p>
+            </div>
+          </label>
+          {sizeError && (
+            <p className="text-red-600 text-center mt-4">Select image</p>
+          )}
+          {image && (
+            <div className='relative mt-8'>
+              <Image
+                src={image}
+                alt='Uploaded image'
+                height={3000}
+                width={3000}
+                className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+              />
+              <button
+                onClick={handleImageRemove}
+                className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full"
+                type='button'
+              >
+                <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      <div className='w-full flex justify-end mt-8'>
+        <button type="submit" className='flex items-center justify-end gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
+          Upload <FiSave size={19} />
+        </button>
+      </div>
+
+    </form>
+  );
+};
+
+export default LogoSettings;

@@ -175,7 +175,7 @@
 
   /* For on hover and active mobile nav links */
   nav.mobile :is(.active, a:not(:has(img)):hover, li:not(:has(a)):hover) {
-    @apply bg-green-100 text-green-600;
+    @apply bg-[var(--color-primary-400)] text-[var(--color-primary-900)];
   }
 
   .chat-sub-btn {
@@ -207,7 +207,7 @@
   }
 
   .payment-methods input:not(:disabled)::before {
-    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-[var(--color-primary-regular)] hover:border-neutral-300 [&:not(:checked):hover]:bg-[var(--color-primary-light)];
+    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-[var(--color-primary-500)] hover:border-neutral-300 [&:not(:checked):hover]:bg-[var(--color-primary-300)];
   }
 
   .payment-methods input:disabled::before {
@@ -220,7 +220,7 @@
   }
 
   .date-picker > div {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75 md:text-[13px];
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75 md:text-[13px];
   }
 
   .select-with-search input,
@@ -239,7 +239,7 @@
   }
 
   .user-info input:not([data-slot]) {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75;
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75;
   }
 
   .user-info input:not([data-slot]):is(:read-only):not(:disabled),
@@ -267,7 +267,7 @@
   }
 
   .user-sidebar li a {
-    @apply flex w-full cursor-pointer items-center gap-2 rounded-md py-2 transition-[background-color] duration-300 ease-in-out hover:bg-green-100 hover:text-green-600 max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
+    @apply flex w-full cursor-pointer items-center gap-2 rounded-md py-2 transition-[background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-400)] hover:text-[var(--color-primary-900)] max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
   }
 
   .custom-desktop-scrollbar {

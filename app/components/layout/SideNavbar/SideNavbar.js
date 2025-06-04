@@ -4,7 +4,7 @@ import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
 import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
-import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog } from "react-icons/tb";
+import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog, TbBrandAppleNews } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
 import { FaChevronRight, FaAngleDown } from "react-icons/fa6";
@@ -187,6 +187,7 @@ const SideNavbar = ({ onClose }) => {
       links: [
         { label: "User Management", link: "/settings/enrollment", icon: <LiaUsersCogSolid /> },
         { label: "Homepage", link: "/settings/homepage", icon: <TbHomeCog /> },
+        { label: "Brand", link: "/settings/brand", icon: <TbBrandAppleNews /> },
         {
           name: "Legal Policies",
           icon: <LuNewspaper />,

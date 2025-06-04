@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GrNotification } from 'react-icons/gr';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { RxCross2 } from 'react-icons/rx';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { GoDotFill } from "react-icons/go";
@@ -133,22 +133,20 @@ const Notifications = () => {
 
       <DropdownMenu closeOnSelect={false} aria-label="Static Actions" variant="flat" className="p-0 md:w-[500px]">
 
-        <DropdownSection>
-          <DropdownItem isReadOnly>
-            <div className='flex justify-between p-0 w-full'>
-              <div className="flex flex-col px-2">
-                <h2 className="text-lg font-semibold">Notifications</h2>
-                <h2 className="text-sm text-neutral-600">Stay updated with your latest notifications</h2>
-              </div>
-              <button onClick={() => {
-                setIsDropdownOpen(false);
-                setShowAll(false);
-              }} className="text-gray-500 hover:text-black hover:cursor-pointer">
-                <RxCross2 size={24} />
-              </button>
+        <DropdownItem isReadOnly>
+          <div className='flex justify-between p-0 w-full'>
+            <div className="flex flex-col px-2">
+              <h2 className="text-lg font-semibold">Notifications</h2>
+              <h2 className="text-sm text-neutral-600">Stay updated with your latest notifications</h2>
             </div>
-          </DropdownItem>
-        </DropdownSection>
+            <button onClick={() => {
+              setIsDropdownOpen(false);
+              setShowAll(false);
+            }} className="text-gray-500 hover:text-black hover:cursor-pointer">
+              <RxCross2 size={24} />
+            </button>
+          </div>
+        </DropdownItem>
 
         <DropdownItem isReadOnly className='p-0'>
           <div className='flex items-center justify-between w-full'>
@@ -176,7 +174,7 @@ const Notifications = () => {
               displayedNotifications?.map((detail, idx) => (
                 <div
                   key={`${idx}`}
-                  className={`px-4 py-2 border-b last:border-none hover:bg-gray-50 cursor-pointer ${detail?.isRead ? "" : "bg-gray-100"}  transition`}
+                  className={`px-4 py-2 border-b last:border-none hover:bg-gray-50 cursor-pointer ${detail?.isRead ? "" : "bg-gray-100"}`}
                   onClick={() => handleNotificationClick(detail)}>
                   <div className="flex justify-between items-center w-full">
                     {detail.type === "Notified" ? (
