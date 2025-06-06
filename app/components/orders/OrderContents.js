@@ -1,8 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
-import emailjs from '@emailjs/browser';
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Textarea } from "@nextui-org/react";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useDisclosure } from '@nextui-org/react';
@@ -20,7 +19,6 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { parseISO, isBefore, subDays } from "date-fns";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import dynamic from 'next/dynamic';
 import useShippingZones from '@/app/hooks/useShippingZones';
@@ -760,7 +758,7 @@ const OrderContents = () => {
           }
         }
         else {
-          sendOrderEmail(order, actionType); // Send notification email
+          sendOrderEmail(actionType); // Send notification email
         }
         refetchOrder();
       } else {
@@ -778,7 +776,7 @@ const OrderContents = () => {
   };
 
   // sending mail to customer
-  const sendOrderEmail = (order, actionType) => {
+  const sendOrderEmail = (actionType) => {
     let message;
     let successToastMessage;
 
@@ -849,54 +847,7 @@ const OrderContents = () => {
     ), {
       position: "bottom-right",
       duration: 5000
-    })
-    // const templateParams = {
-    //   to_name: `${order.firstName} ${order.lastName}`,
-    //   to_email: order.email,
-    //   order_number: order.orderNumber,
-    //   message: message,
-    // };
-
-
-    // emailjs.send('service_26qm3vn', 'template_u931mzo', templateParams, 'kM2ZZ-I4QiQPp3W81')
-    //   .then(() => {
-    //     toast.custom((t) => (
-    //       <div
-    //         className={`${t.visible ? 'animate-enter' : 'animate-leave'
-    //           } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-    //       >
-    //         <div className="pl-6">
-    //           <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-    //         </div>
-    //         <div className="flex-1 w-0 p-4">
-    //           <div className="flex items-start">
-    //             <div className="ml-3 flex-1">
-    //               <p className="text-base font-bold text-gray-900">
-    //                 Order Updated!
-    //               </p>
-    //               <p className="mt-1 text-sm text-gray-500">
-    //                 {successToastMessage}
-    //               </p>
-    //             </div>
-    //           </div>
-    //         </div>
-    //         <div className="flex border-l border-gray-200">
-    //           <button
-    //             onClick={() => toast.dismiss(t.id)}
-    //             className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-    //           >
-    //             <RxCross2 />
-    //           </button>
-    //         </div>
-    //       </div>
-    //     ), {
-    //       position: "bottom-right",
-    //       duration: 5000
-    //     })
-    //   })
-    //   .catch(() => {
-    //     toast.error("Failed to send email");
-    //   });
+    });
   };
 
   const handleOrderClick = (order) => {

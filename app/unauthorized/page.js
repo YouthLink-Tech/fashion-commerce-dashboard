@@ -14,7 +14,7 @@ const Unauthorized = () => {
               <Image
                 className="h-9 md:h-10 w-auto"
                 src={logoWhiteImage}
-                alt={process.env.NEXT_PUBLIC_WEBSITE_NAME}
+                alt={process.env.WEBSITE_NAME}
               />
             </a>
           </Link>

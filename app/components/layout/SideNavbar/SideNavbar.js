@@ -21,6 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
 import { SidebarLoading } from "../../shared/Loading/SidebarLoading";
+import { WEBSITE_NAME } from "@/app/config/config";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -218,7 +219,7 @@ const SideNavbar = ({ onClose }) => {
             <Image
               className="h-9 md:h-10 w-auto"
               src={logoWhiteImage}
-              alt={process.env.NEXT_PUBLIC_WEBSITE_NAME}
+              alt={WEBSITE_NAME}
             />
           </Link>
           <hr style={{ border: "0.5px solid #ccc", margin: "8px 0" }} />

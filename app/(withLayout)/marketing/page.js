@@ -13,6 +13,7 @@ import MarketingContent from '@/app/components/marketing/MarketingContent';
 import { useAuth } from "@/app/contexts/auth";
 import Loading from "@/app/components/shared/Loading/Loading";
 import RewardLevel from "../reward-level/page";
+import { WEBSITE_NAME } from "@/app/config/config";
 
 const currentModule = "Marketing";
 
@@ -150,7 +151,7 @@ const Marketing = () => {
         activeTab === "create promotions" &&
         <div className='pt-6 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold text-xl'>Recommended For You</h1>
-          <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${process.env.NEXT_PUBLIC_WEBSITE_NAME} and customer preferences`}</p>
+          <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${WEBSITE_NAME} and customer preferences`}</p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-screen-2xl">
 
@@ -258,7 +259,7 @@ const Marketing = () => {
 
       {activeTab === "reward level" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
         <h1 className='font-bold text-xl'>Recommended For You</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${process.env.NEXT_PUBLIC_WEBSITE_NAME} and customer preferences`}</p>
+        <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${WEBSITE_NAME} and customer preferences`}</p>
         <RewardLevel />
       </div>}
 
@@ -266,7 +267,7 @@ const Marketing = () => {
         isAuthorized &&
         activeTab === "marketing content" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold text-xl'>Recommended For You</h1>
-          <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${process.env.NEXT_PUBLIC_WEBSITE_NAME} and customer preferences`}</p>
+          <p className='pt-1 pb-8 text-neutral-400 font-medium'>{`Our recommendations are tailored to suit your ${WEBSITE_NAME} and customer preferences`}</p>
           <MarketingContent />
         </div>
       }
