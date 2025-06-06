@@ -283,7 +283,7 @@ const PDFDocument = ({ order }) => {
 
         {/* Main content with padding */}
         <View style={styles.contentContainer}>
-          <Text style={styles.header}>FASHION COMMERCE</Text>
+          <Text style={styles.header}>{process.env.NEXT_PUBLIC_WEBSITE_NAME}</Text>
 
           <View style={styles.orderInfo}>
             {/* Order Information */}
@@ -467,7 +467,7 @@ const PDFDocument = ({ order }) => {
           {/* Footer */}
           <View style={styles.footerAlign}>
             <View style={styles.footerDetails}>
-              <Text>Fashion Commerce</Text>
+              <Text>{process.env.NEXT_PUBLIC_WEBSITE_NAME}</Text>
               <Text>Mirpur, Dhaka, 1100</Text>
               <Text>Email: fashion@commerce.com</Text>
               <Text>Phone: +88 019 999 99999</Text>

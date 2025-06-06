@@ -10,9 +10,9 @@ import "./globals.css";
 const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
 export const metadata = {
-  title: "Fashion Commerce",
+  title: process.env.NEXT_PUBLIC_WEBSITE_NAME,
   description:
-    "Discover the latest trends in men's fashion at Fashion Commerce. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.",
+    `Discover the latest trends in men's fashion at ${process.env.NEXT_PUBLIC_WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
 };
 
 export default function RootLayout({ children }) {

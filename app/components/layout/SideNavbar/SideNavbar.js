@@ -218,7 +218,7 @@ const SideNavbar = ({ onClose }) => {
             <Image
               className="h-9 md:h-10 w-auto"
               src={logoWhiteImage}
-              alt="Fashion Commerce logo"
+              alt={process.env.NEXT_PUBLIC_WEBSITE_NAME}
             />
           </Link>
           <hr style={{ border: "0.5px solid #ccc", margin: "8px 0" }} />
