@@ -24,7 +24,7 @@ const LogoSettings = () => {
 
   useEffect(() => {
     if (logoList && logoList.length > 0) {
-      setImage(logoList[0]?.desktopBannerUrl);
+      setImage(logoList[0]?.desktopLogoUrl);
       setImage2(logoList[0]?.mobileLogoUrl);
     }
   }, [logoList]);
@@ -160,7 +160,7 @@ const LogoSettings = () => {
       const logoId = logoList[0]?._id;
 
       const logoData = {
-        desktopBannerUrl: image, // Image with text for desktop
+        desktopLogoUrl: image, // Image with text for desktop
         mobileLogoUrl: image2,   // Logo only for mobile
       };
 
