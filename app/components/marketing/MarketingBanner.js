@@ -88,8 +88,8 @@ const MarketingBanner = () => {
   };
 
   const handleGoToPreviewPageAfterUpload = (imageUrl, position) => {
-    const previewURL = `/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
-    window.open(previewURL, '_blank');
+    // const previewURL = `/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
+    // window.open(previewURL, '_blank');
   }
 
   const onSubmit = async () => {
