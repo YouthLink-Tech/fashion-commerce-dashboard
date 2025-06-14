@@ -17,11 +17,15 @@ const LogoSettings = () => {
   const [image, setImage] = useState(null);
   const [sizeError, setSizeError] = useState("");
   const [dragging, setDragging] = useState(false);
+  const [image2, setImage2] = useState(null);
+  const [sizeError2, setSizeError2] = useState("");
+  const [dragging2, setDragging2] = useState(false);
   const [logoList, isLogoPending, refetch] = useLogo();
 
   useEffect(() => {
     if (logoList && logoList.length > 0) {
-      setImage(logoList[0]?.logoImgUrl);
+      setImage(logoList[0]?.desktopBannerUrl);
+      setImage2(logoList[0]?.mobileLogoUrl);
     }
   }, [logoList]);
 
@@ -36,6 +40,19 @@ const LogoSettings = () => {
 
   const handleDragLeave = () => {
     setDragging(false);
+  };
+
+  const handleImageRemove2 = () => {
+    setImage2(null);
+  };
+
+  const handleDragOver2 = (event) => {
+    event.preventDefault();
+    setDragging2(true);
+  };
+
+  const handleDragLeave2 = () => {
+    setDragging2(false);
   };
 
   const handleDrop = async (event) => {
@@ -53,6 +70,24 @@ const LogoSettings = () => {
       // Update the state with the Imgbb URL instead of the local blob URL
       setImage(uploadedImageUrl);
       setSizeError(false);
+    }
+  };
+
+  const handleDrop2 = async (event) => {
+    event.preventDefault();
+    setDragging2(false);
+    const file = event.dataTransfer.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage2(uploadedImageUrl);
+      setSizeError2(false);
     }
   };
 
@@ -91,19 +126,42 @@ const LogoSettings = () => {
     }
   };
 
+  const handleImageChange2 = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage2(uploadedImageUrl);
+      setSizeError2(false);
+    }
+  };
+
   const onSubmit = async () => {
 
     if (!image) {
-      setSizeError("Please upload a logo.");
+      setSizeError("Please upload the desktop banner with text.");
       return;
     }
     setSizeError("");
+
+    if (!image2) {
+      setSizeError2("Please upload the mobile logo (logo only).");
+      return;
+    }
+    setSizeError2("");
 
     if (logoList?.length > 0) {
       const logoId = logoList[0]?._id;
 
       const logoData = {
-        logoImgUrl: image
+        desktopBannerUrl: image, // Image with text for desktop
+        mobileLogoUrl: image2,   // Logo only for mobile
       };
 
       try {
@@ -157,59 +215,115 @@ const LogoSettings = () => {
   if (isLogoPending) return <Loading />
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='mt-3'>
+    <form onSubmit={handleSubmit(onSubmit)} className='mt-3 flex flex-col gap-6'>
 
       <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-        <div>
-          <input
-            id='imageUpload'
-            type='file'
-            className='hidden'
-            onChange={handleImageChange}
-          />
-          <label
-            htmlFor='imageUpload'
-            className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
-              } p-6 cursor-pointer`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <MdOutlineFileUpload size={60} />
-            <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
-              <p className="text-[13px]">
-                <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
-                  Click to upload
-                </span>{" "}
-                or drag and drop
-              </p>
-              <p className="text-[11px]">Max image size is 10 MB</p>
-              <p className="text-[11px]"></p>
-            </div>
-          </label>
-          {sizeError && (
-            <p className="text-red-600 text-center mt-4">Select image</p>
-          )}
-          {image && (
-            <div className='relative mt-8'>
-              <Image
-                src={image}
-                alt='Uploaded image'
-                height={3000}
-                width={3000}
-                className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-              />
-              <button
-                onClick={handleImageRemove}
-                className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full"
-                type='button'
-              >
-                <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
-              </button>
-            </div>
-          )}
-        </div>
+        <label htmlFor={`desktop-banner`} className="font-semibold">
+          Desktop Banner (with Text) <span className="text-red-600">*</span>
+        </label>
+        <input
+          id='imageUpload'
+          type='file'
+          className='hidden'
+          onChange={handleImageChange}
+        />
+        <label
+          htmlFor='imageUpload'
+          className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-3 border-dashed border-neutral-200 hover:bg-blue-50 hover:border-blue-300 duration-1000 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+            } p-6 cursor-pointer`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <MdOutlineFileUpload size={60} />
+          <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+            <p className="text-[13px]">
+              <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                Click to upload
+              </span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-[11px]">Max image size is 10 MB</p>
+            <p className="text-[11px]"></p>
+          </div>
+        </label>
+        {sizeError && (
+          <p className="text-red-600 text-center mt-4">Please upload the desktop banner with text.</p>
+        )}
+        {image && (
+          <div className='relative mt-8'>
+            <Image
+              src={image}
+              alt='Uploaded image'
+              height={3000}
+              width={3000}
+              className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+            />
+            <button
+              onClick={handleImageRemove}
+              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full"
+              type='button'
+            >
+              <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
+            </button>
+          </div>
+        )}
+
+      </div>
+
+      <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+        <label htmlFor={`mobile-logo`} className="font-semibold">
+          Mobile Logo (Only Logo) <span className="text-red-600">*</span>
+        </label>
+        <input
+          id='imageUpload2'
+          type='file'
+          className='hidden'
+          onChange={handleImageChange2}
+        />
+        <label
+          htmlFor='imageUpload2'
+          className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-3 border-dashed border-neutral-200 hover:bg-blue-50 hover:border-blue-300 duration-1000 ${dragging2 ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+            } p-6 cursor-pointer`}
+          onDragOver={handleDragOver2}
+          onDragLeave={handleDragLeave2}
+          onDrop={handleDrop2}
+        >
+          <MdOutlineFileUpload size={60} />
+          <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+            <p className="text-[13px]">
+              <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                Click to upload
+              </span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-[11px]">Max image size is 10 MB</p>
+            <p className="text-[11px]"></p>
+          </div>
+        </label>
+        {sizeError2 && (
+          <p className="text-red-600 text-center mt-4">Please upload the mobile logo (logo only).</p>
+        )}
+        {image2 && (
+          <div className='relative mt-8'>
+            <Image
+              src={image2}
+              alt='Uploaded image'
+              height={3000}
+              width={3000}
+              className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+            />
+            <button
+              onClick={handleImageRemove2}
+              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full"
+              type='button'
+            >
+              <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
+            </button>
+          </div>
+        )}
 
       </div>
 
