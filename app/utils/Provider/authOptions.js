@@ -62,11 +62,5 @@ export const authOptions = {
   },
   pages: { signIn: "/auth/restricted-access" },
   secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 24 * 60 * 60 // 1 day in seconds
-  },
-  jwt: {
-    maxAge: 24 * 60 * 60,
-  },
+  session: { strategy: "jwt" }
 };
