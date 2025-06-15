@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import logoWhiteImage from "/public/logos/logo.png";
 import React, { Suspense } from 'react';
+import { WEBSITE_NAME } from "@/app/config/config";
 
 const Unauthorized = () => {
   return (
@@ -14,7 +15,7 @@ const Unauthorized = () => {
               <Image
                 className="h-9 md:h-10 w-auto"
                 src={logoWhiteImage}
-                alt={process.env.WEBSITE_NAME}
+                alt={WEBSITE_NAME}
               />
             </a>
           </Link>

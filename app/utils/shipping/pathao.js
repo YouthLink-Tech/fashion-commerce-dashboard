@@ -1,6 +1,6 @@
-export const placeRedXOrder = async (order) => {
+export const placePathaoOrder = async (order) => {
   try {
-    const response = await fetch("/api/redx-order", {
+    const response = await fetch("/api/pathao-order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -9,12 +9,11 @@ export const placeRedXOrder = async (order) => {
     });
 
     const data = await response.json();
-    console.log(data, "data with tracking code");
 
     if (response.ok && data.trackingCode) {
       return data.trackingCode;
     } else {
-      throw new Error(data?.error || "Failed to place redx order.");
+      throw new Error(data?.error || "Failed to place Pathao order.");
     }
   } catch (err) {
     console.error("Client Error placing order:", err);

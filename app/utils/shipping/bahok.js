@@ -1,5 +1,3 @@
-// in your client code, e.g. /utils/steadfast.js or wherever you keep your client helpers
-
 export const placeBahokOrder = async (order) => {
   try {
     const response = await fetch("/api/bahok-order", {
@@ -15,7 +13,7 @@ export const placeBahokOrder = async (order) => {
     if (response.ok && data.trackingCode) {
       return data.trackingCode;
     } else {
-      throw new Error(data?.error || "Failed to place Steadfast order.");
+      throw new Error(data?.error || "Failed to place Bahok order.");
     }
   } catch (err) {
     console.error("Client Error placing order:", err);

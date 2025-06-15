@@ -5,14 +5,15 @@ import { NextUIProvider } from "@nextui-org/react";
 import ReactTanstackProvider from "./utils/Provider/ReactTanstackProvider";
 import { AuthProvider } from "./contexts/auth";
 import SessionWrapper from "./utils/SessionWrapper/SessionWrapper";
+import { WEBSITE_NAME } from "@/app/config/config";
 import "./globals.css";
 
 const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
 export const metadata = {
-  title: process.env.WEBSITE_NAME,
+  title: WEBSITE_NAME,
   description:
-    `Discover the latest trends in men's fashion at ${process.env.WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
+    `Discover the latest trends in men's fashion at ${WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
 };
 
 export default function RootLayout({ children }) {

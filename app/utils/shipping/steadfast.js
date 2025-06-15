@@ -1,5 +1,3 @@
-// in your client code, e.g. /utils/steadfast.js or wherever you keep your client helpers
-
 export const placeSteadfastOrder = async (order) => {
   try {
     const response = await fetch("/api/steadfast-order", {
