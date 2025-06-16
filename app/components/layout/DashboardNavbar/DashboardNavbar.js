@@ -8,7 +8,6 @@ import { CiLock } from "react-icons/ci";
 import { useAuth } from "@/app/contexts/auth";
 import { signOut, useSession } from "next-auth/react";
 import SideNavbar from "../SideNavbar/SideNavbar";
-import TransitionLink from "../../ui/TransitionLink";
 import NotificationLoading from "../../shared/Loading/NotificationLoading";
 import Notifications from "../../navbar/Notifications";
 import Link from "next/link";
@@ -96,7 +95,7 @@ const DashboardNavbar = () => {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem isReadOnly showDivider key="profile" className="h-14 gap-2">
+                  <DropdownItem isReadOnly showDivider key="profile" className="h-14 gap-2 hover:!bg-white cursor-default">
                     <p className="font-semibold">Logged in as</p>
                     <p className="font-semibold">{existingUserData?.email}</p>
                   </DropdownItem>

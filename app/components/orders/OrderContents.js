@@ -1805,32 +1805,32 @@ const OrderContents = () => {
                           </div>
                         </div>
                       ))}
-
-                      {/* Modal */}
-                      {isImageExpanded && (
-                        <ProductExpandedImageModalOrder
-                          productTitle={
-                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.productTitle
-                          }
-                          selectedColorLabel={
-                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.color?.label
-                          }
-                          expandedImgUrl={
-                            selectedOrder?.returnInfo?.imgUrls?.[activeImageIndex]
-                          }
-                          totalImages={selectedOrder?.returnInfo?.imgUrls?.length}
-                          activeImageIndex={activeImageIndex}
-                          setActiveImageIndex={setActiveImageIndex}
-                          isImageExpanded={isImageExpanded}
-                          setIsImageExpanded={setIsImageExpanded}
-                        />
-                      )}
                     </div>
 
 
                   </AccordionItem >}
 
                 </Accordion>
+
+                {/* Modal */}
+                {isImageExpanded && (
+                  <ProductExpandedImageModalOrder
+                    productTitle={
+                      selectedOrder?.returnInfo?.products?.[activeImageIndex]?.productTitle
+                    }
+                    selectedColorLabel={
+                      selectedOrder?.returnInfo?.products?.[activeImageIndex]?.color?.label
+                    }
+                    expandedImgUrl={
+                      selectedOrder?.returnInfo?.imgUrls?.[activeImageIndex]
+                    }
+                    totalImages={selectedOrder?.returnInfo?.imgUrls?.length}
+                    activeImageIndex={activeImageIndex}
+                    setActiveImageIndex={setActiveImageIndex}
+                    isImageExpanded={isImageExpanded}
+                    setIsImageExpanded={setIsImageExpanded}
+                  />
+                )}
 
               </ModalBody>
 

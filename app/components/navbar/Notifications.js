@@ -133,7 +133,7 @@ const Notifications = () => {
 
       <DropdownMenu closeOnSelect={false} aria-label="Static Actions" variant="flat" className="p-0 md:w-[500px]">
 
-        <DropdownItem isReadOnly>
+        <DropdownItem className='hover:!bg-white cursor-default' isReadOnly>
           <div className='flex justify-between p-0 w-full'>
             <div className="flex flex-col px-2">
               <h2 className="text-lg font-semibold">Notifications</h2>
@@ -166,7 +166,7 @@ const Notifications = () => {
           </div>
         </DropdownItem>
 
-        <DropdownItem isReadOnly className='p-0'>
+        <DropdownItem className='hover:!bg-white p-0' isReadOnly>
           <div className="overflow-y-auto w-full max-h-[700px]">
             {displayedNotifications?.length === 0 ? (
               <div className="text-center py-8 text-gray-500">No notifications to show.</div>

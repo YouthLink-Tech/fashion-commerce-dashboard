@@ -18,7 +18,7 @@ export default function ProductExpandedImageModalOrder({
 
   return (
     <div
-      className={`fixed inset-0 z-10 flex h-dvh w-dvw items-center justify-center bg-black bg-opacity-80 text-neutral-300 backdrop-blur ${isImageExpanded ? "" : "hidden"}`}
+      className={`fixed inset-0 z-[99] flex h-dvh w-dvw items-center justify-center bg-black bg-opacity-80 text-neutral-300 backdrop-blur ${isImageExpanded ? "" : "hidden"}`}
       id="expanded-img-bg"
       onClick={(event) =>
         event.target.id === "expanded-img-bg" && setIsImageExpanded(false)

@@ -1,7 +1,7 @@
 import React from "react";
 import DashboardNavbar from "@/app/components/layout/DashboardNavbar/DashboardNavbar";
 import SideNavbar from "@/app/components/layout/SideNavbar/SideNavbar";
-import InactivityHandler from "../components/InactivityHandler";
+import InactivityHandlerWrapper from "../components/inactivity/InactivityHandlerWrapper";
 
 const Layout = ({ children }) => {
   return (
@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="relative ml-0 xl:ml-[262px]">
         <DashboardNavbar />
-        <InactivityHandler />
+        <InactivityHandlerWrapper />
         {children}
       </div>
     </div>
