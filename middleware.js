@@ -38,32 +38,6 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
   }
 
-  // const currentIp = req.headers.get("x-forwarded-for")?.split(",")[0] || req.ip || req.socket?.remoteAddress;
-
-  // if (token && token.ipAddress && token.ipAddress !== currentIp) {
-  //   const response = NextResponse.redirect(
-  //     new URL("/auth/restricted-access", req.url)
-  //   );
-
-  //   // Clear auth cookies
-  //   response.cookies.set("next-auth.session-token", "", {
-  //     expires: new Date(0),
-  //     path: "/",
-  //     secure: true,
-  //     httpOnly: true,
-  //     sameSite: "Strict",
-  //   });
-  //   response.cookies.set("__Secure-next-auth.session-token", "", {
-  //     expires: new Date(0),
-  //     path: "/",
-  //     secure: true,
-  //     httpOnly: true,
-  //     sameSite: "Strict",
-  //   });
-
-  //   return response;
-  // };
-
   // 🔹 Fetch user permissions from your API
   const userId = token?._id; // Assuming `sub` contains the user ID
   let userPermissions = null;
@@ -157,7 +131,7 @@ export async function middleware(req) {
   }
 
   return NextResponse.next();
-}
+};
 
 export const config = {
   matcher: [
