@@ -64,10 +64,10 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 60, // 30 minutes in seconds
+    maxAge: 1 * 60, // 30 minutes in seconds
     updateAge: 0,    // prevent auto-renewal unless activity occurs
   },
   jwt: {
-    maxAge: 30 * 60,
+    maxAge: 1 * 60,
   },
 };

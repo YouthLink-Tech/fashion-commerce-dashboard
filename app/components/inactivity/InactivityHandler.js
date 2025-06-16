@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 mins
+const INACTIVITY_LIMIT = 1 * 60 * 1000; // 30 mins
 
 export default function InactivityHandler() {
   const { status } = useSession();
