@@ -1,53 +1,68 @@
 'use client';
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes in ms
+const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
 
 export default function InactivityHandler() {
   const { status } = useSession();
   const timer = useRef(null);
+  const router = useRouter();
 
-  const resetTimer = () => {
+  const handleLogout = useCallback(async () => {
+    await signOut({ redirect: false });
+    router.push("/auth/restricted-access");
+  }, [router]);
+
+  const resetTimer = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
-
-    // ✅ Always update activity time
     localStorage.setItem('lastActiveAt', Date.now().toString());
 
     timer.current = setTimeout(() => {
-      console.log("User inactive. Logging out (via setTimeout).");
-      signOut({ callbackUrl: '/auth/restricted-access' });
+      console.log("User inactive. Logging out...");
+      handleLogout();
     }, INACTIVITY_LIMIT);
-  };
+  }, [handleLogout]);
 
   useEffect(() => {
-    // ✅ Wait until session is loaded
+    if (status === "authenticated") {
+      // Ensure fresh timestamp after successful login
+      localStorage.setItem("lastActiveAt", Date.now().toString());
+    }
+  }, [status]);
+
+  useEffect(() => {
     if (status !== "authenticated") return;
 
     const now = Date.now();
-    const lastActiveAt = parseInt(localStorage.getItem("lastActiveAt") || "0");
+    const lastActiveAtString = localStorage.getItem("lastActiveAt");
 
-    // ✅ First-time visit, initialize lastActiveAt
-    if (!lastActiveAt || isNaN(lastActiveAt)) {
-      localStorage.setItem('lastActiveAt', now.toString());
-    } else if (now - lastActiveAt > INACTIVITY_LIMIT) {
-      console.log("User inactive on load (via localStorage). Logging out.");
-      signOut({ callbackUrl: "/auth/restricted-access" });
-      return;
+    // If no activity recorded before, just initialize it
+    if (!lastActiveAtString) {
+      localStorage.setItem("lastActiveAt", now.toString());
+    } else {
+      const lastActiveAt = parseInt(lastActiveAtString, 10);
+      // If lastActiveAt is valid and too old, logout
+      if (!isNaN(lastActiveAt) && now - lastActiveAt > INACTIVITY_LIMIT) {
+        console.log("User inactive too long. Logging out.");
+        handleLogout();
+        return;
+      }
     }
 
     resetTimer();
 
     const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
-    events.forEach(event => window.addEventListener(event, resetTimer));
+    events.forEach((event) => window.addEventListener(event, resetTimer));
 
     return () => {
-      events.forEach(event => window.removeEventListener(event, resetTimer));
+      events.forEach((event) => window.removeEventListener(event, resetTimer));
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [status]);
+  }, [status, handleLogout, resetTimer]);
 
   return null;
-};
+}
