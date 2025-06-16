@@ -6,6 +6,7 @@ import InactivityHandlerWrapper from "../components/inactivity/InactivityHandler
 const Layout = ({ children }) => {
   return (
     <div>
+      <InactivityHandlerWrapper />
       {/* Only render sidebar on large devices */}
       <div className="inset-y-0 hidden flex-col xl:flex">
         <SideNavbar />
@@ -14,7 +15,6 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="relative ml-0 xl:ml-[262px]">
         <DashboardNavbar />
-        <InactivityHandlerWrapper />
         {children}
       </div>
     </div>
