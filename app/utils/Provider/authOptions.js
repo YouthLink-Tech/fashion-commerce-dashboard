@@ -28,6 +28,7 @@ export const authOptions = {
 
           return {
             _id: data._id,
+            accessToken: data.token,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -43,11 +44,13 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token._id = user._id;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
     async session({ session, token }) {
       session.user._id = token._id;
+      session.user.accessToken = token.accessToken;
       return session;
     },
   },
