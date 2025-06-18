@@ -17,9 +17,19 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
+          // const { data } = await axios.post(
+          //   `http://localhost:5000/loginForDashboard`,
+          //   credentials,
+          //   {
+          //     withCredentials: true, // ✅ Required to receive the refreshToken cookie
+          //   }
+          // );
           const { data } = await axios.post(
             `https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard`,
             credentials,
+            {
+              withCredentials: true, // ✅ Required to receive the refreshToken cookie
+            }
           );
 
           if (!data) {
@@ -28,7 +38,7 @@ export const authOptions = {
 
           return {
             _id: data._id,
-            accessToken: data.token,
+            accessToken: data.accessToken,
           };
         } catch (error) {
           // Return specific error messages from backend if available
