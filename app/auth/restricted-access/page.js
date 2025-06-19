@@ -8,7 +8,7 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import { useRouter } from 'next/navigation';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
-// import { Checkbox } from '@nextui-org/react';
+import axios from 'axios';
 
 const RestrictedAccessLoginPage = () => {
 
@@ -23,13 +23,7 @@ const RestrictedAccessLoginPage = () => {
   const [resendOtpText, setResendOtpText] = useState(false);
   const [isResendDisabled, setIsResendDisabled] = useState(false); // Track resend state
   const [timer, setTimer] = useState(30); // Timer state for countdown
-  // const [trustDevice, setTrustDevice] = useState(false);
   const router = useRouter();
-
-  // useEffect(() => {
-  //   const trusted = localStorage.getItem("trust-device") === "true";
-  //   setTrustDevice(trusted);
-  // }, []); // Run only once on mount
 
   useEffect(() => {
     if (otpRequested && inputRefs.current[0]) {
@@ -53,15 +47,6 @@ const RestrictedAccessLoginPage = () => {
 
     return () => clearInterval(interval); // Clean up the interval on component unmount or when OTP is reset
   }, [otpRequested, isResendDisabled]);
-
-  // const handleToggle = (value) => {
-  //   setTrustDevice(value);
-  //   if (value) {
-  //     localStorage.setItem("trust-device", "true");
-  //   } else {
-  //     localStorage.removeItem("trust-device")
-  //   }
-  // }
 
   const handleChange = (index, e) => {
     let value = e.target.value;
@@ -131,7 +116,6 @@ const RestrictedAccessLoginPage = () => {
   };
 
   const resendOtp = async (data) => {
-
     if (isResendDisabled) {
       toast.error("You can only resend OTP after 30 seconds.");
       return;
@@ -142,18 +126,28 @@ const RestrictedAccessLoginPage = () => {
     setFinalOtp(""); // Clear stored OTP
 
     try {
-      const result = await signIn("credentials-backend", {
-        redirect: false,
-        emailOrUsername: data.emailOrUsername,
-        password: data.password,
-        otp: "",
-      });
+      const response = await axios.post(
+        "https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard",
+        {
+          emailOrUsername: data.emailOrUsername,
+          password: data.password,
+          otp: "", // Empty OTP triggers backend to resend OTP
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-      if (result?.error) {
-        if (result.error === "OTP has been sent to your email. Please enter the OTP to complete login.") {
-          toast.custom((t) => (
+      // Check if backend instructed to send OTP again
+      if (
+        response.status === 401 &&
+        response.data.message ===
+        "OTP has been sent to your email. Please enter the OTP to complete login."
+      ) {
+        toast.custom(
+          (t) => (
             <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              className={`${t.visible ? "animate-enter" : "animate-leave"
                 } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
             >
               <div className="pl-6">
@@ -166,7 +160,8 @@ const RestrictedAccessLoginPage = () => {
                       Check your email! ✉️
                     </p>
                     <p className="mt-1 text-sm text-gray-500">
-                      A new OTP has been sent to your email. Enter it to continue logging in.
+                      A new OTP has been sent to your email. Enter it to continue
+                      logging in.
                     </p>
                   </div>
                 </div>
@@ -180,19 +175,73 @@ const RestrictedAccessLoginPage = () => {
                 </button>
               </div>
             </div>
-          ), {
+          ),
+          {
             position: "bottom-right",
-            duration: 5000
-          });
-          setResendOtpText(true);
-          setIsResendDisabled(true); // Disable resend button
-          setTimer(30); // Reset timer
-          return;
-        }
-        setError(result.error);
+            duration: 5000,
+          }
+        );
+
+        // Reset OTP state
+        setResendOtpText(true);
+        setIsResendDisabled(true);
+        setTimer(30);
+        return;
       }
+
+      // If not OTP related, show generic error
+      setError(response.data.message || "Unexpected response.");
     } catch (error) {
-      setError("Something went wrong. Please try again.");
+      if (
+        error.response?.status === 401 &&
+        error.response.data?.message ===
+        "OTP has been sent to your email. Please enter the OTP to complete login."
+      ) {
+        // OTP resend triggered even on 401 (some backends do this)
+        toast.custom(
+          (t) => (
+            <div
+              className={`${t.visible ? "animate-enter" : "animate-leave"
+                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="pl-6">
+                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+              </div>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="ml-3 flex-1">
+                    <p className="text-base font-bold text-gray-900">
+                      Check your email! ✉️
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      A new OTP has been sent to your email. Enter it to continue
+                      logging in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                >
+                  <RxCross2 />
+                </button>
+              </div>
+            </div>
+          ),
+          {
+            position: "bottom-right",
+            duration: 5000,
+          }
+        );
+        setResendOtpText(true);
+        setIsResendDisabled(true);
+        setTimer(30);
+      } else {
+        setError("Something went wrong. Please try again.");
+        console.error("Resend OTP error:", error);
+      }
     }
   };
 
@@ -201,88 +250,30 @@ const RestrictedAccessLoginPage = () => {
 
     if (otpRequested && finalOtp.length < 6) {
       setOtpError(true);
-      return; // Prevent further execution
+      return;
     }
 
     try {
-      const result = await signIn("credentials-backend", {
-        redirect: false,
-        emailOrUsername: data.emailOrUsername,
-        password: data.password,
-        otp: otpRequested ? finalOtp : "",
-        // isOtpShouldNotSend: trustDevice
-      });
+      const loginRes = await axios.post(
+        "https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard",
+        {
+          emailOrUsername: data.emailOrUsername,
+          password: data.password,
+          otp: otpRequested ? finalOtp : "",
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-      if (result?.error) {
+      // If request succeeded (status 200)
+      const resData = loginRes.data;
 
-        if (result.error === "OTP has been sent to your email. Please enter the OTP to complete login.") {
-          setOtpRequested(true);
-          toast.custom((t) => (
-            <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-            >
-              <div className="pl-6">
-                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-              </div>
-              <div className="flex-1 w-0 p-4">
-                <div className="flex items-start">
-                  <div className="ml-3 flex-1">
-                    <p className="text-base font-bold text-gray-900">
-                      Check your email! ✉️
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      We’ve sent an OTP to your email. Enter it to continue logging in.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex border-l border-gray-200">
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                >
-                  <RxCross2 />
-                </button>
-              </div>
-            </div>
-          ), {
-            position: "bottom-right",
-            duration: 5000
-          });
-          return;
-        }
-        else if (result.error === "Your account setup is incomplete. Please set up your password before logging in.") {
-          setError("You haven't set up your password. Please complete your account setup.");
-        } else if (result.error === "No account found with this email or username.") {
-          setError("No account found. Please check your details.");
-        } else if (result.error === "Incorrect password. Please try again.") {
-          setError("Wrong password. Try again.");
-        }
-        else if (result.error === "OTP expired or not found. Please try logging in again.") {
-          setError("OTP expired or not found. Please try logging in again.")
-        }
-        else if (result.error === "OTP has expired. Please try logging in again.") {
-          setError("OTP has expired. Please try logging in again.")
-        }
-        else if (result.error === "Invalid OTP. Please try again.") {
-          setError("Invalid OTP. Please try again.")
-        }
-        else if (result.error === "Error sending OTP email. Please try again later.") {
-          setError("Error sending OTP email. Please try again later.")
-        }
-        else {
-          setError("An unexpected error occurred. Please try again later.");
-        }
-        return;
-      };
-
-      // If no error and OTP was already requested, proceed with login success
-      if (otpRequested && result.ok) {
+      // We expect success here: accessToken and _id present
+      if (resData.accessToken && resData._id) {
         toast.custom((t) => (
           <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+            className={`${t.visible ? "animate-enter" : "animate-leave"} max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
           >
             <div className="pl-6">
               <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
@@ -290,9 +281,7 @@ const RestrictedAccessLoginPage = () => {
             <div className="flex-1 w-0 p-4">
               <div className="flex items-start">
                 <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Login successful! 🎉
-                  </p>
+                  <p className="text-base font-bold text-gray-900">Login successful! 🎉</p>
                   <p className="mt-1 text-sm text-gray-500">
                     You&apos;re now logged into the dashboard. Manage your products, orders, and more!
                   </p>
@@ -310,52 +299,78 @@ const RestrictedAccessLoginPage = () => {
           </div>
         ), {
           position: "bottom-right",
-          duration: 5000
+          duration: 5000,
         });
 
-        router.push("/"); // Redirect after login
+        // Now sign in with next-auth, passing accessToken and _id
+        const result = await signIn("credentials-backend", {
+          redirect: false,
+          accessToken: resData.accessToken,
+          _id: resData._id,
+        });
+
+        if (result?.ok) {
+          router.push("/");
+        } else {
+          setError("Failed to sign in after login. Please try again.");
+        }
+        return;
       }
 
-      // If no error and OTP was already requested, proceed with login success
-      // if (trustDevice === true && result.ok) {
-      //   toast.custom((t) => (
-      //     <div
-      //       className={`${t.visible ? 'animate-enter' : 'animate-leave'
-      //         } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-      //     >
-      //       <div className="pl-6">
-      //         <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-      //       </div>
-      //       <div className="flex-1 w-0 p-4">
-      //         <div className="flex items-start">
-      //           <div className="ml-3 flex-1">
-      //             <p className="text-base font-bold text-gray-900">
-      //               Login successful! 🎉
-      //             </p>
-      //             <p className="mt-1 text-sm text-gray-500">
-      //               You&apos;re now logged into the dashboard. Manage your products, orders, and more!
-      //             </p>
-      //           </div>
-      //         </div>
-      //       </div>
-      //       <div className="flex border-l border-gray-200">
-      //         <button
-      //           onClick={() => toast.dismiss(t.id)}
-      //           className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-      //         >
-      //           <RxCross2 />
-      //         </button>
-      //       </div>
-      //     </div>
-      //   ), {
-      //     position: "bottom-right",
-      //     duration: 5000
-      //   });
-
-      //   router.push("/"); // Redirect after login
-      // }
+      // Should not reach here on success, but fallback:
+      setError("Unexpected response from server. Please try again.");
 
     } catch (error) {
+      // Axios errors have response object with server message
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 401 && data.message === "OTP has been sent to your email. Please enter the OTP to complete login.") {
+          setOtpRequested(true);
+          toast.custom((t) => (
+            <div
+              className={`${t.visible ? "animate-enter" : "animate-leave"} max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="pl-6">
+                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+              </div>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="ml-3 flex-1">
+                    <p className="text-base font-bold text-gray-900">Check your email! ✉️</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      We’ve sent an OTP to your email. Enter it to continue logging in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                >
+                  <RxCross2 />
+                </button>
+              </div>
+            </div>
+          ), {
+            position: "bottom-right",
+            duration: 5000,
+          });
+          return;
+        }
+
+        // Handle other error messages returned by backend
+        if (data.message) {
+          console.log(data.message, "errorMessage");
+
+          setError(data.message);
+          return;
+        }
+      }
+
+      // Network or unknown errors fallback
+      console.error("Login error:", error);
       toast.error("Something went wrong. Please try again.");
     }
   };

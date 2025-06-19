@@ -1,5 +1,4 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
 
 export const authOptions = {
   providers: [
@@ -16,45 +15,25 @@ export const authOptions = {
         },
       },
       async authorize(credentials) {
-        try {
-          // const { data } = await axios.post(
-          //   `http://localhost:5000/loginForDashboard`,
-          //   credentials,
-          //   {
-          //     withCredentials: true, // ✅ Required to receive the refreshToken cookie
-          //   }
-          // );
-          const { data } = await axios.post(
-            `https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard`,
-            credentials,
-            {
-              withCredentials: true, // ✅ Required to receive the refreshToken cookie
-            }
-          );
-
-          if (!data) {
-            throw new Error("Invalid email/username or password"); // ❌ Prevent returning null
-          }
-
+        if (credentials?.accessToken && credentials?._id) {
           return {
-            _id: data._id,
-            accessToken: data.accessToken,
+            _id: credentials._id,
+            accessToken: credentials.accessToken,
           };
-        } catch (error) {
-          // Return specific error messages from backend if available
-          throw new Error(
-            error.response?.data?.message ||
-            "Login failed! Please check your credentials.",
-          );
         }
+        return null;
       },
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token._id = user._id;
         token.accessToken = user.accessToken;
+      }
+      // ✅ session is now defined
+      if (trigger === "update" && session?.accessToken) {
+        token.accessToken = session.accessToken;
       }
       return token;
     },

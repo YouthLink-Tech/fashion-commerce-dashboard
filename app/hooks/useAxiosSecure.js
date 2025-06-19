@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useSession, update } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 
 // Create a single Axios instance
@@ -11,7 +11,7 @@ const axiosSecure = axios.create({
 });
 
 export const useAxiosSecure = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const interceptorRef = useRef(null);
 
   useEffect(() => {
@@ -53,17 +53,18 @@ export const useAxiosSecure = () => {
           originalRequest._retry = true;
 
           try {
-            const { data } = await axios.post("/refresh-token", {}, {
-              baseURL: 'https://fc-backend-664306765395.asia-south1.run.app', // same as axiosSecure
+            // const response = await axios.post("http://localhost:5000/refresh-token", null, {
+            //   withCredentials: true,
+            // });
+            const response = await axios.post("https://fc-backend-664306765395.asia-south1.run.app/refresh-token", null, {
               withCredentials: true,
             });
-            console.log(data, "data");
 
             // ✅ Update token in session (NextAuth)
-            await update({ accessToken: data.accessToken });
+            await update({ accessToken: response.data.accessToken });
 
             // ✅ Set new token in the retried request
-            originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
 
             return axiosSecure(originalRequest);
           } catch (refreshError) {
@@ -78,7 +79,7 @@ export const useAxiosSecure = () => {
     return () => {
       axiosSecure.interceptors.response.eject(responseInterceptor);
     };
-  }, [status]);
+  }, [status, update]);
 
   return axiosSecure;
 };
