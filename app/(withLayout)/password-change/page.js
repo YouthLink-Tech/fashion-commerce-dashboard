@@ -2,20 +2,19 @@
 import React, { useEffect, useState } from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
-// import arrivals2 from "/public/card-images/arrivals2.svg";
 import { MdOutlineFileUpload } from 'react-icons/md';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useSession } from 'next-auth/react';
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const PasswordChangePage = () => {
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -42,13 +41,13 @@ const PasswordChangePage = () => {
     if (status === "unauthenticated") return setError("Please log in first")
 
     const passwordData = {
-      email: session?.user?.email,
+      userId: session?.user?._id,
       currentPassword,
       newPassword
     };
 
     try {
-      const response = await axiosPublic.put('/change-password', passwordData);
+      const response = await axiosSecure.put('/change-password', passwordData);
       if (response.data.success) {
         toast.custom((t) => (
           <div
@@ -110,13 +109,6 @@ const PasswordChangePage = () => {
         className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[138px]'
       />
 
-      {/* <div
-        style={{
-          backgroundImage: `url(${arrivals2.src})`,
-        }}
-        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
-      /> */}
-
       <div
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
@@ -124,7 +116,7 @@ const PasswordChangePage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-sm mx-auto pt-28 lg:pt-56 px-6 relative'>
+      <div className='max-w-screen-sm mx-auto pt-28 lg:pt-48 px-6 relative'>
         {/* Heading */}
         <h1 className="text-4xl font-semibold sm:max-xl:text-center">
           Password & Security

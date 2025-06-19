@@ -5,7 +5,6 @@ import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePic
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useDisclosure } from '@nextui-org/react';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import toast from 'react-hot-toast';
 import { FaUndo } from 'react-icons/fa';
 import Barcode from '@/app/components/layout/Barcode/Barcode';
@@ -34,6 +33,7 @@ import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import { useSearchParams } from 'next/navigation';
 import { placeShipmentOrder } from '@/app/utils/shipping/placeShipmentOrder';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const PrintButton = dynamic(() => import("@/app/components/orders/PrintButton"), { ssr: false });
 
@@ -64,7 +64,7 @@ const OrderContents = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderList, isOrderListPending, refetchOrder] = useOrders();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -520,7 +520,7 @@ const OrderContents = () => {
       if (result.isConfirmed) {
         if (actionType === undefined) {
           try {
-            const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
+            const response = await axiosSecure.put("/decreaseSkuFromProduct", dataToSend);
 
             // Check the results array from the response
             const updateResults = response?.data?.results;
@@ -560,7 +560,7 @@ const OrderContents = () => {
         }
         else if (actionType === "refunded") {
           try {
-            const response = await axiosPublic.put("/addReturnSkuToProduct", returnDataToSend);
+            const response = await axiosSecure.put("/addReturnSkuToProduct", returnDataToSend);
 
             // Check the results array from the response
             const updateResults = response?.data?.results;
@@ -665,7 +665,7 @@ const OrderContents = () => {
     };
 
     try {
-      const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, data);
+      const res = await axiosSecure.patch(`/changeOrderStatus/${id}`, data);
       if (res?.data?.modifiedCount) {
         refetchOrder(); // Refresh orders list
         if (isUndo) {
@@ -705,7 +705,7 @@ const OrderContents = () => {
         }
         else if (actionType === "shipped") {
           try {
-            const response = await axiosPublic.put("/decreaseOnHandSkuFromProduct", dataToSend);
+            const response = await axiosSecure.put("/decreaseOnHandSkuFromProduct", dataToSend);
 
             // Check the results array from the response
             const updateResults = response?.data?.results;
