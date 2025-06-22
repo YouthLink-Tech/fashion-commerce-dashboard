@@ -14,6 +14,8 @@ import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useSession } from 'next-auth/react';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -21,6 +23,7 @@ const EditPromo = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +33,7 @@ const EditPromo = () => {
   const [promoDescription, setPromoDescription] = useState("");
   const [image, setImage] = useState(null);
   const [dateError, setDateError] = useState(false);
+  const { data: session, status } = useSession();
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -46,9 +50,13 @@ const EditPromo = () => {
   };
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchPromoCode = async () => {
       try {
-        const response = await axiosPublic.get(`/getSinglePromo/${id}`);
+        const response = await axiosSecure.get(`/getSinglePromo/${id}`);
         const promo = response.data;
 
         // Ensure the expiry date is set to midnight to avoid timezone issues
@@ -72,7 +80,7 @@ const EditPromo = () => {
     };
 
     fetchPromoCode();
-  }, [id, axiosPublic, setValue]);
+  }, [id, axiosSecure, setValue, session?.user?.accessToken, status]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {
@@ -152,7 +160,7 @@ const EditPromo = () => {
         imageUrl: image === null ? "" : image,
       };
 
-      const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
+      const res = await axiosSecure.put(`/updatePromo/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -199,7 +207,7 @@ const EditPromo = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || status === "loading") {
     return <Loading />;
   }
 

@@ -11,12 +11,14 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
 const AddPaymentMethod = () => {
 
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState(null);
   const router = useRouter();
@@ -86,7 +88,7 @@ const AddPaymentMethod = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addPaymentMethod', paymentData);
+      const response = await axiosSecure.post('/addPaymentMethod', paymentData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

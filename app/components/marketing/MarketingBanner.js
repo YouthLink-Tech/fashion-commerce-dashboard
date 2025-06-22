@@ -8,11 +8,13 @@ import toast from 'react-hot-toast';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const MarketingBanner = () => {
 
   const { handleSubmit } = useForm();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState("");
   const [sizeError, setSizeError] = useState(false);
@@ -123,7 +125,7 @@ const MarketingBanner = () => {
 
       try {
 
-        const response = await axiosPublic.put(`/editMarketingBanner/${bannerId}`, bannerData);
+        const response = await axiosSecure.put(`/editMarketingBanner/${bannerId}`, bannerData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div

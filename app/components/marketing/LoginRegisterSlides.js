@@ -9,11 +9,13 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import useLoginRegisterSlides from '@/app/hooks/useLoginRegisterSlides';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const LoginRegisterSlides = () => {
 
   const { handleSubmit } = useForm();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [sizeError, setSizeError] = useState(false);
   const [loginRegisterImageList, isLoginRegisterImagePending, refetch] = useLoginRegisterSlides();
@@ -165,7 +167,7 @@ const LoginRegisterSlides = () => {
     try {
       const loginRegisterImageUrls = { urls: uploadedImageUrls };
       if (loginRegisterImageList?.[0]?._id) {
-        const res = await axiosPublic.put(`/editLoginRegisterImageUrls/${loginRegisterImageList[0]._id}`, loginRegisterImageUrls);
+        const res = await axiosSecure.put(`/editLoginRegisterImageUrls/${loginRegisterImageList[0]._id}`, loginRegisterImageUrls);
         if (res.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div
@@ -205,7 +207,7 @@ const LoginRegisterSlides = () => {
           toast.error('No changes detected!');
         }
       } else {
-        const response = await axiosPublic.post('/addLoginRegisterImageUrls', loginRegisterImageUrls);
+        const response = await axiosSecure.post('/addLoginRegisterImageUrls', loginRegisterImageUrls);
         if (response.data.insertedId) {
           toast.custom((t) => (
             <div

@@ -17,6 +17,7 @@ import ProductSearchSelect from '@/app/components/marketing/ProductSearchSelect'
 import useOffers from '@/app/hooks/useOffers';
 import { HiCheckCircle } from 'react-icons/hi2';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -25,6 +26,7 @@ const AddOffer = () => {
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [offerDiscountType, setOfferDiscountType] = useState('Percentage');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dateError, setDateError] = useState(false);
@@ -405,7 +407,7 @@ const AddOffer = () => {
         selectedProductIds
       };
 
-      const response = await axiosPublic.post('/addOffer', offerData);
+      const response = await axiosSecure.post('/addOffer', offerData);
       if (response.data.insertedId) {
         toast.custom((t) => (
           <div

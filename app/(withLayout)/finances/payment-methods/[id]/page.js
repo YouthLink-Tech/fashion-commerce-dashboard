@@ -12,13 +12,18 @@ import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { FiSave } from 'react-icons/fi';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
 const EditPaymentMethod = () => {
 
   const { id } = useParams();
+  const { data: session, status } = useSession();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState([]);
   const router = useRouter();
@@ -34,19 +39,24 @@ const EditPaymentMethod = () => {
     });
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchShipmentHandler = async () => {
       try {
-        const { data } = await axiosPublic.get(`/getSinglePaymentMethod/${id}`);
+        const { data } = await axiosSecure.get(`/getSinglePaymentMethod/${id}`);
         setValue('paymentMethodName', data?.paymentMethodName);
         setPaymentDetails(data?.paymentDetails);
         setImage(data?.imageUrl);
       } catch (error) {
-        toast.error("Failed to load shipping zone details.");
+        console.error(error);
+        toast.error("Failed to load payment method details.");
       }
     };
 
     fetchShipmentHandler();
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosSecure, status, session]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {
@@ -96,7 +106,7 @@ const EditPaymentMethod = () => {
         imageUrl: image === null ? DEFAULT_IMAGE_URL : image,
       };
 
-      const res = await axiosPublic.put(`/editPaymentMethod/${id}`, updatedPaymentMethod);
+      const res = await axiosSecure.put(`/editPaymentMethod/${id}`, updatedPaymentMethod);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -140,6 +150,10 @@ const EditPaymentMethod = () => {
       toast.error('There was an error editing the Payment Method. Please try again.');
     }
   };
+
+  if (status === "loading") {
+    return <Loading />;
+  }
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>

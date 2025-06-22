@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React from 'react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -14,13 +13,14 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Finances";
 
 const PaymentMethods = () => {
 
   const [paymentMethodList, isPaymentMethodPending, refetch] = usePaymentMethods();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
   const role = permissions?.find(
@@ -44,7 +44,7 @@ const PaymentMethods = () => {
       const paymentMethodData = { ...rest, status: !currentStatus };
 
       // Send the update request
-      const res = await axiosPublic.put(`/editPaymentMethod/${id}`, paymentMethodData);
+      const res = await axiosSecure.put(`/editPaymentMethod/${id}`, paymentMethodData);
       if (res.data.modifiedCount > 0) {
         refetch(); // Refetch the promo list to get the updated data
         toast.custom((t) => (
@@ -101,7 +101,7 @@ const PaymentMethods = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deletePaymentMethod/${id}`);
+          const res = await axiosSecure.delete(`/deletePaymentMethod/${id}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (

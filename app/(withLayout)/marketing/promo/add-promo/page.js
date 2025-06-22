@@ -1,6 +1,7 @@
 "use client";
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ const AddPromo = () => {
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
   const [dateError, setDateError] = useState(false);
@@ -129,7 +131,7 @@ const AddPromo = () => {
         promoStatus: true
       };
 
-      const response = await axiosPublic.post('/addPromoCode', discountData);
+      const response = await axiosSecure.post('/addPromoCode', discountData);
       if (response.data.insertedId) {
         toast.custom((t) => (
           <div

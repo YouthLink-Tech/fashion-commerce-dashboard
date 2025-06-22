@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useOrders from '@/app/hooks/useOrders';
 import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
@@ -18,6 +17,7 @@ import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from 'react-icons/hi';
 import { useAuth } from '@/app/contexts/auth';
 import CustomSwitch from '../shared/switch/CustomSwitch';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
 
@@ -27,7 +27,7 @@ const RecentPromotions = () => {
 
   const dropdownRef = useRef(null);
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [orderList, isOrderPending] = useOrders();
   const [promoList, isPromoPending, refetchPromo] = usePromoCodes();
   const [offerList, isOfferPending, refetchOffer] = useOffers();
@@ -296,7 +296,7 @@ const RecentPromotions = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deletePromo/${id}`);
+          const res = await axiosSecure.delete(`/deletePromo/${id}`);
           if (res?.data?.deletedCount) {
             refetchPromo();
             toast.custom((t) => (
@@ -352,7 +352,7 @@ const RecentPromotions = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteOffer/${id}`);
+          const res = await axiosSecure.delete(`/deleteOffer/${id}`);
           if (res?.data?.deletedCount) {
             refetchOffer();
             toast.custom((t) => (
@@ -410,7 +410,7 @@ const RecentPromotions = () => {
       const discountData = { ...rest, promoStatus: !currentStatus };
 
       // Send the update request
-      const res = await axiosPublic.put(`/updatePromo/${id}`, discountData);
+      const res = await axiosSecure.put(`/updatePromo/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         await refetchPromo(); // Refetch the promo list to get the updated data
         toast.custom((t) => (
@@ -469,7 +469,7 @@ const RecentPromotions = () => {
       const discountData = { ...rest, offerStatus: !currentStatus };
 
       // Send the update request
-      const res = await axiosPublic.put(`/updateOffer/${id}`, discountData);
+      const res = await axiosSecure.put(`/updateOffer/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         refetchOffer(); // Refetch the promo list to get the updated data
         toast.custom((t) => (

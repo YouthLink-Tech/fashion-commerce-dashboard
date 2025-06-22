@@ -1,11 +1,10 @@
 "use client";
 import CustomPagination from '@/app/components/shared/pagination/CustomPagination';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useOrders from '@/app/hooks/useOrders';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useCustomers from '@/app/hooks/useCustomers';
 import { FaCrown, FaMedal, FaRegUser, FaStar, FaCheck } from 'react-icons/fa6';
 import { RxCross2 } from "react-icons/rx";
@@ -17,6 +16,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 const CustomerPrintButton = dynamic(() => import("@/app/components/customers/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alt. Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -27,7 +27,7 @@ const Customers = () => {
   const { isOpen: isOpenCustomerModal, onOpen: openCustomerModal, onClose: onCloseCustomerModal } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
   const [customerDetails, isCustomerPending] = useCustomers();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -89,7 +89,7 @@ const Customers = () => {
   const { data: { result, totalCustomerList } = [], isCustomerListPending, refetch } = useQuery({
     queryKey: ["customerList", page, itemsPerPage],
     queryFn: async () => {
-      const res = await axiosPublic.get(`/customerList?page=${page}&itemsPerPage=${itemsPerPage}`);
+      const res = await axiosSecure.get(`/customerList?page=${page}&itemsPerPage=${itemsPerPage}`);
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

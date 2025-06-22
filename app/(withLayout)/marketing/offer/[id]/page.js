@@ -19,6 +19,8 @@ import useOffers from '@/app/hooks/useOffers';
 import ProductSearchSelect from '@/app/components/marketing/ProductSearchSelect';
 import { HiCheckCircle } from 'react-icons/hi2';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -26,6 +28,7 @@ const EditOffer = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +49,7 @@ const EditOffer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { data: session, status } = useSession();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -86,9 +90,14 @@ const EditOffer = () => {
   };
 
   useEffect(() => {
+
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchOfferData = async () => {
       try {
-        const response = await axiosPublic.get(`/getSingleOffer/${id}`);
+        const response = await axiosSecure.get(`/getSingleOffer/${id}`);
         const offer = response.data;
 
         // Ensure the expiry date is set to midnight to avoid timezone issues
@@ -125,7 +134,7 @@ const EditOffer = () => {
     };
 
     fetchOfferData();
-  }, [id, axiosPublic, setValue, categoryList]);
+  }, [id, axiosSecure, setValue, categoryList, session?.user?.accessToken, status]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {
@@ -442,7 +451,7 @@ const EditOffer = () => {
         selectedProductIds
       };
 
-      const res = await axiosPublic.put(`/updateOffer/${id}`, updatedDiscount);
+      const res = await axiosSecure.put(`/updateOffer/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -489,7 +498,7 @@ const EditOffer = () => {
     }
   };
 
-  if (isLoading || isCategoryPending || isProductPending || isOfferPending) {
+  if (isLoading || isCategoryPending || isProductPending || isOfferPending || status === "loading") {
     return <Loading />;
   };
 
