@@ -1,7 +1,7 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ const currentModule = "Supply Chain";
 
 const ExistingZones = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [shippingList, isShippingPending, refetch] = useShippingZones();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('inside dhaka');
@@ -75,7 +75,7 @@ const ExistingZones = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteShippingZone/${zoneId}`);
+          const res = await axiosSecure.delete(`/deleteShippingZone/${zoneId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

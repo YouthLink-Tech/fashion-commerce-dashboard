@@ -1,14 +1,14 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useAxiosSecure } from "./useAxiosSecure";
+import useAxiosPublic from "./useAxiosPublic";
 
 const usePromoCodes = () => {
-  const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxiosPublic();
 
   const { data: promoList, isPending: isPromoPending, refetch } = useQuery({
     queryKey: ["promoList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allPromoCodes");
+      const res = await axiosPublic.get("/allPromoCodes");
       return res?.data;
     },
     onError: (err) => {

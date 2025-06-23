@@ -1,9 +1,7 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Select, SelectItem } from '@nextui-org/react';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -14,11 +12,13 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 export default function EditShippingZone() {
   const router = useRouter();
   const params = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
@@ -27,15 +27,20 @@ export default function EditShippingZone() {
   const [cityError, setCityError] = useState(false);
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const suggestionsRefCity = useRef(null);
+  const { data: session, status } = useSession();
 
   const {
-    register, handleSubmit, setValue, control, formState: { errors, isSubmitting }
+    register, handleSubmit, setValue, formState: { errors, isSubmitting }
   } = useForm();
 
   useEffect(() => {
+    if (!params.id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchShippingZone = async () => {
       try {
-        const { data } = await axiosPublic.get(`/getSingleShippingZone/${params.id}`);
+        const { data } = await axiosSecure.get(`/getSingleShippingZone/${params.id}`);
 
         setValue('shippingZone', data?.shippingZone);
         setSelectedCities(data?.selectedCity);
@@ -89,7 +94,7 @@ export default function EditShippingZone() {
     };
 
     fetchShippingZone();
-  }, [params.id, setValue, axiosPublic]);
+  }, [params.id, setValue, axiosSecure, session?.user?.accessToken, status]);
 
   // Filter cities based on the search term and exclude selected cities
   const filteredCities = cities.filter((city) => city.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -188,7 +193,7 @@ export default function EditShippingZone() {
         selectedCity: selectedCities
       };
 
-      const res = await axiosPublic.put(`/editShippingZone/${params.id}`, updatedShippingZone);
+      const res = await axiosSecure.put(`/editShippingZone/${params.id}`, updatedShippingZone);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -232,7 +237,7 @@ export default function EditShippingZone() {
     }
   };
 
-  if (isShipmentHandlerPending) {
+  if (isShipmentHandlerPending || status === "loading") {
     return <Loading />;
   }
 

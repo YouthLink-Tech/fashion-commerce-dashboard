@@ -1,7 +1,6 @@
 "use client";
 import CustomSwitch from '@/app/components/shared/switch/CustomSwitch';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useLocations from '@/app/hooks/useLocations';
 import { Checkbox } from '@nextui-org/react';
 import Link from 'next/link';
@@ -17,13 +16,14 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Supply Chain";
 
 const LocationsPage = () => {
 
   const [locationList, isLocationPending, refetch] = useLocations();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
@@ -45,7 +45,7 @@ const LocationsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteLocation/${locationId}`);
+          const res = await axiosSecure.delete(`/deleteLocation/${locationId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (
@@ -103,7 +103,7 @@ const LocationsPage = () => {
       const locationData = { ...rest, status: !currentStatus };
 
       // Send the update request
-      const res = await axiosPublic.put(`/updateLocation/${id}`, locationData);
+      const res = await axiosSecure.put(`/updateLocation/${id}`, locationData);
       if (res.data.modifiedCount > 0) {
         await refetch(); // Refetch the promo list to get the updated data
         toast.custom((t) => (

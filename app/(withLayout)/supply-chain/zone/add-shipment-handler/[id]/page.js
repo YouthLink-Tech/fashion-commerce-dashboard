@@ -12,14 +12,19 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import standardImage from "/public/logos/standard.png";
 import expressImage from "/public/logos/express.png";
 import { FiSave } from 'react-icons/fi';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 const EditShipmentHandler = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
+  const { data: session, status } = useSession();
   const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748149508141_default-image.png";
 
   const { register, handleSubmit, setValue, trigger, formState: { errors, isSubmitting } } = useForm({
@@ -35,9 +40,14 @@ const EditShipmentHandler = () => {
   });
 
   useEffect(() => {
+
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchShipmentHandler = async () => {
       try {
-        const { data } = await axiosPublic.get(`/getSingleShipmentHandler/${id}`);
+        const { data } = await axiosSecure.get(`/getSingleShipmentHandler/${id}`);
         setValue('shipmentHandlerName', data?.shipmentHandlerName);
         setValue('contactPersonName', data?.contactPersonName);
         setValue('contactPersonNumber', data?.contactPersonNumber);
@@ -52,7 +62,7 @@ const EditShipmentHandler = () => {
     };
 
     fetchShipmentHandler();
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
 
   const handleDeliveryType = (option) => {
     let deliveryTypes;
@@ -114,7 +124,7 @@ const EditShipmentHandler = () => {
         deliveryType
       };
 
-      const res = await axiosPublic.put(`/editShipmentHandler/${id}`, updatedShipmentHandler);
+      const res = await axiosSecure.put(`/editShipmentHandler/${id}`, updatedShipmentHandler);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -158,6 +168,8 @@ const EditShipmentHandler = () => {
       toast.error('There was an error editing the shipment handler. Please try again.');
     }
   };
+
+  if (status === "loading") return <Loading />;
 
   return (
     <div className='bg-gray-50 min-h-screen'>

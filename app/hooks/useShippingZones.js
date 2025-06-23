@@ -1,14 +1,14 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import { useAxiosSecure } from "./useAxiosSecure";
 
 const useShippingZones = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const { data: shippingList, isPending: isShippingPending, refetch } = useQuery({
     queryKey: ["shippingList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allShippingZones");
+      const res = await axiosSecure.get("/allShippingZones");
       return res?.data;
     },
     onError: (err) => {

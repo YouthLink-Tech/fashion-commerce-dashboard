@@ -11,10 +11,12 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import standardImage from "/public/logos/standard.png";
 import expressImage from "/public/logos/express.png";
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const AddShipmentHandler = () => {
 
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState(null);
   const [deliveryType, setDeliveryType] = useState([]);
@@ -86,7 +88,7 @@ const AddShipmentHandler = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addShipmentHandler', shipmentData);
+      const response = await axiosSecure.post('/addShipmentHandler', shipmentData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

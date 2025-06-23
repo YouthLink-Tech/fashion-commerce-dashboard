@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -9,9 +8,10 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { Checkbox } from '@nextui-org/react';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const AddLocation = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -34,7 +34,7 @@ const AddLocation = () => {
     }
 
     try {
-      const response = await axiosPublic.post('/addLocation', locationData);
+      const response = await axiosSecure.post('/addLocation', locationData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

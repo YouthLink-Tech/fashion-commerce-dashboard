@@ -1,6 +1,8 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import Loading from '@/app/components/shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { Checkbox } from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -13,16 +15,21 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const EditLocation = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [isSelected, setIsSelected] = useState(false);
+  const { data: session, status } = useSession();
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchLocationDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/getSingleLocationDetails/${id}`);
+        const { data } = await axiosSecure.get(`/getSingleLocationDetails/${id}`);
 
         setValue('locationName', data?.locationName);
         setValue('contactPersonName', data?.contactPersonName);
@@ -38,7 +45,7 @@ const EditLocation = () => {
     };
 
     fetchLocationDetails();
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
 
   const onSubmit = async (data) => {
     try {
@@ -55,7 +62,7 @@ const EditLocation = () => {
         isPrimaryLocation: isSelected,
       };
 
-      const res = await axiosPublic.put(`/updateLocation/${id}`, locationData);
+      const res = await axiosSecure.put(`/updateLocation/${id}`, locationData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -99,6 +106,8 @@ const EditLocation = () => {
       toast.error('There was an error editing the location. Please try again.');
     }
   };
+
+  if (status === "loading") return <Loading />;
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>

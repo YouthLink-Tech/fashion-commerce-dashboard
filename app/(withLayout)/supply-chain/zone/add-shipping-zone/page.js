@@ -2,7 +2,6 @@
 import { cities } from '@/app/data/cities';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,11 +16,12 @@ import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-i
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Supply Chain";
 
 const AddShippingZone = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
@@ -112,7 +112,7 @@ const AddShippingZone = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteShipmentHandler/${id}`);
+          const res = await axiosSecure.delete(`/deleteShipmentHandler/${id}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (
@@ -223,7 +223,7 @@ const AddShippingZone = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addShippingZone', shippingData);
+      const response = await axiosSecure.post('/addShippingZone', shippingData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div
