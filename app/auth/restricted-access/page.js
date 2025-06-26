@@ -310,7 +310,8 @@ const RestrictedAccessLoginPage = () => {
         });
 
         if (result?.ok) {
-          router.push("/");
+          const initialPath = resData.initialPage || "/auth/restricted-access";
+          router.push(initialPath);
         } else {
           setError("Failed to sign in after login. Please try again.");
         }
