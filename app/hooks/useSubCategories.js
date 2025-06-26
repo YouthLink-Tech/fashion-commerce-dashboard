@@ -1,15 +1,15 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import { useAxiosSecure } from "./useAxiosSecure";
 
 const useSubCategories = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const { data: subCategoryList, isPending: isSubCategoryPending, refetch } = useQuery({
     queryKey: ["subCategoryList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allSubCategories");
+      const res = await axiosSecure.get("/allSubCategories");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

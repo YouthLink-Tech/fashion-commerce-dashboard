@@ -12,10 +12,12 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import StoryEditModal from './StoryEditModal';
 import axios from 'axios';
 import { formatDate } from '../../shared/date-format/DateFormat';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const OurStories = () => {
 
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [ourStoryList, isOurStoryPending, refetch] = useOurStory();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -54,7 +56,7 @@ const OurStories = () => {
       if (!selectedStoryId) return;
 
       try {
-        const { data } = await axiosPublic.get(`/get-single-story/${selectedStoryId}`);
+        const { data } = await axiosSecure.get(`/get-single-story/${selectedStoryId}`);
 
         if (data) {
           const fetchedStoryPublishDate = formatDate(data.storyPublishDate);
@@ -82,7 +84,7 @@ const OurStories = () => {
     };
 
     fetchStoryData();
-  }, [selectedStoryId, setValue, reset, axiosPublic]);
+  }, [selectedStoryId, setValue, reset, axiosSecure]);
 
   const handleDelete = async (storyId) => {
     Swal.fire({
@@ -96,7 +98,7 @@ const OurStories = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/delete-story/${storyId}`);
+          const res = await axiosSecure.delete(`/delete-story/${storyId}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (
@@ -321,7 +323,7 @@ const OurStories = () => {
         contents: mergedStoryInformation
       };
 
-      const response = await axiosPublic.put(`/update-our-story/${selectedStoryId}`, editStoryInformation);
+      const response = await axiosSecure.put(`/update-our-story/${selectedStoryId}`, editStoryInformation);
 
       if (response.data.modifiedCount > 0) {
         toast.custom((t) => (

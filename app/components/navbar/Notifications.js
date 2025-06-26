@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { GrNotification } from 'react-icons/gr';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { RxCross2 } from 'react-icons/rx';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { GoDotFill } from "react-icons/go";
 import useNotifications from '@/app/hooks/useNotifications';
 import { getTimeAgo } from './GetTimeAgo';
 import NotificationLoading from '../shared/Loading/NotificationLoading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { PiChecksLight } from "react-icons/pi";
 
 const Notifications = () => {
@@ -14,7 +14,7 @@ const Notifications = () => {
   const [notificationList, isNotificationPending, refetch] = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [productId, setProductId] = useState({}); // Store the fetched product names
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [showAll, setShowAll] = useState(false);
   const [filter, setFilter] = useState("all"); // 'all' or 'unread'
 
@@ -56,7 +56,7 @@ const Notifications = () => {
         orderStatus: detail.orderStatus
       };
 
-      const response = await axiosPublic.post("/mark-notification-read", notificationDetails)
+      const response = await axiosSecure.post("/mark-notification-read", notificationDetails)
       if (response?.data?.message === "Notification marked as read") {
         refetch();
       }
@@ -90,7 +90,7 @@ const Notifications = () => {
 
         if (!productIds || productIds.length === 0) return;
 
-        const response = await axiosPublic.post('/getProductIds', { ids: productIds });
+        const response = await axiosSecure.post('/getProductIds', { ids: productIds });
 
         if (response.status === 200) {
           const productNamesMap = response.data.reduce((acc, product) => {
@@ -107,7 +107,7 @@ const Notifications = () => {
     };
 
     fetchProductNames();
-  }, [notificationList, axiosPublic]);
+  }, [notificationList, axiosSecure]);
 
   if (isNotificationPending) return <NotificationLoading />;
 

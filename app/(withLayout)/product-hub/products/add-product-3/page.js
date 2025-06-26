@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import { Checkbox } from '@nextui-org/react';
@@ -17,10 +16,11 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const ThirdStepOfAddProduct = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { handleSubmit } = useForm();
   const [shippingList, isShippingPending] = useShippingZones();
@@ -229,7 +229,7 @@ const ThirdStepOfAddProduct = () => {
 
     try {
       // Post the entire selectedShipmentHandler array, which contains full shipping details
-      const response = await axiosPublic.post('/addProduct', wholeProductData);
+      const response = await axiosSecure.post('/addProduct', wholeProductData);
 
       if (response?.data?.insertedId) {
         toast.custom((t) => (

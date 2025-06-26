@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -14,6 +13,8 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/app/contexts/auth';
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitConfirmationModalProduct';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/TransferOrderPDFButton"), { ssr: false });
 
@@ -22,7 +23,7 @@ const currentModule = "Product Hub";
 const EditTransferOrder = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +49,7 @@ const EditTransferOrder = () => {
   )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
+  const { data: session, status } = useSession();
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -61,7 +63,11 @@ const EditTransferOrder = () => {
   // Memoized function to fetch transfer order data
   const fetchTransferOrderData = useCallback(async () => {
     try {
-      const response = await axiosPublic.get(`/getSingleTransferOrder/${id}`);
+      if (!id || typeof window === "undefined") return;
+
+      if (status !== "authenticated" || !session?.user?.accessToken) return;
+
+      const response = await axiosSecure.get(`/getSingleTransferOrder/${id}`);
       const order = response?.data;
       const fetchedEstimatedArrival = formatDateForInput(order?.estimatedArrival);
       setEstimatedArrival(fetchedEstimatedArrival);
@@ -81,7 +87,7 @@ const EditTransferOrder = () => {
       console.error(err);
       toast.error("Failed to fetch transfer order details!");
     }
-  }, [id, axiosPublic]);
+  }, [id, axiosSecure, session?.user?.accessToken, status]);
 
   // Initial load useEffect
   useEffect(() => {
@@ -113,7 +119,7 @@ const EditTransferOrder = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteTransferOrder/${id}`);
+          const res = await axiosSecure.delete(`/deleteTransferOrder/${id}`);
           if (res?.data?.deletedCount) {
             toast.custom((t) => (
               <div
@@ -187,7 +193,7 @@ const EditTransferOrder = () => {
         status: data?.status,
       }
 
-      const res = await axiosPublic.put(`/editTransferOrder/${id}`, updatedTransferOrderData);
+      const res = await axiosSecure.put(`/editTransferOrder/${id}`, updatedTransferOrderData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -247,7 +253,7 @@ const EditTransferOrder = () => {
       });
   };
 
-  if (isLoading || isUserLoading) {
+  if (isLoading || isUserLoading || status === "loading") {
     return <Loading />;
   };
 

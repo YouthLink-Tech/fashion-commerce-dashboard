@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useVendors from '@/app/hooks/useVendors';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
@@ -15,13 +14,14 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Product Hub";
 
 const VendorsPage = () => {
 
   const [vendorList, isVendorPending, refetchVendors] = useVendors();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
@@ -43,7 +43,7 @@ const VendorsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteVendor/${vendorId}`);
+          const res = await axiosSecure.delete(`/deleteVendor/${vendorId}`);
           if (res?.data?.deletedCount) {
             refetchVendors(); // Call your refetch function to refresh data
             toast.custom((t) => (

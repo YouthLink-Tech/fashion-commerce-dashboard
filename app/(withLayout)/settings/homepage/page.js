@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { FiSave } from 'react-icons/fi';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { FaPlus } from 'react-icons/fa6';
@@ -13,6 +12,7 @@ import CustomSwitch from '@/app/components/shared/switch/CustomSwitch';
 import HomepageContent from '@/app/components/settings/home/HomepageContent';
 import TabsForSettings from '@/app/components/settings/tabs/TabsForSetting';
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const HomepageSettings = () => {
 
@@ -26,7 +26,7 @@ const HomepageSettings = () => {
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(false);
   const [highlightedColorEnabled, setHighlightedColorEnabled] = useState(false);
   const [topHeaderList, isTopHeaderPending, refetch] = useTopHeader();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   // Ensure the code runs only on the client
   useEffect(() => {
@@ -86,7 +86,7 @@ const HomepageSettings = () => {
           slides: slideEnabled ? data.slides : [],
         }
 
-        const response = await axiosPublic.put(`/update-top-header/${topHeaderId}`, topHeaderInformation);
+        const response = await axiosSecure.put(`/update-top-header/${topHeaderId}`, topHeaderInformation);
 
         if (response.data.modifiedCount > 0) {
 

@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import { MdBlock } from "react-icons/md";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import Loading from '@/app/components/shared/Loading/Loading';
@@ -15,10 +14,11 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import EnrollmentForm from '@/app/components/settings/enrollment/EnrollmentForm';
 import EditCartDrawer from '@/app/components/settings/enrollment/cart/EditCartDrawer';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const EnrollmentPage = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [existingUsers, isExistingUsersPending, refetch] = useExistingUsers();
   const [isGrantAccessOpen, setIsGrantAccessOpen] = useState(false);
@@ -45,7 +45,7 @@ const EnrollmentPage = () => {
             role,
           };
 
-          const response = await axiosPublic.post('/invite', resendInformation);
+          const response = await axiosSecure.post('/invite', resendInformation);
 
           if (response.data.success) {
             // ✅ Show success toast if the invitation is successfully sent
@@ -176,7 +176,7 @@ const EnrollmentPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/delete-existing-user/${userId}`);
+          const res = await axiosSecure.delete(`/delete-existing-user/${userId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

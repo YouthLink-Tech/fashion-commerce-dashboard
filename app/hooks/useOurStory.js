@@ -1,15 +1,15 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import { useAxiosSecure } from "./useAxiosSecure";
 
 const useOurStory = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const { data: ourStoryList, isPending: isOurStoryPending, refetch } = useQuery({
     queryKey: ["ourStoryList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/get-all-story-collection-backend");
+      const res = await axiosSecure.get("/get-all-story-collection-backend");
       return res?.data;
     },
     onError: (err) => {

@@ -2,7 +2,7 @@
 import DestinationSelect from '@/app/components/product/select/DestinationSelect';
 import OriginSelect from '@/app/components/product/select/OriginSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
 import useTransferOrders from '@/app/hooks/useTransferOrders';
@@ -19,7 +19,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const CreateTransfer = () => {
 
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [selectedOrigin, setSelectedOrigin] = useState("");
   const [selectedDestination, setSelectedDestination] = useState("");
@@ -447,7 +447,7 @@ const CreateTransfer = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addTransferOrder', transferOrderData);
+      const response = await axiosSecure.post('/addTransferOrder', transferOrderData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

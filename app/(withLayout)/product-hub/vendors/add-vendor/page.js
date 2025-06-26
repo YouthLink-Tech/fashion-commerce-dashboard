@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -8,9 +7,10 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const AddVendor = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -29,7 +29,7 @@ const AddVendor = () => {
     }
 
     try {
-      const response = await axiosPublic.post('/addVendor', vendorData);
+      const response = await axiosSecure.post('/addVendor', vendorData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

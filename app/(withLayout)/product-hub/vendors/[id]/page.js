@@ -1,5 +1,7 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import Loading from '@/app/components/shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
@@ -12,8 +14,9 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const EditVendor = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
@@ -26,9 +29,13 @@ const EditVendor = () => {
   });
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchVendorDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/getSingleVendorDetails/${id}`);
+        const { data } = await axiosSecure.get(`/getSingleVendorDetails/${id}`);
 
         setValue('vendorName', data?.value);
         setValue('contactPersonName', data?.contactPersonName);
@@ -40,7 +47,7 @@ const EditVendor = () => {
     };
 
     fetchVendorDetails();
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
 
   const onSubmit = async (data) => {
     try {
@@ -53,7 +60,7 @@ const EditVendor = () => {
         vendorAddress: data?.vendorAddress,
       };
 
-      const res = await axiosPublic.put(`/editVendor/${id}`, updatedVendorList);
+      const res = await axiosSecure.put(`/editVendor/${id}`, updatedVendorList);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -98,8 +105,11 @@ const EditVendor = () => {
     }
   };
 
+  if (status === "loading") return <Loading />;
+
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
+
       <form onSubmit={handleSubmit(onSubmit)}>
 
         <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
@@ -180,6 +190,7 @@ const EditVendor = () => {
         </div>
 
       </form>
+
     </div>
   );
 };

@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,6 +21,8 @@ import VendorSelect from '@/app/components/product/select/VendorSelect';
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitConfirmationModalProduct';
 import PendingModalProduct from '@/app/components/product/modal/PendingModalProduct';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/PurchaseOrderPDFButton"), { ssr: false });
 
@@ -30,7 +31,7 @@ const currentModule = "Product Hub";
 const EditPurchaseOrderPage = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +65,7 @@ const EditPurchaseOrderPage = () => {
   )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
+  const { data: session, status } = useSession();
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -121,8 +123,12 @@ const EditPurchaseOrderPage = () => {
 
   // Memoized function to fetch purchase order data
   const fetchPurchaseOrderData = useCallback(async () => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     try {
-      const response = await axiosPublic.get(`/getSinglePurchaseOrder/${id}`);
+      const response = await axiosSecure.get(`/getSinglePurchaseOrder/${id}`);
       const order = response?.data;
 
       // Reset the form with the new data from the response
@@ -158,7 +164,7 @@ const EditPurchaseOrderPage = () => {
       console.error(err);
       toast.error("Failed to fetch purchase order details!");
     }
-  }, [id, setValue, axiosPublic, reset]);
+  }, [id, setValue, axiosSecure, reset, session?.user?.accessToken, status]);
 
   // Initial load useEffect
   useEffect(() => {
@@ -456,7 +462,7 @@ const EditPurchaseOrderPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deletePurchaseOrder/${id}`);
+          const res = await axiosSecure.delete(`/deletePurchaseOrder/${id}`);
           if (res?.data?.deletedCount) {
             toast.custom((t) => (
               <div
@@ -521,7 +527,7 @@ const EditPurchaseOrderPage = () => {
 
   const revertStatusToPending = async () => {
     try {
-      const res = await axiosPublic.put(`/editPurchaseOrder/${id}`, { status: "pending" });
+      const res = await axiosSecure.put(`/editPurchaseOrder/${id}`, { status: "pending" });
 
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
@@ -625,7 +631,7 @@ const EditPurchaseOrderPage = () => {
         attachment: attachment
       };
 
-      const res = await axiosPublic.put(`/editPurchaseOrder/${id}`, updatedPurchaseOrderData);
+      const res = await axiosSecure.put(`/editPurchaseOrder/${id}`, updatedPurchaseOrderData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -686,7 +692,7 @@ const EditPurchaseOrderPage = () => {
       });
   };
 
-  if (isLoading || isProductPending || isUserLoading) {
+  if (isLoading || isProductPending || isUserLoading || status === "loading") {
     return <Loading />;
   }
 

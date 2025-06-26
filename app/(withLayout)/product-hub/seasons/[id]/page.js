@@ -1,6 +1,9 @@
 "use client";
+import Loading from '@/app/components/shared/Loading/Loading';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -16,14 +19,20 @@ export default function EditSeason() {
   const router = useRouter();
   const params = useParams();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
+  const { data: session, status } = useSession();
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
 
   useEffect(() => {
+    if (!params.id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchSeason = async () => {
       try {
-        const res = await axiosPublic.get(`/allSeasons/${params.id}`);
+        const res = await axiosSecure.get(`/allSeasons/${params.id}`);
         const season = res.data;
         setValue('seasonName', season?.seasonName);
         setImage(season?.imageUrl || null);
@@ -33,7 +42,7 @@ export default function EditSeason() {
       }
     };
     fetchSeason();
-  }, [params.id, axiosPublic, setValue]);
+  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status]);
 
   const uploadSingleFileToGCS = async (file) => {
     try {
@@ -82,7 +91,7 @@ export default function EditSeason() {
         imageUrl: image
       };
 
-      const res = await axiosPublic.put(`/editSeason/${params.id}`, updatedSeason);
+      const res = await axiosSecure.put(`/editSeason/${params.id}`, updatedSeason);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -126,6 +135,8 @@ export default function EditSeason() {
       toast.error('There was an error editing the season. Please try again.');
     }
   };
+
+  if (status === "loading") return <Loading />;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>

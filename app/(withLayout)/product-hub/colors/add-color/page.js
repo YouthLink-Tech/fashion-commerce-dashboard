@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -10,9 +9,10 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FiPlus } from 'react-icons/fi';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const AddColor = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
@@ -37,7 +37,7 @@ const AddColor = () => {
 
 
     try {
-      const response = await axiosPublic.post('/addColor', colorData);
+      const response = await axiosSecure.post('/addColor', colorData);
       if (response.status === 201) {
         toast.custom((t) => (
           <div

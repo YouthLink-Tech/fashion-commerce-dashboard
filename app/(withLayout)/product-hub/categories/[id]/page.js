@@ -2,8 +2,10 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useCategories from '@/app/hooks/useCategories';
 import { Button } from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -19,6 +21,7 @@ export default function EditCategory() {
   const router = useRouter();
   const params = useParams();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [categoryDetails, setCategoryDetails] = useState([]);
   const inputRef = useRef(null);
@@ -39,6 +42,7 @@ export default function EditCategory() {
   const [sizeImages, setSizeImages] = useState({});
   const [sizeImagesForSuggestion, setSizeImagesForSuggestion] = useState({});
   const [categoryKey, setCategoryKey] = useState("");
+  const { data: session, status } = useSession();
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { category: '', sizes: [{ size: '' }], subCategories: [{ subCategory: '' }] }
@@ -77,9 +81,13 @@ export default function EditCategory() {
   }, [categoryList]);
 
   useEffect(() => {
+    if (!params.id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchCategory = async () => {
       try {
-        const res = await axiosPublic.get(`/allCategories/${params.id}`);
+        const res = await axiosSecure.get(`/allCategories/${params.id}`);
         const category = res.data;
         setValue('category', category?.label);
         setCategoryKey(category?.key);
@@ -93,7 +101,7 @@ export default function EditCategory() {
       }
     };
     fetchCategory();
-  }, [params.id, axiosPublic, setValue]);
+  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status]);
 
   // Close suggestions if clicking outside the input or suggestions
   useEffect(() => {
@@ -375,7 +383,7 @@ export default function EditCategory() {
         imageUrl
       };
 
-      const res = await axiosPublic.put(`/editCategory/${params.id}`, updatedCategory);
+      const res = await axiosSecure.put(`/editCategory/${params.id}`, updatedCategory);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -420,7 +428,7 @@ export default function EditCategory() {
     }
   };
 
-  if (isCategoryPending) {
+  if (isCategoryPending || status === "loading") {
     return <Loading />
   }
 
@@ -677,6 +685,7 @@ export default function EditCategory() {
         </div>
 
       </div>
+
     </form>
   );
 }

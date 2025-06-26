@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const defaultImages = ["https://i.ibb.co.com/b7TyG4Y/8271908.png",
   "https://i.ibb.co.com/PgJc6zx/halloween.png",
@@ -25,6 +26,7 @@ const AddSeason = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,7 +84,7 @@ const AddSeason = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addSeason', seasonData);
+      const response = await axiosSecure.post('/addSeason', seasonData);
 
       if (response.status === 201) {
         toast.custom((t) => (
@@ -229,6 +231,7 @@ const AddSeason = () => {
           </div>
         </div>
       </form >
+
     </div>
   );
 };

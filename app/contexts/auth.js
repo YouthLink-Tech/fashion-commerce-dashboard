@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import useAxiosPublic from "../hooks/useAxiosPublic";
+import { useAxiosSecure } from "../hooks/useAxiosSecure";
 
 // Create a new context for authentication and user data
 const AuthContext = createContext({
@@ -12,7 +12,7 @@ const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [isUserLoading, setIsUserLoading] = useState(true);
   const { data: session, status } = useSession();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [existingUserData, setExistingUserData] = useState(null);
 
   // Provide the user state, loading state, and user data to child components through context
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         // Set loading to true when the fetch starts
         setIsUserLoading(true);
 
-        const res = await axiosPublic.get(
+        const res = await axiosSecure.get(
           `/single-existing-user/${session?.user?._id}`,
         );
         setExistingUserData(res.data);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     fetchExistingUserInformation();
-  }, [session?.user?._id, axiosPublic, status]);
+  }, [session?.user?._id, axiosSecure, status]);
 
   // Provide the user state and loading state to child components through context
   return (

@@ -5,6 +5,7 @@ import { formatDate } from '@/app/components/shared/date-format/DateFormat';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
 import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
@@ -22,6 +23,7 @@ const currentModule = "Product Hub";
 const CreatePurchaseOrder = () => {
 
 	const axiosPublic = useAxiosPublic();
+	const axiosSecure = useAxiosSecure();
 	const router = useRouter();
 	const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 	const [selectedVendor, setSelectedVendor] = useState("");
@@ -476,7 +478,7 @@ const CreatePurchaseOrder = () => {
 		}
 
 		try {
-			const response = await axiosPublic.post('/addPurchaseOrder', purchaseOrderData);
+			const response = await axiosSecure.post('/addPurchaseOrder', purchaseOrderData);
 			if (response?.data?.insertedId) {
 				toast.custom((t) => (
 					<div

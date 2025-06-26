@@ -8,7 +8,6 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import LegalPoliciesEditor from '@/app/utils/Editor/LegalPoliciesEditor';
 import { FiSave } from 'react-icons/fi';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import useFAQ from '@/app/hooks/useFAQ';
@@ -17,6 +16,7 @@ import EditorFAQ from '@/app/utils/Editor/EditorFAQ';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import Loading from '@/app/components/shared/Loading/Loading';
 import DOMPurify from "dompurify";
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const AddFAQPage = () => {
 
@@ -24,7 +24,7 @@ const AddFAQPage = () => {
     defaultValues: { faqs: [{ question: "", answer: "" }] }
   });
   const { fields, append, remove } = useFieldArray({ control, name: "faqs" });
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [faqList, isFAQPending] = useFAQ();
   const router = useRouter();
 
@@ -53,7 +53,7 @@ const AddFAQPage = () => {
         return;
       }
 
-      const res = await axiosPublic.post(`/add-faq`, faqData);
+      const res = await axiosSecure.post(`/add-faq`, faqData);
       if (res.data.insertedId) {
         toast.custom((t) => (
           <div

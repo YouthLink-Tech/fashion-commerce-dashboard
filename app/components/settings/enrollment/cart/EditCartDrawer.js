@@ -1,5 +1,5 @@
 "use client";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { useAxiosSecure } from "@/app/hooks/useAxiosSecure";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,7 @@ export default function EditCartDrawer({
 }) {
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [roleGroups, setRoleGroups] = useState([
     { role: "", modules: {} },
   ]);
@@ -33,7 +33,7 @@ export default function EditCartDrawer({
       // Fetch user data when drawer opens
       const fetchUser = async () => {
         try {
-          const { data } = await axiosPublic.get(`/single-existing-user/${userId}`);
+          const { data } = await axiosSecure.get(`/single-existing-user/${userId}`);
           if (data) {
             setValue("email", data?.email || "");
             setRoleGroups(data.permissions || []);
@@ -45,7 +45,7 @@ export default function EditCartDrawer({
 
       fetchUser();
     }
-  }, [axiosPublic, isGrantAccessOpen, setValue, userId, setRoleGroups]);
+  }, [axiosSecure, isGrantAccessOpen, setValue, userId, setRoleGroups]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -172,7 +172,7 @@ export default function EditCartDrawer({
         permissions: roleGroups
       };
 
-      const response = await axiosPublic.put(`/update-user-permissions/${userId}`, userEditedPermissions);
+      const response = await axiosSecure.put(`/update-user-permissions/${userId}`, userEditedPermissions);
 
       if (response.data.success) {
 

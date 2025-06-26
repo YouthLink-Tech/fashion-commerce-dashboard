@@ -1,14 +1,14 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import { useAxiosSecure } from "./useAxiosSecure";
 
 const useSeasons = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const { data: seasonList, isPending: isSeasonPending, refetch } = useQuery({
     queryKey: ["seasonList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allSeasons");
+      const res = await axiosSecure.get("/allSeasons");
       return res?.data;
     },
     onError: (err) => {

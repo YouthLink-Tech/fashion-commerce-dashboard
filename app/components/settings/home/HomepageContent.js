@@ -12,6 +12,7 @@ import CustomSwitch from '../../shared/switch/CustomSwitch';
 import LeftSlides from './LeftSlides';
 import CenterSlides from './CenterSlides';
 import RightSlides from './RightSlides';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Settings";
 
@@ -19,6 +20,7 @@ const HomepageContent = () => {
 
   const { handleSubmit, control, setValue, formState: { errors } } = useForm();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [heroBannerImageList = [], isLoginRegisterHeroBannerImagePending, refetch] = useHeroBannerImages();
   const [image, setImage] = useState([]);
   const [image2, setImage2] = useState([]);
@@ -76,12 +78,20 @@ const HomepageContent = () => {
     }
     setSizeError3("");
 
+    const interval = parseFloat(data.slideInterval);
+
+    // ✅ Validate slideInterval if slide is enabled
+    if (status && (interval === 0 || isNaN(interval))) {
+      toast.error("Interval is required when slide is enabled.");
+      return;
+    }
+
     if (heroBannerImageList?.length > 0) {
       const bannerId = heroBannerImageList[0]?._id;
 
       const bannerData = {
         isEnabled: status,
-        slideInterval: status ? parseFloat(data.slideInterval) : null,
+        slideInterval: status ? interval : 0,
         sliders: {
           leftSlides: image,
           centerSlides: image2,
@@ -90,7 +100,7 @@ const HomepageContent = () => {
       };
 
       try {
-        const response = await axiosPublic.put(`/editHeroBannerImageUrls/${bannerId}`, bannerData);
+        const response = await axiosSecure.put(`/editHeroBannerImageUrls/${bannerId}`, bannerData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div

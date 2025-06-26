@@ -40,6 +40,8 @@ import { isValidImageFile } from '../../shared/upload/isValidImageFile';
 import { CustomCheckbox } from '../checkbox/CustomCheckbox';
 import { CustomCheckbox2 } from '../checkbox/CustomCheckbox2';
 import CustomSwitch from '../../shared/switch/CustomSwitch';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -58,6 +60,7 @@ const EditProductContents = () => {
 
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [productDetails, setProductDetails] = useState("");
   const [materialCare, setMaterialCare] = useState("");
   const [sizeFit, setSizeFit] = useState("");
@@ -119,6 +122,7 @@ const EditProductContents = () => {
     (group) => group.modules?.[currentModule]?.access === true
   )?.role;
   const isOwner = role === "Owner";
+  const { data: session, status } = useSession();
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) => season.seasonName.toLowerCase().includes(searchTerm.toLowerCase())).sort((a, b) => a.seasonName.localeCompare(b.seasonName)); // Sorting A → Z
@@ -685,9 +689,13 @@ const EditProductContents = () => {
   }, [setValue, locationList]);
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/singleProduct/${id}`);
+        const { data } = await axiosSecure.get(`/singleProduct/${id}`);
 
         setValue('productTitle', data?.productTitle);
         setValue('batchCode', data?.batchCode);
@@ -749,7 +757,7 @@ const EditProductContents = () => {
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName]);
+  }, [id, setValue, axiosSecure, initializeVariants, primaryLocationName, session?.user?.accessToken, status]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {
@@ -1051,7 +1059,7 @@ const EditProductContents = () => {
         isInventoryShown: showInventory,
       };
 
-      const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
+      const res = await axiosSecure.put(`/editProductDetails/${id}`, updatedProductData);
       if (res.data.success) {
         toast.custom((t) => (
           <div
@@ -1106,7 +1114,7 @@ const EditProductContents = () => {
     }
   };
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending || isLocationPending || isProductPending || isUserLoading) return <Loading />;
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending || isLocationPending || isProductPending || isUserLoading || status === "loading") return <Loading />;
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative'>

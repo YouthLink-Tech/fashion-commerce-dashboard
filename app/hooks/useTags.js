@@ -1,15 +1,15 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import { useAxiosSecure } from "./useAxiosSecure";
 
 const useTags = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const { data: tagList, isPending: isTagPending, refetch } = useQuery({
     queryKey: ["tagList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allTags");
+      const res = await axiosSecure.get("/allTags");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

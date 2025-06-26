@@ -1,8 +1,9 @@
 "use client";
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const EditReceiveInventory = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { handleSubmit, setValue } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
@@ -25,11 +26,16 @@ const EditReceiveInventory = () => {
   const [productList, isProductPending] = useProductsInformation();
   const [locationName, setLocationName] = useState([]);
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await axiosPublic.get(`/getSinglePurchaseOrder/${id}`);
+        const response = await axiosSecure.get(`/getSinglePurchaseOrder/${id}`);
         const order = response?.data;
 
         setSelectedProducts(order?.selectedProducts);
@@ -45,7 +51,7 @@ const EditReceiveInventory = () => {
     };
 
     fetchPurchaseOrderData();
-  }, [id, axiosPublic, setValue]);
+  }, [id, axiosSecure, setValue, session?.user?.accessToken, status]);
 
   const handleAddAllAccept = (index) => {
     setPurchaseOrderVariants(prevVariants => {
@@ -177,7 +183,7 @@ const EditReceiveInventory = () => {
     });
 
     // API call for updating purchase order
-    const response1 = await axiosPublic.put(`/editPurchaseOrder/${id}`, receivedOrderData);
+    const response1 = await axiosSecure.put(`/editPurchaseOrder/${id}`, receivedOrderData);
 
     const updateResponses = await Promise.all(
       Array.from(modifiedProducts).map(async (productId) => {
@@ -185,7 +191,7 @@ const EditReceiveInventory = () => {
         if (updatedProduct) {
           try {
             // Send the update request for each modified product
-            const response = await axiosPublic.put(`/editProductDetails/${productId}`, updatedProduct);
+            const response = await axiosSecure.put(`/editProductDetails/${productId}`, updatedProduct);
             return { productId, success: true, response: response.data };
           } catch (error) {
             console.error(`Failed to update product ${productId}:`, error.response?.data || error.message);
@@ -246,7 +252,7 @@ const EditReceiveInventory = () => {
 
   };
 
-  if (isLoading || isProductPending) {
+  if (isLoading || isProductPending || status === "loading") {
     return <Loading />
   }
 

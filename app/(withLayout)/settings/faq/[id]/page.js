@@ -8,13 +8,15 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import LegalPoliciesEditor from '@/app/utils/Editor/LegalPoliciesEditor';
 import { FiSave } from 'react-icons/fi';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import { useParams, useRouter } from 'next/navigation';
 import { RiDeleteBinLine } from "react-icons/ri";
 import EditorFAQ from '@/app/utils/Editor/EditorFAQ';
 import DOMPurify from "dompurify";
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 const EditFAQPage = () => {
 
@@ -23,13 +25,18 @@ const EditFAQPage = () => {
     defaultValues: { faqs: [{ question: "", answer: "" }] }
   });
   const { fields, append, remove } = useFieldArray({ control, name: "faqs" });
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchFAQDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/get-single-faq/${id}`);
+        const { data } = await axiosSecure.get(`/get-single-faq/${id}`);
 
         setValue('pageTitle', data?.pageTitle);
         setValue('faqDescription', data?.faqDescription);
@@ -44,7 +51,7 @@ const EditFAQPage = () => {
     };
 
     fetchFAQDetails();
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
 
   const onSubmit = async (data) => {
 
@@ -64,7 +71,7 @@ const EditFAQPage = () => {
         faqs: data?.faqs
       }
 
-      const res = await axiosPublic.put(`/update-faqs/${id}`, faqData);
+      const res = await axiosSecure.put(`/update-faqs/${id}`, faqData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -111,6 +118,8 @@ const EditFAQPage = () => {
     }
 
   };
+
+  if (status === "loading") return <Loading />;
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative px-6'>

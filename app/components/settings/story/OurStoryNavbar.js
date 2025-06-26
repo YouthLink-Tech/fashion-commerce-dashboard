@@ -14,6 +14,7 @@ import useOurStory from '@/app/hooks/useOurStory';
 import axios from 'axios';
 import { formatDate } from '../../shared/date-format/DateFormat';
 import CustomSwitch from '../../shared/switch/CustomSwitch';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const OurStoryNavbar = () => {
 
@@ -24,6 +25,7 @@ const OurStoryNavbar = () => {
   });
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [sizeError1, setSizeError1] = useState("");
   const [sizeError2, setSizeError2] = useState("");
   const [coverImgUrl, setCoverImgUrl] = useState(null);
@@ -244,7 +246,7 @@ const OurStoryNavbar = () => {
         contents: mergedStoryInformation
       };
 
-      const response = await axiosPublic.post('/add-our-story-information', storyInformation);
+      const response = await axiosSecure.post('/add-our-story-information', storyInformation);
 
       if (response.data.insertedId) {
         toast.custom((t) => (

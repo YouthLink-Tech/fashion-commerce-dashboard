@@ -8,67 +8,125 @@ import {
 import { getToken } from "next-auth/jwt";
 
 // Helper function to fetch user permissions
-const fetchUserPermissions = async (userId) => {
-  try {
-    const response = await fetch(
-      `https://fc-backend-664306765395.asia-south1.run.app/single-existing-user/${userId}`,
-    );
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-    if (!response.ok) {
-      throw new Error(`Error fetching data: ${response.statusText}`);
+const fetchUserPermissions = async (userId, token, retries = 2, delayMs = 300) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(
+        `https://fc-backend-664306765395.asia-south1.run.app/single-existing-user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          ok: true,
+          permissions: data?.permissions || [],
+        };
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        return { ok: false, reason: "unauthorized" };
+      }
+
+      if (response.status === 404) {
+        return { ok: false, reason: "not_found" };
+      }
+
+      console.warn(`Fetch attempt ${attempt + 1} failed:`, response.status);
+    } catch (err) {
+      console.error(`Attempt ${attempt + 1} error:`, err);
     }
 
-    const data = await response.json();
-
-    return {
-      permissions: data?.permissions || [], // Default to an empty object if no permissions found
-    };
-  } catch (error) {
-    console.error("Error fetching user permissions:", error);
-    return null;
+    if (attempt < retries) {
+      await delay(delayMs);
+    }
   }
+
+  return { ok: false, reason: "network_error" };
+};
+
+const isTokenExpired = (token) => {
+  const nowInSeconds = Math.floor(Date.now() / 1000);
+  return token?.exp && token.exp < nowInSeconds;
 };
 
 export async function middleware(req) {
   const nextUrlPathname = req.nextUrl.pathname;
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const justRefreshed = req.cookies.get("just-refreshed")?.value === "true";
+  console.log("justRefreshed:", justRefreshed);
+  console.log(token, "token");
 
-  // 🔒 Enforce auth for all other routes
-  if (!token || !token?._id) {
-    return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
+  // ⛔ Prevent loop if already refreshed
+  if (justRefreshed) {
+    const response = NextResponse.next();
+
+    // ⛔ Cookie deletion must be correct
+    response.cookies.set("just-refreshed", "false", { maxAge: 0, path: "/" });
+
+    console.log("Skipping refresh because just refreshed recently.");
+    return response;
+  };
+
+  console.log("justRefreshed (middleware):", justRefreshed);
+  console.log("Token expired?", isTokenExpired(token));
+  console.log("Current path:", req.nextUrl.pathname);
+
+  if (!token || !token.accessToken) {
+    const hasRefreshToken = req.cookies.get("refresh-token");
+
+    if (!hasRefreshToken) {
+      return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
+    }
+
+    console.log(req.url, "req.url");
+    console.log(req.nextUrl.pathname, "req.nextUrl.pathname");
+
+    const refreshUrl = new URL("/auth/refresh-page", req.url);
+    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
+    return NextResponse.redirect(refreshUrl);
+  }
+
+  // ❌ If token is expired, just redirect without clearing cookies
+  if (isTokenExpired(token)) {
+    console.warn("Access token expired in middleware.");
+
+    const refreshUrl = new URL("/auth/refresh-page", req.url);
+    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
+
+    return NextResponse.redirect(refreshUrl);
   }
 
   // 🔹 Fetch user permissions from your API
   const userId = token?._id; // Assuming `sub` contains the user ID
-  let userPermissions = null;
+  const accessToken = token.accessToken;
 
-  if (userId) {
-    userPermissions = await fetchUserPermissions(userId);
-  };
+  const userPermissionsResponse = await fetchUserPermissions(userId, accessToken);
 
-  // 🔹 If userPermissions is null, auto-logout and redirect to login
-  if (!userPermissions) {
-    const response = NextResponse.redirect(
-      new URL("/auth/restricted-access", req.url),
-    );
+  if (!userPermissionsResponse.ok) {
+    if (userPermissionsResponse.reason === "unauthorized") {
+      const refreshUrl = new URL("/auth/refresh-page", req.url);
+      refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
 
-    response.cookies.set("next-auth.session-token", "", {
-      expires: new Date(0),
-      path: "/",
-      secure: true,
-      httpOnly: true,
-      sameSite: "Strict",
-    });
-    response.cookies.set("__Secure-next-auth.session-token", "", {
-      expires: new Date(0),
-      path: "/",
-      secure: true,
-      httpOnly: true,
-      sameSite: "Strict",
-    });
+      return NextResponse.redirect(refreshUrl);
+    }
 
-    return response;
+    if (userPermissionsResponse.reason === "not_found") {
+      return NextResponse.redirect(new URL("/auth/account-deleted", req.url));
+    }
+
+    // If backend is down, refresh might help, or retry later
+    return NextResponse.redirect(new URL("/auth/refresh-page", req.url));
   }
+
+  const userPermissions = userPermissionsResponse;
 
   // 🔹 Restrict "Viewer" access on Add/Edit routes
   const viewerRoles = userPermissions?.permissions?.filter(
@@ -135,6 +193,6 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|auth/restricted-access|auth/setup).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth/restricted-access|auth/setup|auth/refresh-page|auth/account-deleted).*)",
   ],
 };

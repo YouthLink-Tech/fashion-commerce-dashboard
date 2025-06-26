@@ -1,5 +1,5 @@
 "use client";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { useAxiosSecure } from "@/app/hooks/useAxiosSecure";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,7 +17,7 @@ export default function CartDrawer({
 }) {
 
   const { register, reset, handleSubmit, formState: { errors } } = useForm();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [roleGroups, setRoleGroups] = useState([
     { role: "", modules: {} },
   ]);
@@ -157,7 +157,7 @@ export default function CartDrawer({
         permissions: roleGroups
       };
 
-      const response = await axiosPublic.post('/invite', enrollmentInformation);
+      const response = await axiosSecure.post('/invite', enrollmentInformation);
 
       if (response.data.success) {
 

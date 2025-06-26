@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useTags from '@/app/hooks/useTags';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
@@ -11,13 +10,14 @@ import { MdDeleteOutline } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Product Hub";
 
 const TagsPage = () => {
 
   const [tagList, isTagPending, refetchTags] = useTags();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
@@ -39,7 +39,7 @@ const TagsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteTag/${tagId}`);
+          const res = await axiosSecure.delete(`/deleteTag/${tagId}`);
           if (res?.data?.deletedCount) {
             refetchTags(); // Call your refetch function to refresh data
             toast.custom((t) => (

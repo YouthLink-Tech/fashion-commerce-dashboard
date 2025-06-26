@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -15,11 +14,12 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Product Hub";
 
 const CategoriesOverview = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [categoryList, isCategoryPending, refetch] = useCategories();
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -55,7 +55,7 @@ const CategoriesOverview = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteCategory/${categoryId}`);
+          const res = await axiosSecure.delete(`/deleteCategory/${categoryId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (
@@ -139,7 +139,7 @@ const CategoriesOverview = () => {
         };
       });
 
-      const response = await axiosPublic.patch("/updateFeaturedCategories", categoriesToUpdate);
+      const response = await axiosSecure.patch("/updateFeaturedCategories", categoriesToUpdate);
 
       if (response?.data?.modifiedCount > 0) {
         toast.success("Featured category selected successfully!");

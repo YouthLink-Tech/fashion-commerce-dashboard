@@ -9,10 +9,12 @@ import { FiSave } from 'react-icons/fi';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useLogo from '@/app/hooks/useLogo';
 import Loading from '../../shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const LogoSettings = () => {
 
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { handleSubmit } = useForm();
   const [image, setImage] = useState(null);
   const [sizeError, setSizeError] = useState("");
@@ -165,7 +167,7 @@ const LogoSettings = () => {
       };
 
       try {
-        const response = await axiosPublic.put(`/update-logo/${logoId}`, logoData);
+        const response = await axiosSecure.put(`/update-logo/${logoId}`, logoData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div
@@ -328,7 +330,7 @@ const LogoSettings = () => {
       </div>
 
       <div className='w-full flex justify-end mt-8'>
-        <button type="submit" className='flex items-center justify-end gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
+        <button type="submit" className='w-fit rounded-lg bg-[#d4ffce] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out'>
           Upload <FiSave size={19} />
         </button>
       </div>

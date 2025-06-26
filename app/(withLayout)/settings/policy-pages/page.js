@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const policyLabels = [
   { key: 'terms', label: 'Terms & Conditions' },
@@ -20,6 +21,7 @@ const policyLabels = [
 
 const PolicyPages = () => {
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { handleSubmit } = useForm();
   const [files, setFiles] = useState({});
   const [errors, setErrors] = useState({}); // Tracks missing fields
@@ -132,7 +134,7 @@ const PolicyPages = () => {
       setUploadedUrls(uploadResults); // Save URLs for preview
 
       try {
-        const response = await axiosPublic.put(`/edit-policy-pdfs/${pdfId}`, uploadResults);
+        const response = await axiosSecure.put(`/edit-policy-pdfs/${pdfId}`, uploadResults);
         if (response?.data?.modifiedCount > 0) {
           toast.custom((t) => (
             <div

@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -22,6 +21,8 @@ import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import CustomPagination from '@/app/components/shared/pagination/CustomPagination';
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
+import { useSession } from 'next-auth/react';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Season', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -31,7 +32,7 @@ const currentModule = "Product Hub";
 
 const ProductPage = () => {
 
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const { id } = useParams();
   const router = useRouter();
 
@@ -61,6 +62,7 @@ const ProductPage = () => {
     (group) => group.modules?.[currentModule]?.access === true
   )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
@@ -112,9 +114,13 @@ const ProductPage = () => {
   };
 
   useEffect(() => {
+    if (!decodedCategoryName || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/productFromCategory/${decodedCategoryName}`);
+        const { data } = await axiosSecure.get(`/productFromCategory/${decodedCategoryName}`);
         setProductDetails(data);
       } catch (error) {
         toast.error("Failed to load product category details.");
@@ -124,7 +130,7 @@ const ProductPage = () => {
     };
 
     fetchProductDetails();
-  }, [decodedCategoryName, axiosPublic]);
+  }, [decodedCategoryName, axiosSecure, session?.user?.accessToken, status]);
 
   // Convert dateTime string to Date object
   const parseDate = (dateString) => {
@@ -372,7 +378,7 @@ const ProductPage = () => {
     }
   }, [paginatedProducts]);
 
-  if (isLocationPending || isUserLoading) {
+  if (isLocationPending || isUserLoading || status === "loading") {
     return <Loading />
   };
 

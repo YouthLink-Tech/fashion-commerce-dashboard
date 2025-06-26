@@ -34,6 +34,7 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import DOMPurify from "dompurify";
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -42,6 +43,7 @@ const FirstStepOfAddProduct = () => {
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [tagList, isTagPending] = useTags();
   const [vendorList, isVendorPending] = useVendors();
   const [colorList, isColorPending] = useColors();
@@ -743,7 +745,7 @@ const FirstStepOfAddProduct = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addProduct', productData);
+      const response = await axiosSecure.post('/addProduct', productData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

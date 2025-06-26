@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/components/shared/Loading/Loading';
@@ -15,11 +14,12 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Product Hub";
 
 const Seasons = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [seasonList, isSeasonPending, refetch] = useSeasons();
   const { existingUserData, isUserLoading } = useAuth();
@@ -42,7 +42,7 @@ const Seasons = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteSeason/${seasonId}`);
+          const res = await axiosSecure.delete(`/deleteSeason/${seasonId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

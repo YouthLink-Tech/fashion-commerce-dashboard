@@ -12,6 +12,7 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const defaultImages = ["https://i.ibb.co.com/ZJ2Qy29/2892174.png",
   "https://i.ibb.co.com/dcRM6Fz/88768.png",
@@ -25,6 +26,7 @@ const AddCategory = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -400,7 +402,7 @@ const AddCategory = () => {
 
     // Submit category data
     try {
-      const response = await axiosPublic.post('/addCategory', categoryData);
+      const response = await axiosSecure.post('/addCategory', categoryData);
 
       if (response.status === 201) {
         toast.custom((t) => (

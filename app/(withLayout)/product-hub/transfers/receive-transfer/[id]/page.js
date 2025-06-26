@@ -1,8 +1,9 @@
 "use client";
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const ReceiveTransferOrder = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { handleSubmit, setValue } = useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -26,11 +27,15 @@ const ReceiveTransferOrder = () => {
   const [originName, setOriginName] = useState([]);
   const [destinationName, setDestinationName] = useState([]);
   const [acceptError, setAcceptError] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
     const fetchTransferOrderData = async () => {
       try {
-        const response = await axiosPublic.get(`/getSingleTransferOrder/${id}`);
+        const response = await axiosSecure.get(`/getSingleTransferOrder/${id}`);
         const order = response?.data;
 
         setSelectedProducts(order?.selectedProducts);
@@ -47,7 +52,7 @@ const ReceiveTransferOrder = () => {
     };
 
     fetchTransferOrderData();
-  }, [id, axiosPublic, setValue]);
+  }, [id, axiosSecure, setValue, session?.user?.accessToken, status]);
 
   const handleAddAllAccept = (index) => {
     setTransferOrderVariants(prevVariants => {
@@ -188,7 +193,7 @@ const ReceiveTransferOrder = () => {
     };
 
     // Update product details in the database
-    const response1 = await axiosPublic.put(`/editTransferOrder/${id}`, receivedOrderData);
+    const response1 = await axiosSecure.put(`/editTransferOrder/${id}`, receivedOrderData);
 
     const updateResponses = await Promise.all(
       Array.from(modifiedProducts).map(async (productId) => {
@@ -196,7 +201,7 @@ const ReceiveTransferOrder = () => {
         if (updatedProduct) {
           try {
             // Send the update request for each modified product
-            const response = await axiosPublic.put(`/editProductDetails/${productId}`, updatedProduct);
+            const response = await axiosSecure.put(`/editProductDetails/${productId}`, updatedProduct);
             return { productId, success: true, response: response.data };
           } catch (error) {
             console.error(`Failed to update product ${productId}:`, error.response?.data || error.message);
@@ -257,7 +262,7 @@ const ReceiveTransferOrder = () => {
 
   };
 
-  if (isLoading || isProductPending) {
+  if (isLoading || isProductPending || status === "loading") {
     return <Loading />
   }
 

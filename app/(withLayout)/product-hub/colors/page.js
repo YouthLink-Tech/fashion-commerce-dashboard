@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useColors from '@/app/hooks/useColors';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
@@ -11,13 +10,14 @@ import { MdDeleteOutline } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/app/contexts/auth';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const currentModule = "Product Hub";
 
 const ColorsPage = () => {
 
   const [colorList, isColorPending, refetchColors] = useColors();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
@@ -39,7 +39,7 @@ const ColorsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/deleteColor/${colorId}`);
+          const res = await axiosSecure.delete(`/deleteColor/${colorId}`);
           if (res?.data?.deletedCount) {
             refetchColors(); // Call your refetch function to refresh data
             toast.custom((t) => (
@@ -89,6 +89,7 @@ const ColorsPage = () => {
 
   return (
     <div className='relative bg-gray-50'>
+
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6 max-w-screen-2xl mx-auto'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>COLOR MANAGEMENT</h1>
 

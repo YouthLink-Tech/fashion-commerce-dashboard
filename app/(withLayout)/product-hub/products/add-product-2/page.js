@@ -18,6 +18,7 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/shared/switch/CustomSwitch';
 import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const SecondStepOfAddProduct = () => {
 
@@ -27,6 +28,7 @@ const SecondStepOfAddProduct = () => {
   const [navigate, setNavigate] = useState(false);
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [locationList, isLocationPending] = useLocations();
   const [showModal, setShowModal] = useState(false);
   const [sizeError, setSizeError] = useState(false);
@@ -423,7 +425,7 @@ const SecondStepOfAddProduct = () => {
     };
 
     try {
-      const response = await axiosPublic.post('/addProduct', productData);
+      const response = await axiosSecure.post('/addProduct', productData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div
