@@ -253,7 +253,7 @@ const Notifications = () => {
                     ? notificationList?.filter(n => n.notified)
                     : notificationList;
 
-              return fullFilteredList.length > 5 && !showAll && (
+              return fullFilteredList?.length > 5 && !showAll && (
                 <div className="text-center my-4">
                   <button
                     onClick={() => setShowAll(true)}

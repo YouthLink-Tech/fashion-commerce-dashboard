@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 mins
 
@@ -13,6 +14,13 @@ export default function InactivityHandler() {
   const [isInitialCheckDone, setIsInitialCheckDone] = useState(false); // ✅ prevent false logout
 
   const handleLogout = useCallback(async () => {
+    try {
+      await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+        withCredentials: true,
+      });
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
     // console.log("[AutoLogout] Logging out user now...");
     await signOut({ redirect: false });
     // console.log("[AutoLogout] Redirecting to /auth/restricted-access");

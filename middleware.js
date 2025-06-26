@@ -61,8 +61,8 @@ export async function middleware(req) {
   const nextUrlPathname = req.nextUrl.pathname;
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const justRefreshed = req.cookies.get("just-refreshed")?.value === "true";
-  console.log("justRefreshed:", justRefreshed);
-  console.log(token, "token");
+  // console.log("justRefreshed:", justRefreshed);
+  // console.log(token, "token");
 
   // ⛔ Prevent loop if already refreshed
   if (justRefreshed) {
@@ -71,13 +71,13 @@ export async function middleware(req) {
     // ⛔ Cookie deletion must be correct
     response.cookies.set("just-refreshed", "false", { maxAge: 0, path: "/" });
 
-    console.log("Skipping refresh because just refreshed recently.");
+    // console.log("Skipping refresh because just refreshed recently.");
     return response;
   };
 
-  console.log("justRefreshed (middleware):", justRefreshed);
-  console.log("Token expired?", isTokenExpired(token));
-  console.log("Current path:", req.nextUrl.pathname);
+  // console.log("justRefreshed (middleware):", justRefreshed);
+  // console.log("Token expired?", isTokenExpired(token));
+  // console.log("Current path:", req.nextUrl.pathname);
 
   if (!token || !token.accessToken) {
     const hasRefreshToken = req.cookies.get("refresh-token");
@@ -86,8 +86,8 @@ export async function middleware(req) {
       return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
     }
 
-    console.log(req.url, "req.url");
-    console.log(req.nextUrl.pathname, "req.nextUrl.pathname");
+    // console.log(req.url, "req.url");
+    // console.log(req.nextUrl.pathname, "req.nextUrl.pathname");
 
     const refreshUrl = new URL("/auth/refresh-page", req.url);
     refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
@@ -109,6 +109,7 @@ export async function middleware(req) {
   const accessToken = token.accessToken;
 
   const userPermissionsResponse = await fetchUserPermissions(userId, accessToken);
+  // console.log(userPermissionsResponse, "userPermissionsResponse");
 
   if (!userPermissionsResponse.ok) {
     if (userPermissionsResponse.reason === "unauthorized") {

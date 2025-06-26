@@ -3,17 +3,26 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import axios from 'axios';
 
 export default function AccountDeletedPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      signOut({ redirect: false });
-      router.push("/auth/restricted-access");
-    }, 3000);
+    const logoutCompletely = async () => {
+      try {
+        await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+          withCredentials: true,
+        });
+      } catch (err) {
+        console.error("Logout failed", err);
+      }
 
-    return () => clearTimeout(timer);
+      await signOut({ redirect: false });
+      router.replace("/auth/restricted-access")
+    };
+
+    logoutCompletely();
   }, [router]);
 
   return (

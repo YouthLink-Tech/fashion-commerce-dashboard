@@ -2,6 +2,7 @@ import React from "react";
 import DashboardNavbar from "@/app/components/layout/DashboardNavbar/DashboardNavbar";
 import SideNavbar from "@/app/components/layout/SideNavbar/SideNavbar";
 import InactivityHandlerWrapper from "../components/inactivity/InactivityHandlerWrapper";
+import SessionWatcher from "../components/SessionWatcher/SessionWatcher";
 
 const Layout = ({ children }) => {
   return (
@@ -15,6 +16,7 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="relative ml-0 xl:ml-[262px]">
         <DashboardNavbar />
+        <SessionWatcher />
         {children}
       </div>
     </div>

@@ -11,6 +11,7 @@ import SideNavbar from "../SideNavbar/SideNavbar";
 import NotificationLoading from "../../shared/Loading/NotificationLoading";
 import Notifications from "../../navbar/Notifications";
 import Link from "next/link";
+import axios from "axios";
 
 const DashboardNavbar = () => {
   const [isToggle, setIsToggle] = useState(false);
@@ -21,6 +22,13 @@ const DashboardNavbar = () => {
   const handleClose = () => setIsToggle(false);
 
   const handleLogout = async () => {
+    try {
+      await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+        withCredentials: true,
+      });
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
     await signOut({ redirect: false });
     router.push("/auth/restricted-access");
   };
