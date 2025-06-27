@@ -276,6 +276,26 @@
   }
 }
 
+/* You can add this to your global CSS or module CSS */
+.loader-spin {
+  border: 2px solid #f3f3f3; /* Light grey */
+  border-top: 2px solid #333; /* Darker spinning color */
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .custom-editor {
   font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
   border: 1px solid #dbd3d1a1; /* Custom border */

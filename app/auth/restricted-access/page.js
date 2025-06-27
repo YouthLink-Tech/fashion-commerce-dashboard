@@ -24,6 +24,7 @@ const RestrictedAccessLoginPage = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(false); // Track resend state
   const [timer, setTimer] = useState(30); // Timer state for countdown
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (otpRequested && inputRefs.current[0]) {
@@ -246,6 +247,8 @@ const RestrictedAccessLoginPage = () => {
   };
 
   const onSubmit = async (data) => {
+    if (isSubmitting) return; // prevent multiple submits
+    setIsSubmitting(true);
     setError(null);
 
     if (otpRequested && finalOtp.length < 6) {
@@ -373,6 +376,8 @@ const RestrictedAccessLoginPage = () => {
       // Network or unknown errors fallback
       console.error("Login error:", error);
       toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
   };
 
@@ -535,10 +540,21 @@ const RestrictedAccessLoginPage = () => {
 
                 <button
                   type="submit"
-                  disabled={finalOtp?.length < 6}
-                  className={`!mt-7 w-full rounded-lg ${finalOtp?.length === 6 ? "bg-[#d4ffce] hover:bg-[#bdf6b4]" : "cursor-not-allowed bg-gray-200 text-[#191838]"} py-4 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 md:text-base`}
+                  disabled={finalOtp.length < 6 || isSubmitting}
+                  className={`!mt-7 w-full rounded-lg py-4 text-xs font-semibold md:text-base transition duration-300
+    ${finalOtp.length === 6 && !isSubmitting
+                      ? "bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+  `}
                 >
-                  Verify
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="loader-spin" />
+                      Verifying...
+                    </span>
+                  ) : (
+                    "Verify"
+                  )}
                 </button>
 
                 {error && (
@@ -567,10 +583,21 @@ const RestrictedAccessLoginPage = () => {
 
           {!otpRequested && <button
             type="submit"
-            className="!mt-7 w-full rounded-lg bg-[#d4ffce] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm"
+            disabled={isSubmitting}
+            className={`!mt-7 w-full rounded-lg py-2.5 text-xs font-semibold transition-[background-color] duration-300 md:text-sm
+    ${isSubmitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700'}
+  `}
           >
-            Login
-          </button>}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="loader-spin" />
+                Logging in...
+              </span>
+            ) : (
+              "Login"
+            )}
+          </button>
+          }
 
         </form>
 
