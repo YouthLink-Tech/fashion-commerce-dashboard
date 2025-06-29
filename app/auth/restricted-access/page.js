@@ -253,7 +253,12 @@ const RestrictedAccessLoginPage = () => {
 
     if (otpRequested && finalOtp.length < 6) {
       setOtpError(true);
+      setIsSubmitting(false);
       return;
+    }
+
+    if (otpRequested && finalOtp.length === 6) {
+      setOtpError(false);
     }
 
     try {
@@ -271,6 +276,8 @@ const RestrictedAccessLoginPage = () => {
 
       // If request succeeded (status 200)
       const resData = loginRes.data;
+
+      localStorage.setItem("initialPage", resData?.initialPage || "/auth/restricted-access");
 
       // We expect success here: accessToken and _id present
       if (resData.accessToken && resData._id) {
