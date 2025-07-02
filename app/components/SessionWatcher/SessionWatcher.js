@@ -23,7 +23,7 @@ export default function SessionWatcher() {
         } catch (err) {
           console.error("Failed to clear backend refresh token", err);
         }
-
+        localStorage.removeItem("initialPage");
         await signOut({ redirect: false });
         router.replace("/auth/restricted-access");
       })();

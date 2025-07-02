@@ -73,7 +73,7 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Dashboard",
       icon: <RxDashboard />,
-      path: "/",
+      path: "/dashboard",
       permission: checkPermission("Dashboard"),
     },
     {

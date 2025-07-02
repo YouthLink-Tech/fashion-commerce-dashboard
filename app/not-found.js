@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import ErrorSvg from '/public/not-found/no-results.png';
+import GoBackButton from './components/ui/GoBackButton';
 
 const NotFoundPage = () => {
   return (
@@ -20,12 +21,7 @@ const NotFoundPage = () => {
         The page you are looking for doesn’t exist or has been moved. Let’s get you back on track.
       </p>
 
-      <Link
-        href="/"
-        className="flex gap-4 mt-9 rounded-lg bg-[#d4ffce] px-6 py-3 text-center text-sm text-neutral-700 font-semibold transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
-      >
-        <span>⬅</span>  Go Back to Dashboard
-      </Link>
+      <GoBackButton defaultHref="/dashboard" />
     </div>
   );
 };

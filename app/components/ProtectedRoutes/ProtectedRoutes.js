@@ -1,6 +1,6 @@
 // Define permission-based routes
 export const protectedRoutes = {
-  "/": "Dashboard",
+  "/dashboard": "Dashboard",
   "/orders": "Orders",
   "/product-hub": "Product Hub",
   "/supply-chain": "Supply Chain",

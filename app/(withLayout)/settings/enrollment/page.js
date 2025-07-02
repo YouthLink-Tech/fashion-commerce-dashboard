@@ -25,7 +25,7 @@ const EnrollmentPage = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
 
-  const handleResendInvitationMail = async (email, fullName, role) => {
+  const handleResendInvitationMail = async (email, permissions) => {
 
     Swal.fire({
       title: "Resend Email Confirmation",
@@ -40,9 +40,8 @@ const EnrollmentPage = () => {
         try {
 
           const resendInformation = {
-            fullName,
             email,
-            role,
+            permissions,
           };
 
           const response = await axiosSecure.post('/invite', resendInformation);
@@ -247,7 +246,7 @@ const EnrollmentPage = () => {
       return {
         statusText: <p className='text-rose-600'>Expired</p>,
         icon: <FaExclamationCircle color="red" />,
-        button: <button onClick={() => handleResendInvitationMail(user?.email, user?.fullName, user?.role)} className="flex items-center gap-1.5 rounded-md bg-rose-50 px-2 py-1 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-rose-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs"><FaRedo /> Resend</button>
+        button: <button onClick={() => handleResendInvitationMail(user?.email, user?.permissions)} className="flex items-center gap-1.5 rounded-md bg-rose-50 px-2 py-1 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-rose-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs"><FaRedo /> Resend</button>
       };
     }
 

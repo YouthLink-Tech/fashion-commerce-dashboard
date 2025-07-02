@@ -1,6 +1,15 @@
+import { authOptions } from "@/app/utils/Provider/authOptions";
+import { getServerSession } from "next-auth";
+
 export async function POST(request) {
 
   const merchantId = `${process.env.BAHOK_MERCHANT_ID}`;
+
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.accessToken) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   try {
     const order = await request.json();

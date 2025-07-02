@@ -21,6 +21,7 @@ export default function InactivityHandler() {
     } catch (err) {
       console.error("Logout failed", err);
     }
+    localStorage.removeItem("initialPage");
     // console.log("[AutoLogout] Logging out user now...");
     await signOut({ redirect: false });
     // console.log("[AutoLogout] Redirecting to /auth/restricted-access");

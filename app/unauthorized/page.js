@@ -4,10 +4,11 @@ import Link from 'next/link';
 import logoWhiteImage from "/public/logos/logo.png";
 import React, { Suspense, useEffect, useState } from 'react';
 import { WEBSITE_NAME } from "@/app/config/config";
+import GoBackButton from '../components/ui/GoBackButton';
 
 const Unauthorized = () => {
 
-  const [initialPage, setInitialPage] = useState("/");
+  const [initialPage, setInitialPage] = useState("/dashboard");
 
   useEffect(() => {
     const storedPage = localStorage.getItem("initialPage");
@@ -36,12 +37,7 @@ const Unauthorized = () => {
         <div className="flex flex-1 flex-col items-center justify-center gap-4">
           <h1 className="text-2xl font-bold">Access Denied</h1>
           <p className="text-lg">You do not have permission to access this page.</p>
-          <Link
-            href={initialPage}
-            className="mt-9 block rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm text-neutral-700 font-semibold transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
-          >
-            Continue
-          </Link>
+          <GoBackButton defaultHref="/dashboard" />
         </div>
 
       </div>

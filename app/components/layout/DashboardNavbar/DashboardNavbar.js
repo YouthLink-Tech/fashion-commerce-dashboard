@@ -29,6 +29,7 @@ const DashboardNavbar = () => {
     } catch (err) {
       console.error("Logout failed", err);
     }
+    localStorage.removeItem("initialPage");
     await signOut({ redirect: false });
     router.push("/auth/restricted-access");
   };

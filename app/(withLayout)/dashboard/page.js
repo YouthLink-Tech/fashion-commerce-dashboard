@@ -5,7 +5,7 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
 
-const DashboardMainPage = () => {
+const Dashboard = () => {
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative'>
@@ -50,4 +50,4 @@ const DashboardMainPage = () => {
   );
 };
 
-export default DashboardMainPage;
+export default Dashboard;

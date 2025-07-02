@@ -14,10 +14,14 @@ export default function AccountDeletedPage() {
         await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
           withCredentials: true,
         });
+        // await axios.post("http://localhost:5000/logout", null, {
+        //   withCredentials: true,
+        // });
       } catch (err) {
         console.error("Logout failed", err);
       }
 
+      localStorage.removeItem("initialPage");
       await signOut({ redirect: false });
       router.replace("/auth/restricted-access")
     };
