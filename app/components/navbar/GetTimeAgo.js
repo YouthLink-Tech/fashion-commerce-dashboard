@@ -21,3 +21,28 @@ export const getTimeAgo = (dateTimeStr) => {
   if (months < 12) return `${months}mo ago`;
   return `${years}y ago`;
 };
+
+export const formatMessageDate = (isoString) => {
+  const messageDate = new Date(isoString);
+  const now = new Date();
+
+  // Compare local date parts (your browser already knows it's BD if running in BD)
+  const isToday =
+    messageDate.getDate() === now.getDate() &&
+    messageDate.getMonth() === now.getMonth() &&
+    messageDate.getFullYear() === now.getFullYear();
+
+  if (isToday) {
+    // Format time (like 7:02 PM)
+    const hours = messageDate.getHours();
+    const minutes = messageDate.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  } else {
+    // Format date (like Jul 5)
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${monthNames[messageDate.getMonth()]} ${messageDate.getDate()}`;
+  }
+};

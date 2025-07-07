@@ -727,3 +727,27 @@
   border-bottom: 1px solid #ddd; /* Custom border */
   font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
 }
+
+/* Clean, modern custom scrollbar */
+.custom-scrollbars {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent; /* For Firefox */
+}
+
+.custom-scrollbars::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbars::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbars::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-scrollbars:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3); /* Darker on hover */
+}

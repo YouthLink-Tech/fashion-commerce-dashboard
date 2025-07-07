@@ -21,6 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
 import { SidebarLoading } from "../../shared/Loading/SidebarLoading";
+import { MdSupportAgent } from "react-icons/md";
 import { WEBSITE_NAME } from "@/app/config/config";
 
 const SideNavbar = ({ onClose }) => {
@@ -39,6 +40,8 @@ const SideNavbar = ({ onClose }) => {
   const role2 = getUserRoleForModule("Supply Chain");
   const isViewer1 = role1 === "Viewer";
   const isViewer2 = role2 === "Viewer";
+
+  let hasRenderedOthers = false;
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
@@ -182,6 +185,12 @@ const SideNavbar = ({ onClose }) => {
       ]
     },
     {
+      name: "Customer Support",
+      icon: <MdSupportAgent />,
+      path: "/customer-support",
+      permission: checkPermission("Marketing")
+    },
+    {
       name: "Settings",
       icon: <IoSettingsOutline />,
       permission: checkPermission("Settings"),
@@ -227,15 +236,25 @@ const SideNavbar = ({ onClose }) => {
 
         <div className={`flex flex-col mt-6 ${session ? "mb-8" : "mb-8"}`}>
           <h1 className="px-4 text-neutral-500 mb-4 font-medium">MAIN MENU</h1>
+
           {
             allList?.map((item, index) => {
 
               if (!item?.permission) return null;
 
+              const isOtherItem = item?.name === "Customer Support" || item?.name === "Settings";
+              const renderOthersHeading = isOtherItem && !hasRenderedOthers;
+
+              if (renderOthersHeading) {
+                hasRenderedOthers = true;
+              }
+
               return item?.permission ? (
 
                 <div key={index}>
-                  {item?.name === "Settings" && <h1 className="px-4 text-neutral-500 mt-8 mb-4  font-medium">OTHERS</h1>}
+                  {renderOthersHeading && (
+                    <h1 className="px-4 text-neutral-500 mt-8 mb-4 font-medium">OTHERS</h1>
+                  )}
                   <div
                     onClick={(e) => {
                       if (item?.links) {

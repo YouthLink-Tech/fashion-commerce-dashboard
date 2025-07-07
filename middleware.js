@@ -90,7 +90,7 @@ export async function middleware(req) {
     // console.log(req.nextUrl.pathname, "req.nextUrl.pathname");
 
     const refreshUrl = new URL("/auth/refresh-page", req.url);
-    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
+    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(refreshUrl);
   }
 
@@ -99,7 +99,7 @@ export async function middleware(req) {
     console.warn("Access token expired in middleware.");
 
     const refreshUrl = new URL("/auth/refresh-page", req.url);
-    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
+    refreshUrl.searchParams.set("redirect", req.nextUrl.pathname + req.nextUrl.search);
 
     return NextResponse.redirect(refreshUrl);
   }
@@ -114,7 +114,7 @@ export async function middleware(req) {
   if (!userPermissionsResponse.ok) {
     if (userPermissionsResponse.reason === "unauthorized") {
       const refreshUrl = new URL("/auth/refresh-page", req.url);
-      refreshUrl.searchParams.set("redirect", req.nextUrl.pathname);
+      refreshUrl.searchParams.set("redirect", req.nextUrl.pathname + req.nextUrl.search);
 
       return NextResponse.redirect(refreshUrl);
     }

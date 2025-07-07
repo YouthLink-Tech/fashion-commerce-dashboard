@@ -9,8 +9,9 @@ const RefreshAccessToken = () => {
   const { update } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get("redirect") || "/";
-  console.log(redirectPath, "redirectPath");
+  const redirectPath = searchParams.get("redirect") || (typeof window !== "undefined" && localStorage.getItem("initialPage")) || "/dashboard";
+
+  // console.log(redirectPath, "redirectPath");
 
   // console.log(window.location.href); // Should show ?redirect=/your-path
 
@@ -24,7 +25,7 @@ const RefreshAccessToken = () => {
           withCredentials: true,
         });
 
-        console.log("Access token updated:", res.data.accessToken);
+        // console.log("Access token updated:", res.data.accessToken);
 
         if (res?.data?.accessToken) {
           // Step 1: Update session
