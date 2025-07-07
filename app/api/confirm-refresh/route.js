@@ -7,8 +7,8 @@ export async function POST() {
     httpOnly: true,
     maxAge: 10, // seconds
     path: "/",
-    sameSite: "Lax",
-    secure: process.env.NODE_ENV === "production", // ✅ allow localhost dev
+    sameSite: "None",
+    secure: true,
   });
 
   return response;

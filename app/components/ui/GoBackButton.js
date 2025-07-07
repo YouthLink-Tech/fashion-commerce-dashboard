@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { IoArrowBackOutline } from "react-icons/io5";
 
 export default function GoBackButton({ defaultHref = "/dashboard" }) {
   const [href, setHref] = useState(defaultHref);
@@ -26,7 +27,7 @@ export default function GoBackButton({ defaultHref = "/dashboard" }) {
       onClick={handleClick}
       className="mt-9 rounded-lg bg-[#d4ffce] px-6 py-3 text-center text-sm text-neutral-700 font-semibold transition duration-300 hover:bg-[#bdf6b4]"
     >
-      ⬅ Go Back
+      <span className="flex items-center gap-2"><IoArrowBackOutline size={14} /> Go Back </span>
     </button>
   );
 }

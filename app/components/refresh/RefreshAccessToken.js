@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 
@@ -9,15 +9,31 @@ const RefreshAccessToken = () => {
   const { update } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get("redirect") || (typeof window !== "undefined" && localStorage.getItem("initialPage")) || "/dashboard";
+  const [ready, setReady] = useState(false);
+  // const redirectPath = searchParams.get("redirect") || (typeof window !== "undefined" && localStorage.getItem("initialPage")) || "/dashboard";
 
   // console.log(redirectPath, "redirectPath");
 
   // console.log(window.location.href); // Should show ?redirect=/your-path
 
   useEffect(() => {
+    if (searchParams) {
+      setReady(true); // wait until searchParams is hydrated
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!ready) return;
+
     const tryRefresh = async () => {
       try {
+        const redirectPath = searchParams.get("redirect");
+        if (!redirectPath) {
+          console.warn("Missing redirect path. Avoiding refresh.");
+          router.replace("/auth/restricted-access");
+          return;
+        }
+
         // const res = await axios.post("http://localhost:5000/refresh-token", null, {
         //   withCredentials: true,
         // });
@@ -48,7 +64,7 @@ const RefreshAccessToken = () => {
     };
 
     tryRefresh();
-  }, [router, update, redirectPath]);
+  }, [ready, router, searchParams, update]);
 
   return (
     <div className="min-h-screen flex items-center justify-center text-gray-600">
