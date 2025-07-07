@@ -1,21 +1,26 @@
 "use client";
 import useCustomerSupport from '@/app/hooks/useCustomerSupport';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Loading from '../shared/Loading/Loading';
 import { GoDotFill } from 'react-icons/go';
 import { formatMessageDate } from '../navbar/GetTimeAgo';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import SupportFilterDropdown from './SupportFilter';
+import AssignUser from './AssignUser';
+import { useSearchParams } from 'next/navigation';
 
 const CustomerSupportComponent = () => {
 
+  const searchParams = useSearchParams();
+  const selectedMessageId = searchParams.get("selectedMessageId");
   const [existingCustomerSupport, isCustomerSupportPending, refetch] = useCustomerSupport();
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const axiosSecure = useAxiosSecure();
   const [filter, setFilter] = useState("all"); // 'all' or 'unread'
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
-  const displayedNotifications = useMemo(() => {
+  const displayedInboxes = useMemo(() => {
     let baseList;
 
     if (filter === "unread") {
@@ -27,8 +32,7 @@ const CustomerSupportComponent = () => {
     return baseList;
   }, [existingCustomerSupport, filter]);
 
-  const handleOpenMessage = async (item) => {
-
+  const handleOpenMessage = useCallback(async (item) => {
     setSelectedMessage(item);
 
     if (!item.isRead) {
@@ -37,12 +41,20 @@ const CustomerSupportComponent = () => {
         if (result.data.success === true) {
           refetch();
         }
-
       } catch (err) {
         console.error("Failed to mark as read", err);
       }
     }
-  };
+
+    try {
+      const res = await axiosSecure.get(`/assigned-users/${item._id}`);
+      if (res.data.success) {
+        setSelectedUsers(res.data.assignedUsers);
+      }
+    } catch (err) {
+      console.error("Failed to fetch assigned users", err);
+    }
+  }, [axiosSecure, refetch]);
 
   const handleMarkAsUnread = async () => {
     if (!selectedIds.length) return;
@@ -60,6 +72,15 @@ const CustomerSupportComponent = () => {
     }
   };
 
+  useEffect(() => {
+    if (!selectedMessageId || !existingCustomerSupport) return;
+
+    const foundMessage = existingCustomerSupport.find(m => m._id === selectedMessageId);
+    if (foundMessage) {
+      handleOpenMessage(foundMessage);
+    }
+  }, [selectedMessageId, existingCustomerSupport, handleOpenMessage]);
+
   if (isCustomerSupportPending) return <Loading />;
 
   return (
@@ -75,8 +96,8 @@ const CustomerSupportComponent = () => {
           </div>
 
           {
-            displayedNotifications?.length > 0 ? (
-              displayedNotifications.map((item) => (
+            displayedInboxes?.length > 0 ? (
+              displayedInboxes.map((item) => (
                 <div
                   key={item._id}
                   onClick={() => handleOpenMessage(item)}
@@ -120,7 +141,7 @@ const CustomerSupportComponent = () => {
         <div className='lg:col-span-8 overflow-y-auto custom-scrollbars'>
 
           <div className="h-[56px] mt-[5px] px-2 flex items-center gap-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-            {selectedIds.length > 0 && (
+            {selectedIds?.length > 0 && (
               <div className="p-4 flex items-center gap-4 bg-gray-50 border-b border-gray-200">
                 <button
                   onClick={() => handleMarkAsUnread(selectedIds)}
@@ -128,17 +149,16 @@ const CustomerSupportComponent = () => {
                 >
                   Mark as Unread
                 </button>
-
-                <button
-                  onClick={() => {
-                    // trigger assign modal or logic
-                  }}
-                  className="text-green-600 hover:underline"
-                >
-                  Assign User
-                </button>
               </div>
             )}
+            {selectedIds?.length === 0 && selectedMessage?._id &&
+              <div className="p-4 flex items-center gap-4 bg-gray-50 border-b border-gray-200">
+                <AssignUser
+                  messageId={selectedMessage?._id}
+                  selectedUsers={selectedUsers}
+                  setSelectedUsers={setSelectedUsers} />
+              </div>
+            }
           </div>
 
           {
