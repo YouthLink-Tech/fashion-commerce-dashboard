@@ -9,6 +9,7 @@ import NotificationLoading from '../shared/Loading/NotificationLoading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useAuth } from '@/app/contexts/auth';
 import { useSession } from 'next-auth/react';
+import toast from 'react-hot-toast';
 
 const Notifications = () => {
 
