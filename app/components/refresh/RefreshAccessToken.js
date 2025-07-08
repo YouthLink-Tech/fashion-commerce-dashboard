@@ -34,10 +34,10 @@ const RefreshAccessToken = () => {
           return;
         }
 
-        // const res = await axios.post("http://localhost:5000/refresh-token", null, {
+        // const res = await axios.post("http://localhost:5000/refresh-token-backend", null, {
         //   withCredentials: true,
         // });
-        const res = await axios.post("https://fc-backend-664306765395.asia-south1.run.app/refresh-token", null, {
+        const res = await axios.post("https://fc-backend-664306765395.asia-south1.run.app/refresh-token-backend", null, {
           withCredentials: true,
         });
 
