@@ -14,7 +14,6 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useSizeRanges from '@/app/hooks/useSizeRanges';
@@ -42,7 +41,6 @@ const FirstStepOfAddProduct = () => {
 
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [tagList, isTagPending] = useTags();
   const [vendorList, isVendorPending] = useVendors();
@@ -359,7 +357,7 @@ const FirstStepOfAddProduct = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

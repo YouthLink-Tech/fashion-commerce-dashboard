@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { FiSave } from 'react-icons/fi';
 import useLocations from '@/app/hooks/useLocations';
@@ -27,7 +26,6 @@ const SecondStepOfAddProduct = () => {
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [navigate, setNavigate] = useState(false);
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [locationList, isLocationPending] = useLocations();
   const [showModal, setShowModal] = useState(false);
@@ -220,7 +218,7 @@ const SecondStepOfAddProduct = () => {
       for (const image of images) {
         formData.append('file', image.file); // ✅ correctly send the File object
       }
-      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+      const response = await axiosSecure.post('/upload-multiple-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

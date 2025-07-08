@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -19,7 +18,6 @@ import Loading from '@/app/components/shared/Loading/Loading';
 const EditShipmentHandler = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [deliveryType, setDeliveryType] = useState([]);
@@ -81,7 +79,7 @@ const EditShipmentHandler = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

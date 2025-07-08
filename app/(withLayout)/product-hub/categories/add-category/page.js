@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@nextui-org/react';
@@ -25,7 +24,6 @@ const AddCategory = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [image, setImage] = useState(null);
@@ -153,7 +151,7 @@ const AddCategory = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -172,7 +170,7 @@ const AddCategory = () => {
     formData.append('attachment', image.file);  // assuming image = { file: File }
 
     try {
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

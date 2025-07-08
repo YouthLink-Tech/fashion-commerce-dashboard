@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
@@ -20,7 +19,6 @@ const policyLabels = [
 ];
 
 const PolicyPages = () => {
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const { handleSubmit } = useForm();
   const [files, setFiles] = useState({});
@@ -69,7 +67,7 @@ const PolicyPages = () => {
   const uploadFile = async (file, key) => {
     const formData = new FormData();
     formData.append(key, file);
-    const response = await axiosPublic.post('/upload-multiple-files', formData, {
+    const response = await axiosSecure.post('/upload-multiple-files', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response?.data?.urls;

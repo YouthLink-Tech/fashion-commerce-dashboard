@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
@@ -19,7 +18,6 @@ const currentModule = "Settings";
 const HomepageContent = () => {
 
   const { handleSubmit, control, setValue, formState: { errors } } = useForm();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [heroBannerImageList = [], isLoginRegisterHeroBannerImagePending, refetch] = useHeroBannerImages();
   const [image, setImage] = useState([]);
@@ -202,11 +200,11 @@ const HomepageContent = () => {
 
           <div className='flex flex-col w-full rounded-lg gap-4 xl:gap-8'>
 
-            <LeftSlides image={image} setImage={setImage} setSizeError={setSizeError} sizeError={sizeError} axiosPublic={axiosPublic} dragging={dragging} setDragging={setDragging} />
+            <LeftSlides image={image} setImage={setImage} setSizeError={setSizeError} sizeError={sizeError} axiosSecure={axiosSecure} dragging={dragging} setDragging={setDragging} />
 
-            <CenterSlides image2={image2} setImage2={setImage2} setSizeError2={setSizeError2} sizeError2={sizeError2} axiosPublic={axiosPublic} dragging2={dragging2} setDragging2={setDragging2} />
+            <CenterSlides image2={image2} setImage2={setImage2} setSizeError2={setSizeError2} sizeError2={sizeError2} axiosSecure={axiosSecure} dragging2={dragging2} setDragging2={setDragging2} />
 
-            <RightSlides image3={image3} setImage3={setImage3} setSizeError3={setSizeError3} sizeError3={sizeError3} axiosPublic={axiosPublic} dragging3={dragging3} setDragging3={setDragging3} />
+            <RightSlides image3={image3} setImage3={setImage3} setSizeError3={setSizeError3} sizeError3={sizeError3} axiosSecure={axiosSecure} dragging3={dragging3} setDragging3={setDragging3} />
 
           </div>
 

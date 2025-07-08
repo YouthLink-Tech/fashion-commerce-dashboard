@@ -1,6 +1,5 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,7 +26,6 @@ const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false }
 const EditOffer = () => {
 
   const { id } = useParams();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
@@ -141,7 +139,7 @@ const EditOffer = () => {
       const formData = new FormData();
       formData.append('attachment', image);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

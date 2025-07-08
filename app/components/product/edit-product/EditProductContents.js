@@ -3,7 +3,6 @@ import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import ColorOption from '@/app/components/product/color/ColorOption';
 import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
 import useColors from '@/app/hooks/useColors';
 import useSizeRanges from '@/app/hooks/useSizeRanges';
@@ -59,7 +58,6 @@ const EditProductContents = () => {
   const decodedSeasonName = decodeURIComponent(season || ''); // Decode the season name
 
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [productDetails, setProductDetails] = useState("");
   const [materialCare, setMaterialCare] = useState("");
@@ -426,7 +424,7 @@ const EditProductContents = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -562,7 +560,7 @@ const EditProductContents = () => {
       for (const image of images) {
         formData.append('file', image.file); // ✅ correctly send the File object
       }
-      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+      const response = await axiosSecure.post('/upload-multiple-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

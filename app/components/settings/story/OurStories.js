@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import useOurStory from '@/app/hooks/useOurStory';
 import Swal from 'sweetalert2';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import { useDisclosure } from '@nextui-org/react';
@@ -16,7 +15,6 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const OurStories = () => {
 
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [ourStoryList, isOurStoryPending, refetch] = useOurStory();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -157,7 +155,7 @@ const OurStories = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -174,7 +172,7 @@ const OurStories = () => {
   const uploadSingleFileToGCS2 = async (file) => {
     try {
       // Step 1: Ask your backend for a signed upload URL
-      const { data } = await axiosPublic.post('/generate-upload-url', {
+      const { data } = await axiosSecure.post('/generate-upload-url', {
         fileName: file.name,
         contentType: file.type,
       });

@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useMarketingBanners from '@/app/hooks/useMarketingBanners';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +12,6 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 const MarketingBanner = () => {
 
   const { handleSubmit } = useForm();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState("");
@@ -66,7 +64,7 @@ const MarketingBanner = () => {
     formData.append('attachment', image.file);  // assuming image = { file: File }
 
     try {
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

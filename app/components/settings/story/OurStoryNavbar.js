@@ -7,7 +7,6 @@ import { FaPlus } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
 import FileUploadZone from './FileUploadZone';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 const OurStoryEditor = dynamic(() => import('@/app/utils/Editor/OurStoryEditor'), { ssr: false });
 import DOMPurify from "dompurify";
 import useOurStory from '@/app/hooks/useOurStory';
@@ -24,7 +23,6 @@ const OurStoryNavbar = () => {
     },
   });
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [sizeError1, setSizeError1] = useState("");
   const [sizeError2, setSizeError2] = useState("");
@@ -66,7 +64,7 @@ const OurStoryNavbar = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -83,7 +81,7 @@ const OurStoryNavbar = () => {
   const uploadSingleFileToGCS2 = async (file) => {
     try {
       // Step 1: Ask your backend for a signed upload URL
-      const { data } = await axiosPublic.post('/generate-upload-url', {
+      const { data } = await axiosSecure.post('/generate-upload-url', {
         fileName: file.name,
         contentType: file.type,
       });

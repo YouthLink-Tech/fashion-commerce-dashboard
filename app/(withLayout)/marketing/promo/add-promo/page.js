@@ -1,6 +1,5 @@
 "use client";
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
@@ -19,7 +18,6 @@ const AddPromo = () => {
 
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
@@ -53,7 +51,7 @@ const AddPromo = () => {
       const formData = new FormData();
       formData.append('attachment', image);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

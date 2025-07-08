@@ -4,7 +4,6 @@ import VendorSelect from '@/app/components/product/select/VendorSelect';
 import { formatDate } from '@/app/components/shared/date-format/DateFormat';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
@@ -22,7 +21,6 @@ const currentModule = "Product Hub";
 
 const CreatePurchaseOrder = () => {
 
-	const axiosPublic = useAxiosPublic();
 	const axiosSecure = useAxiosSecure();
 	const router = useRouter();
 	const { register, handleSubmit, setValue, formState: { errors } } = useForm();
@@ -392,7 +390,7 @@ const CreatePurchaseOrder = () => {
 			const formData = new FormData();
 			formData.append('attachment', file); // Append the file to FormData
 
-			const response = await axiosPublic.post('/upload-single-file', formData, {
+			const response = await axiosSecure.post('/upload-single-file', formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},

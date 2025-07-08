@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,7 +16,6 @@ const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false }
 
 const AddPaymentMethod = () => {
 
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState(null);
@@ -48,7 +46,7 @@ const AddPaymentMethod = () => {
       const formData = new FormData();
       formData.append('attachment', image.file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

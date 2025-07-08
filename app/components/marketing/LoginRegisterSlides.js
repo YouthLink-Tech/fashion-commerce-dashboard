@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -14,7 +13,6 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 const LoginRegisterSlides = () => {
 
   const { handleSubmit } = useForm();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [sizeError, setSizeError] = useState(false);
@@ -86,7 +84,7 @@ const LoginRegisterSlides = () => {
       for (const image of images) {
         formData.append('file', image.file); // ✅ correctly send the File object
       }
-      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+      const response = await axiosSecure.post('/upload-multiple-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

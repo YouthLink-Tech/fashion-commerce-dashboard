@@ -6,14 +6,12 @@ import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { isValidImageFile } from '../../shared/upload/isValidImageFile';
 import { FiSave } from 'react-icons/fi';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useLogo from '@/app/hooks/useLogo';
 import Loading from '../../shared/Loading/Loading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const LogoSettings = () => {
 
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const { handleSubmit } = useForm();
   const [image, setImage] = useState(null);
@@ -98,7 +96,7 @@ const LogoSettings = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

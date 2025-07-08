@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -25,7 +24,6 @@ const AddOffer = () => {
 
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
   const router = useRouter();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const [offerDiscountType, setOfferDiscountType] = useState('Percentage');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,7 +88,7 @@ const AddOffer = () => {
       const formData = new FormData();
       formData.append('attachment', image);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

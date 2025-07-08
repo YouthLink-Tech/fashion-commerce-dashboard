@@ -3,7 +3,7 @@ import React from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
 
-const LeftSlides = ({ image, setImage, setSizeError, sizeError, axiosPublic, dragging, setDragging }) => {
+const LeftSlides = ({ image, setImage, setSizeError, sizeError, axiosSecure, dragging, setDragging }) => {
 
   const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_FILES = 6;
@@ -74,7 +74,7 @@ const LeftSlides = ({ image, setImage, setSizeError, sizeError, axiosPublic, dra
       for (const image of files) {
         formData.append('file', image.file); // ✅ correctly send the File object
       }
-      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+      const response = await axiosSecure.post('/upload-multiple-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

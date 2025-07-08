@@ -1,5 +1,4 @@
 "use client";
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -25,7 +24,6 @@ const defaultImages = ["https://i.ibb.co.com/b7TyG4Y/8271908.png",
 const AddSeason = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const axiosPublic = useAxiosPublic();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [image, setImage] = useState(null);
@@ -37,7 +35,7 @@ const AddSeason = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosPublic.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
