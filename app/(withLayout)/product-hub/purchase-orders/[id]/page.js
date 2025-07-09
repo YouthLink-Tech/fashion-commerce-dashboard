@@ -35,17 +35,17 @@ const EditPurchaseOrderPage = () => {
   const router = useRouter();
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [estimatedArrival, setEstimatedArrival] = useState(''); // Initial state set to an empty string
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [dateError, setDateError] = useState(false)
-  const [productList, isProductPending] = useProductsInformation();
+  // const [productList, isProductPending] = useProductsInformation();
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [shipping, setShipping] = useState(0);  // Initial value for shipping
   const [discount, setDiscount] = useState(0);  // Initial value for discount
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  // const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [purchaseOrderVariants, setPurchaseOrderVariants] = useState([]);
   const [purchaseOrderStatus, setPurchaseOrderStatus] = useState("");
@@ -114,12 +114,12 @@ const EditPurchaseOrderPage = () => {
     setDiscount(parseFloat(e.target.value) || 0);  // Update state with parsed value
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    if (e.target.value) {
-      onOpen(); // Open modal when there's input
-    }
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearchQuery(e.target.value);
+  //   if (e.target.value) {
+  //     onOpen(); // Open modal when there's input
+  //   }
+  // };
 
   // Memoized function to fetch purchase order data
   const fetchPurchaseOrderData = useCallback(async () => {
@@ -160,9 +160,12 @@ const EditPurchaseOrderPage = () => {
       setAttachment(order?.attachment || "");
 
       setIsLoading(false);
+
+      return order;
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch purchase order details!");
+      return null;
     }
   }, [id, setValue, axiosSecure, reset, session?.user?.accessToken, status]);
 
@@ -172,232 +175,232 @@ const EditPurchaseOrderPage = () => {
   }, [fetchPurchaseOrderData]);
 
   // Function to calculate total SKU per size and SKU for selected location
-  const calculateSkuBySizeAndColorAndLocation = (productList, selectedLocation) => {
-    if (!productList || !selectedLocation) return [];
+  // const calculateSkuBySizeAndColorAndLocation = (productList, selectedLocation) => {
+  //   if (!productList || !selectedLocation) return [];
 
-    const skuByProduct = [];
+  //   const skuByProduct = [];
 
-    productList?.forEach((product) => {
-      const skuEntries = [];
+  //   productList?.forEach((product) => {
+  //     const skuEntries = [];
 
-      product?.productVariants?.forEach((variant) => {
-        const size = variant?.size;
-        const colorCode = variant?.color?.color; // Hex code for the color
-        const colorName = variant?.color?.value; // Name of the color
-        const sku = variant?.sku || 0;
+  //     product?.productVariants?.forEach((variant) => {
+  //       const size = variant?.size;
+  //       const colorCode = variant?.color?.color; // Hex code for the color
+  //       const colorName = variant?.color?.value; // Name of the color
+  //       const sku = variant?.sku || 0;
 
-        // Find an existing entry for this size and color
-        let entry = skuEntries?.find(
-          (e) => e?.size === size && e?.color?.code === colorCode
-        );
+  //       // Find an existing entry for this size and color
+  //       let entry = skuEntries?.find(
+  //         (e) => e?.size === size && e?.color?.code === colorCode
+  //       );
 
-        if (!entry) {
-          // If not found, initialize a new entry for this size and color
-          entry = { size, color: { code: colorCode, name: colorName }, locationSku: 0, totalSku: 0 };
-          skuEntries.push(entry);
-        }
+  //       if (!entry) {
+  //         // If not found, initialize a new entry for this size and color
+  //         entry = { size, color: { code: colorCode, name: colorName }, locationSku: 0, totalSku: 0 };
+  //         skuEntries.push(entry);
+  //       }
 
-        // Add to total SKU for this size and color
-        entry.totalSku += sku;
+  //       // Add to total SKU for this size and color
+  //       entry.totalSku += sku;
 
-        // If the variant matches the selected location, add its SKU to locationSku
-        if (variant?.location === selectedLocation) {
-          entry.locationSku += sku;
-        }
-      });
+  //       // If the variant matches the selected location, add its SKU to locationSku
+  //       if (variant?.location === selectedLocation) {
+  //         entry.locationSku += sku;
+  //       }
+  //     });
 
-      // Find the first image URL from a variant matching the selected location
-      // const variantWithLocation = product.productVariants.find(
-      //   (variant) => variant.location === selectedLocation
-      // );
-      // const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
+  //     // Find the first image URL from a variant matching the selected location
+  //     // const variantWithLocation = product.productVariants.find(
+  //     //   (variant) => variant.location === selectedLocation
+  //     // );
+  //     // const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
 
-      skuByProduct?.push({
-        productTitle: product?.productTitle,
-        skuBySizeAndColor: skuEntries,
-        imageUrl: product?.thumbnailImageUrl,
-      });
-    });
+  //     skuByProduct?.push({
+  //       productTitle: product?.productTitle,
+  //       skuBySizeAndColor: skuEntries,
+  //       imageUrl: product?.thumbnailImageUrl,
+  //     });
+  //   });
 
-    return skuByProduct;
-  };
+  //   return skuByProduct;
+  // };
 
   // Function to toggle selection for a specific product size
-  const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
-    setSelectedProducts((prevSelectedProducts) => {
-      const isSelected = prevSelectedProducts?.some(
-        (item) =>
-          item?.productTitle === product?.productTitle &&
-          item?.size === size &&
-          item?.color === colorCode &&
-          item?.name === colorName
-      );
+  // const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
+  //   setSelectedProducts((prevSelectedProducts) => {
+  //     const isSelected = prevSelectedProducts?.some(
+  //       (item) =>
+  //         item?.productTitle === product?.productTitle &&
+  //         item?.size === size &&
+  //         item?.color === colorCode &&
+  //         item?.name === colorName
+  //     );
 
-      if (isSelected) {
-        // Deselect the specific entry
-        setPurchaseOrderVariants((prevVariants) =>
-          prevVariants.filter(
-            (variant) =>
-              !(
-                variant?.productTitle === product?.productTitle &&
-                variant?.size === size &&
-                variant?.color?.code === colorCode &&
-                variant?.color?.name === colorName
-              )
-          )
-        );
-        return prevSelectedProducts?.filter(
-          (item) =>
-            !(
-              item?.productTitle === product?.productTitle &&
-              item?.size === size &&
-              item?.color === colorCode &&
-              item?.name === colorName
-            )
-        );
-      } else {
-        // Select the specific entry
-        setPurchaseOrderVariants((prevVariants) => [
-          ...prevVariants,
-          {
-            productTitle: product?.productTitle,
-            size,
-            color: {
-              code: colorCode,
-              name: colorName,
-            },
-            quantity: 0, // Initialize quantity to 0 or any default value
-            cost: 0, // Initialize cost to 0
-            tax: 0, // Initialize tax to 0
-          },
-        ]);
-        return [
-          ...prevSelectedProducts,
-          {
-            productTitle: product?.productTitle,
-            imageUrl: product?.imageUrl,
-            size,
-            color: colorCode,
-            name: colorName,
-          },
-        ];
-      }
-    });
-  };
+  //     if (isSelected) {
+  //       // Deselect the specific entry
+  //       setPurchaseOrderVariants((prevVariants) =>
+  //         prevVariants.filter(
+  //           (variant) =>
+  //             !(
+  //               variant?.productTitle === product?.productTitle &&
+  //               variant?.size === size &&
+  //               variant?.color?.code === colorCode &&
+  //               variant?.color?.name === colorName
+  //             )
+  //         )
+  //       );
+  //       return prevSelectedProducts?.filter(
+  //         (item) =>
+  //           !(
+  //             item?.productTitle === product?.productTitle &&
+  //             item?.size === size &&
+  //             item?.color === colorCode &&
+  //             item?.name === colorName
+  //           )
+  //       );
+  //     } else {
+  //       // Select the specific entry
+  //       setPurchaseOrderVariants((prevVariants) => [
+  //         ...prevVariants,
+  //         {
+  //           productTitle: product?.productTitle,
+  //           size,
+  //           color: {
+  //             code: colorCode,
+  //             name: colorName,
+  //           },
+  //           quantity: 0, // Initialize quantity to 0 or any default value
+  //           cost: 0, // Initialize cost to 0
+  //           tax: 0, // Initialize tax to 0
+  //         },
+  //       ]);
+  //       return [
+  //         ...prevSelectedProducts,
+  //         {
+  //           productTitle: product?.productTitle,
+  //           imageUrl: product?.imageUrl,
+  //           size,
+  //           color: colorCode,
+  //           name: colorName,
+  //         },
+  //       ];
+  //     }
+  //   });
+  // };
 
   // Function to toggle selection for all sizes of a product
-  const toggleAllSizesAndColorsForProduct = (product) => {
-    setSelectedProducts((prevSelectedProducts) => {
-      const allSelected = product?.skuBySizeAndColor?.every((entry) =>
-        prevSelectedProducts?.some(
-          (item) =>
-            item?.productTitle === product?.productTitle &&
-            item?.size === entry?.size &&
-            item?.color === entry?.color?.code &&
-            item?.name === entry?.color?.name
-        )
-      );
+  // const toggleAllSizesAndColorsForProduct = (product) => {
+  //   setSelectedProducts((prevSelectedProducts) => {
+  //     const allSelected = product?.skuBySizeAndColor?.every((entry) =>
+  //       prevSelectedProducts?.some(
+  //         (item) =>
+  //           item?.productTitle === product?.productTitle &&
+  //           item?.size === entry?.size &&
+  //           item?.color === entry?.color?.code &&
+  //           item?.name === entry?.color?.name
+  //       )
+  //     );
 
-      if (allSelected) {
-        // Deselect all sizes and colors for this product
-        setPurchaseOrderVariants((prevVariants) =>
-          prevVariants?.filter((variant) => variant?.productTitle !== product?.productTitle)
-        );
-        return prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle);
-      } else {
-        // Select all sizes and colors for this product
-        const newSelections = product?.skuBySizeAndColor?.map((entry) => ({
-          productTitle: product?.productTitle,
-          imageUrl: product?.imageUrl,
-          size: entry?.size,
-          color: entry?.color?.code,
-          name: entry?.color?.name,
-        }));
+  //     if (allSelected) {
+  //       // Deselect all sizes and colors for this product
+  //       setPurchaseOrderVariants((prevVariants) =>
+  //         prevVariants?.filter((variant) => variant?.productTitle !== product?.productTitle)
+  //       );
+  //       return prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle);
+  //     } else {
+  //       // Select all sizes and colors for this product
+  //       const newSelections = product?.skuBySizeAndColor?.map((entry) => ({
+  //         productTitle: product?.productTitle,
+  //         imageUrl: product?.imageUrl,
+  //         size: entry?.size,
+  //         color: entry?.color?.code,
+  //         name: entry?.color?.name,
+  //       }));
 
-        setPurchaseOrderVariants((prevVariants) => [
-          ...prevVariants?.filter((variant) => variant.productTitle !== product.productTitle),
-          ...product?.skuBySizeAndColor?.map((entry) => ({
-            productTitle: product?.productTitle,
-            size: entry?.size,
-            color: {
-              code: entry?.color?.code,
-              name: entry?.color?.name,
-            },
-            quantity: 0, // Initialize quantity to 0
-            cost: 0, // Initialize cost to 0
-            tax: 0, // Initialize tax to 0
-          })),
-        ]);
+  //       setPurchaseOrderVariants((prevVariants) => [
+  //         ...prevVariants?.filter((variant) => variant.productTitle !== product.productTitle),
+  //         ...product?.skuBySizeAndColor?.map((entry) => ({
+  //           productTitle: product?.productTitle,
+  //           size: entry?.size,
+  //           color: {
+  //             code: entry?.color?.code,
+  //             name: entry?.color?.name,
+  //           },
+  //           quantity: 0, // Initialize quantity to 0
+  //           cost: 0, // Initialize cost to 0
+  //           tax: 0, // Initialize tax to 0
+  //         })),
+  //       ]);
 
-        return [
-          ...prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle),
-          ...newSelections,
-        ];
-      }
-    });
-  };
+  //       return [
+  //         ...prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle),
+  //         ...newSelections,
+  //       ];
+  //     }
+  //   });
+  // };
 
   // Function to remove a selected product
-  const removeSelectedProduct = (product, size, color) => {
+  // const removeSelectedProduct = (product, size, color) => {
 
-    setSelectedProducts((prevSelectedProducts) => {
-      const updatedSelectedProducts = prevSelectedProducts?.filter(
-        (item) => !(
-          item?.productTitle === product?.productTitle &&
-          item?.size === size &&
-          item?.color === color
-        )
-      );
-      return updatedSelectedProducts;
-    });
+  //   setSelectedProducts((prevSelectedProducts) => {
+  //     const updatedSelectedProducts = prevSelectedProducts?.filter(
+  //       (item) => !(
+  //         item?.productTitle === product?.productTitle &&
+  //         item?.size === size &&
+  //         item?.color === color
+  //       )
+  //     );
+  //     return updatedSelectedProducts;
+  //   });
 
-    setPurchaseOrderVariants((prevVariants) => {
-      const updatedVariants = prevVariants?.filter((variant) => {
-        const titleMatches = variant?.productTitle === product?.productTitle;
-        const sizeMatches = variant?.size === size;
-        const colorMatches = variant?.color?.code === color;
+  //   setPurchaseOrderVariants((prevVariants) => {
+  //     const updatedVariants = prevVariants?.filter((variant) => {
+  //       const titleMatches = variant?.productTitle === product?.productTitle;
+  //       const sizeMatches = variant?.size === size;
+  //       const colorMatches = variant?.color?.code === color;
 
-        return !(titleMatches && sizeMatches && colorMatches);
-      });
-      return updatedVariants;
-    });
-  };
+  //       return !(titleMatches && sizeMatches && colorMatches);
+  //     });
+  //     return updatedVariants;
+  //   });
+  // };
 
   // Update filtered products whenever productList or searchQuery changes
-  useEffect(() => {
-    const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedLocation?.locationName);
+  // useEffect(() => {
+  //   const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedLocation?.locationName);
 
-    const filtered = totalSku?.filter(product => {
-      // Check if productTitle matches the search query
-      const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
+  //   const filtered = totalSku?.filter(product => {
+  //     // Check if productTitle matches the search query
+  //     const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Check if sizes, colors, locationSku, or totalSku match the search query
-      const sizeOrColorMatches = product?.skuBySizeAndColor?.some(entry => {
-        // Check if entry.size matches the search query
-        const sizeMatches = entry?.size?.toString().toLowerCase().includes(searchQuery.toLowerCase());
+  //     // Check if sizes, colors, locationSku, or totalSku match the search query
+  //     const sizeOrColorMatches = product?.skuBySizeAndColor?.some(entry => {
+  //       // Check if entry.size matches the search query
+  //       const sizeMatches = entry?.size?.toString().toLowerCase().includes(searchQuery.toLowerCase());
 
-        // Assuming entry.color is an object with a 'name' property
-        const colorNameMatches = entry?.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
+  //       // Assuming entry.color is an object with a 'name' property
+  //       const colorNameMatches = entry?.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
 
-        return sizeMatches || colorNameMatches;
-      });
+  //       return sizeMatches || colorNameMatches;
+  //     });
 
-      // Check if locationSku matches the search query
-      const locationSkuMatches = product.skuBySizeAndColor.some(entry => {
-        return entry.locationSku.toString().includes(searchQuery);
-      });
+  //     // Check if locationSku matches the search query
+  //     const locationSkuMatches = product.skuBySizeAndColor.some(entry => {
+  //       return entry.locationSku.toString().includes(searchQuery);
+  //     });
 
-      // Check if totalSku matches the search query
-      const totalSkuMatches = product.skuBySizeAndColor.some(entry => {
-        return entry.totalSku.toString().includes(searchQuery);
-      });
+  //     // Check if totalSku matches the search query
+  //     const totalSkuMatches = product.skuBySizeAndColor.some(entry => {
+  //       return entry.totalSku.toString().includes(searchQuery);
+  //     });
 
-      // Return true if title, size/color, locationSku, or totalSku matches the search query
-      return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches;
-    });
+  //     // Return true if title, size/color, locationSku, or totalSku matches the search query
+  //     return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches;
+  //   });
 
-    setFilteredProducts(filtered);
-  }, [productList, searchQuery, selectedLocation]);
+  //   setFilteredProducts(filtered);
+  // }, [productList, searchQuery, selectedLocation]);
 
   const handlePaymentTerms = (value) => {
     setPaymentTerms(value);
@@ -563,7 +566,27 @@ const EditPurchaseOrderPage = () => {
           position: "bottom-right",
           duration: 5000
         })
-        await fetchPurchaseOrderData();
+
+        const updatedOrder = await fetchPurchaseOrderData();
+
+        if (!updatedOrder) return;
+
+        const updatedFormValues = {
+          shipping: updatedOrder.shippingCharge || 0,
+          discount: updatedOrder.discountCharge || 0,
+          referenceNumber: updatedOrder.referenceNumber || "",
+          supplierNote: updatedOrder.supplierNote || "",
+          estimatedArrival: formatDateForInput(updatedOrder.estimatedArrival),
+        };
+
+        updatedOrder.purchaseOrderVariants.forEach((variant, index) => {
+          updatedFormValues[`quantity-${index}`] = variant.quantity;
+          updatedFormValues[`cost-${index}`] = variant.cost;
+          updatedFormValues[`tax-${index}`] = variant.tax || '';
+        });
+
+        reset(updatedFormValues); // ✅ This now includes all fields
+
       } else {
         toast.error('No changes detected.');
       }
@@ -692,7 +715,7 @@ const EditPurchaseOrderPage = () => {
       });
   };
 
-  if (isLoading || isProductPending || isUserLoading || status === "loading") {
+  if (isLoading || isUserLoading || status === "loading") {
     return <Loading />;
   }
 
@@ -830,7 +853,7 @@ const EditPurchaseOrderPage = () => {
                   <input
                     type="date"
                     id="estimatedArrival"
-                    {...register("estimatedArrival", { required: true })}
+                    {...register("estimatedArrival", { required: purchaseOrderStatus === "pending" })}
                     value={estimatedArrival}
                     onChange={(e) => setEstimatedArrival(e.target.value)} // Update state with the input value
                     className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
@@ -847,7 +870,7 @@ const EditPurchaseOrderPage = () => {
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             <div className='flex justify-between items-center gap-6'>
-              <h1 className='font-bold text-lg flex-1'>{["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "Ordered products" : "Add products"}</h1>
+              <h1 className='font-bold text-lg flex-1'>{["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "Ordered products" : "Edit products"}</h1>
               <div className='flex-1'>
                 {purchaseOrderStatus === "received" ? <div className=''>
                   <div className='flex flex-col'>
@@ -864,7 +887,7 @@ const EditPurchaseOrderPage = () => {
               </div>
             </div>
 
-            {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : <div className='w-full pt-2'>
+            {/* {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : <div className='w-full pt-2'>
               <li className="flex items-center relative group border-2 rounded-lg">
                 <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
                   <g>
@@ -879,7 +902,7 @@ const EditPurchaseOrderPage = () => {
                   className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:bg-white  text-[12px] md:text-base"
                 />
               </li>
-            </div>}
+            </div>} */}
 
             {selectedProducts?.length > 0 &&
               <div
@@ -919,7 +942,7 @@ const EditPurchaseOrderPage = () => {
                       const total = totalCost + taxAmount;
 
                       return (
-                        <tr key={index} className="hover:bg-gray-50">
+                        <tr key={index} className={`${["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : "hover:bg-gray-50"}`}>
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
                               <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
@@ -935,7 +958,7 @@ const EditPurchaseOrderPage = () => {
                           <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                             <input
                               id={`quantity-${index}`}
-                              {...register(`quantity-${index}`, { required: true })}
+                              {...register(`quantity-${index}`, { required: purchaseOrderStatus === "pending" })}
                               value={purchaseOrderVariants[index]?.quantity || ''}
                               onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
                               className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -952,7 +975,7 @@ const EditPurchaseOrderPage = () => {
                               <span className="input-prefix">৳</span>
                               <input
                                 id={`cost-${index}`}
-                                {...register(`cost-${index}`, { required: true })}
+                                {...register(`cost-${index}`, { required: purchaseOrderStatus === "pending" })}
                                 value={purchaseOrderVariants[index]?.cost || ''}
                                 onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
                                 className="pl-7 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -982,14 +1005,14 @@ const EditPurchaseOrderPage = () => {
                           <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                             <div className='flex gap-3 w-full justify-center items-center'>
                               <p className="font-bold flex gap-1 text-neutral-500"><span>৳</span> {total.toFixed(2)}</p> {/* Display the total */}
-                              {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : <button
+                              {/* {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : <button
                                 type="button"  // Set type to "button" to prevent form submission
                                 onClick={() => removeSelectedProduct(product, product.size, product.color)}
                                 className="hover:text-red-700 text-gray-700"
                                 aria-label="Remove product"
                               >
                                 <RxCross2 size={18} />
-                              </button>}
+                              </button>} */}
                             </div>
                           </td>
                         </tr>
@@ -1158,7 +1181,7 @@ const EditPurchaseOrderPage = () => {
 
       </form>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+      {/* <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
         <ModalContent>
           {(onClose) => (
             <>
@@ -1234,7 +1257,7 @@ const EditPurchaseOrderPage = () => {
                             <td colSpan="2"></td>
                           </tr>
 
-                          {/* Show sizes and colors */}
+                          
                           {product?.skuBySizeAndColor?.map((entry) => (
                             <tr key={`${index}-${entry.size}-${entry.color.code}`} className="hover:bg-gray-50 transition-colors">
                               <td className="pl-12 text-xs p-3 text-gray-600 flex items-center">
@@ -1281,7 +1304,7 @@ const EditPurchaseOrderPage = () => {
             </>
           )}
         </ModalContent>
-      </Modal>
+      </Modal> */}
 
       <ExitConfirmationModalProduct
         isOpen={isModalOpen}

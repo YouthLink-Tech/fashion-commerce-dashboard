@@ -72,22 +72,32 @@ const EditReceiveInventory = () => {
   };
 
   const handleAcceptChange = (index, value) => {
-    // Allow any number as input
-    const parsedValue = value === '' ? 0 : Math.max(0, parseInt(value)); // Allow 0 or positive numbers
-    setPurchaseOrderVariants(prevVariants => {
-      const updatedVariants = [...prevVariants];
-      updatedVariants[index].accept = parsedValue; // Update accept with parsed value
-      return updatedVariants;
+    const quantity = purchaseOrderVariants[index]?.quantity || 0;
+    let accept = parseInt(value) || 0;
+
+    if (accept > quantity) accept = quantity;
+    const reject = quantity - accept;
+
+    setPurchaseOrderVariants(prev => {
+      const updated = [...prev];
+      updated[index].accept = accept;
+      updated[index].reject = reject;
+      return updated;
     });
   };
 
   const handleRejectChange = (index, value) => {
-    // Allow any number as input
-    const parsedValue = value === '' ? 0 : Math.max(0, parseInt(value)); // Allow 0 or positive numbers
-    setPurchaseOrderVariants(prevVariants => {
-      const updatedVariants = [...prevVariants];
-      updatedVariants[index].reject = parsedValue; // Update reject with parsed value
-      return updatedVariants;
+    const quantity = purchaseOrderVariants[index]?.quantity || 0;
+    let reject = parseInt(value) || 0;
+
+    if (reject > quantity) reject = quantity;
+    const accept = quantity - reject;
+
+    setPurchaseOrderVariants(prev => {
+      const updated = [...prev];
+      updated[index].reject = reject;
+      updated[index].accept = accept;
+      return updated;
     });
   };
 
@@ -315,6 +325,9 @@ const EditReceiveInventory = () => {
                     <div className='flex items-center gap-3'>
                       <input
                         type="number"
+                        min="0"
+                        max={purchaseOrderVariants[index]?.quantity}
+                        step="1"
                         className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                         value={purchaseOrderVariants[index]?.accept || ''} // Set value to empty string when 0
                         onChange={(e) => handleAcceptChange(index, e.target.value)}
@@ -333,6 +346,9 @@ const EditReceiveInventory = () => {
                     <div className='flex items-center gap-3'>
                       <input
                         type="number"
+                        min="0"
+                        max={purchaseOrderVariants[index]?.quantity}
+                        step="1"
                         className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                         value={purchaseOrderVariants[index]?.reject || ''} // Set value to empty string when 0
                         onChange={(e) => handleRejectChange(index, e.target.value)}

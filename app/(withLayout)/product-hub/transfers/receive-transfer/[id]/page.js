@@ -73,21 +73,27 @@ const ReceiveTransferOrder = () => {
   };
 
   const handleAcceptChange = (index, value) => {
-    // Allow any number as input
-    const parsedValue = value === '' ? 0 : Math.max(0, parseInt(value)); // Allow 0 or positive numbers
+    const quantity = transferOrderVariants[index]?.quantity || 0;
+    const parsedAccept = Math.max(0, Math.min(quantity, parseInt(value) || 0));
+    const parsedReject = quantity - parsedAccept;
+
     setTransferOrderVariants(prevVariants => {
       const updatedVariants = [...prevVariants];
-      updatedVariants[index].accept = parsedValue; // Update accept with parsed value
+      updatedVariants[index].accept = parsedAccept;
+      updatedVariants[index].reject = parsedReject;
       return updatedVariants;
     });
   };
 
   const handleRejectChange = (index, value) => {
-    // Allow any number as input
-    const parsedValue = value === '' ? 0 : Math.max(0, parseInt(value)); // Allow 0 or positive numbers
+    const quantity = transferOrderVariants[index]?.quantity || 0;
+    const parsedReject = Math.max(0, Math.min(quantity, parseInt(value) || 0));
+    const parsedAccept = quantity - parsedReject;
+
     setTransferOrderVariants(prevVariants => {
       const updatedVariants = [...prevVariants];
-      updatedVariants[index].reject = parsedValue; // Update reject with parsed value
+      updatedVariants[index].reject = parsedReject;
+      updatedVariants[index].accept = parsedAccept;
       return updatedVariants;
     });
   };
@@ -328,6 +334,9 @@ const ReceiveTransferOrder = () => {
                         className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                         value={transferOrderVariants[index]?.accept || ''} // Set value to empty string when 0
                         onChange={(e) => handleAcceptChange(index, e.target.value)}
+                        max={transferOrderVariants[index]?.quantity}
+                        min={0}
+                        step="1"
                       />
                       <button
                         type="button" // Prevent form submission
@@ -343,6 +352,9 @@ const ReceiveTransferOrder = () => {
                     <div className='flex items-center gap-3'>
                       <input
                         type="number"
+                        max={transferOrderVariants[index]?.quantity}
+                        min={0}
+                        step="1"
                         className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                         value={transferOrderVariants[index]?.reject || ''} // Set value to empty string when 0
                         onChange={(e) => handleRejectChange(index, e.target.value)}
