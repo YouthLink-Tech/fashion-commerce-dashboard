@@ -7,9 +7,9 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
-import useProductsInformation from '@/app/hooks/useProductsInformation';
+// import useProductsInformation from '@/app/hooks/useProductsInformation';
 import Image from 'next/image';
-import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+// import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Swal from 'sweetalert2';
 import { FaUndo } from 'react-icons/fa';
 
