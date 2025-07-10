@@ -6,6 +6,7 @@ import {
   protectedRoutes,
 } from "./app/components/ProtectedRoutes/ProtectedRoutes";
 import { getToken } from "next-auth/jwt";
+import { BACKEND_URL } from "./app/config/config";
 
 // Helper function to fetch user permissions
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -14,8 +15,7 @@ const fetchUserPermissions = async (userId, token, retries = 2, delayMs = 300) =
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await fetch(
-        // `http://localhost:5000/single-existing-user/${userId}`,
-        `https://fc-backend-664306765395.asia-south1.run.app/single-existing-user/${userId}`,
+        `${BACKEND_URL}/single-existing-user/${userId}`,
         {
           method: "GET",
           headers: {

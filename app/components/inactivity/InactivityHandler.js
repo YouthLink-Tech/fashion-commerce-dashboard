@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { BACKEND_URL } from "@/app/config/config";
 
 const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 mins
 
@@ -15,7 +16,7 @@ export default function InactivityHandler() {
 
   const handleLogout = useCallback(async () => {
     try {
-      await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+      await axios.post(`${BACKEND_URL}/logout`, null, {
         withCredentials: true,
       });
     } catch (err) {

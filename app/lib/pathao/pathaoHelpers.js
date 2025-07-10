@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "@/app/config/config";
 import { getPathaoToken } from "./pathaoClient";
 
 export async function lookupCityId(cityName) {
@@ -75,7 +76,7 @@ export async function lookupZoneId(cityId, zoneGuess) {
 
 async function fetchProductById(productId) {
   try {
-    const res = await fetch(`https://fc-backend-664306765395.asia-south1.run.app/singleProduct/${productId}`);
+    const res = await fetch(`${BACKEND_URL}/singleProduct/${productId}`);
     if (!res.ok) {
       throw new Error(`Product ${productId} fetch failed`);
     }

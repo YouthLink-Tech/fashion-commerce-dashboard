@@ -41,6 +41,7 @@ import { CustomCheckbox2 } from '../checkbox/CustomCheckbox2';
 import CustomSwitch from '../../shared/switch/CustomSwitch';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
+import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -59,6 +60,7 @@ const EditProductContents = () => {
 
   const router = useRouter();
   const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxiosPublic();
   const [productDetails, setProductDetails] = useState("");
   const [materialCare, setMaterialCare] = useState("");
   const [sizeFit, setSizeFit] = useState("");
@@ -693,7 +695,7 @@ const EditProductContents = () => {
 
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosSecure.get(`/singleProduct/${id}`);
+        const { data } = await axiosPublic.get(`/singleProduct/${id}`);
 
         setValue('productTitle', data?.productTitle);
         setValue('batchCode', data?.batchCode);
@@ -755,7 +757,7 @@ const EditProductContents = () => {
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosSecure, initializeVariants, primaryLocationName, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import axios from 'axios';
+import { BACKEND_URL } from '@/app/config/config';
 
 export default function AccountDeletedPage() {
   const router = useRouter();
@@ -11,12 +12,9 @@ export default function AccountDeletedPage() {
   useEffect(() => {
     const logoutCompletely = async () => {
       try {
-        await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+        await axios.post(`${BACKEND_URL}/logout`, null, {
           withCredentials: true,
         });
-        // await axios.post("http://localhost:5000/logout", null, {
-        //   withCredentials: true,
-        // });
       } catch (err) {
         console.error("Logout failed", err);
       }

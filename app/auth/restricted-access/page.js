@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { BACKEND_URL } from '@/app/config/config';
 
 const RestrictedAccessLoginPage = () => {
 
@@ -128,7 +129,7 @@ const RestrictedAccessLoginPage = () => {
 
     try {
       const response = await axios.post(
-        "https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard",
+        `${BACKEND_URL}/loginForDashboard`,
         {
           emailOrUsername: data.emailOrUsername,
           password: data.password,
@@ -263,8 +264,7 @@ const RestrictedAccessLoginPage = () => {
 
     try {
       const loginRes = await axios.post(
-        "https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard",
-        // "http://localhost:5000/loginForDashboard",
+        `${BACKEND_URL}/loginForDashboard`,
         {
           emailOrUsername: data.emailOrUsername,
           password: data.password,

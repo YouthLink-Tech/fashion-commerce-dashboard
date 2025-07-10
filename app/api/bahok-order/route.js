@@ -27,7 +27,7 @@ export async function POST(request) {
       ex: 2, // 1 if exchange, otherwise 2
     };
 
-    const response = await fetch("https://api.bahokbd.com/api/merchant/parcel/store", {
+    const response = await fetch("https://api.bahokcourier.com/api/merchant/parcel/store", {
       method: "POST",
       headers: {
         "Accept": "application/json",
@@ -39,10 +39,9 @@ export async function POST(request) {
     });
 
     const data = await response.json();
-    console.log(data, "bahok response");
 
-    if (data?.success === true) {
-      return Response.json({ message: "Parcel stored successfully." });
+    if (data.success === true && data.data.parcel_id) {
+      return Response.json({ trackingCode: data.data.parcel_id });
     } else {
       return Response.json({ error: data?.message || "Failed to store parcel in Bahok." }, { status: 400 });
     }

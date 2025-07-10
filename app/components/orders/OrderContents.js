@@ -168,7 +168,7 @@ const OrderContents = () => {
       const tracking = await placeShipmentOrder(handler, orderToUpdate);
 
       if (tracking) {
-        setTrackingNumber(tracking.toUpperCase());
+        setTrackingNumber(tracking);
         toast.success("Tracking number generated from " + handler.shipmentHandlerName);
       }
     } catch (err) {

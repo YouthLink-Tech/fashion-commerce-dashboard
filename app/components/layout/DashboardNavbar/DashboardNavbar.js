@@ -12,6 +12,7 @@ import NotificationLoading from "../../shared/Loading/NotificationLoading";
 import Notifications from "../../navbar/Notifications";
 import Link from "next/link";
 import axios from "axios";
+import { BACKEND_URL } from "@/app/config/config";
 
 const DashboardNavbar = () => {
   const [isToggle, setIsToggle] = useState(false);
@@ -23,7 +24,7 @@ const DashboardNavbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("https://fc-backend-664306765395.asia-south1.run.app/logout", null, {
+      await axios.post(`${BACKEND_URL}/logout`, null, {
         withCredentials: true,
       });
     } catch (err) {

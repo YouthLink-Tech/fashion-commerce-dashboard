@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import { BACKEND_URL } from "@/app/config/config";
 
 const RefreshAccessToken = () => {
   const { update } = useSession();
@@ -34,10 +35,7 @@ const RefreshAccessToken = () => {
           return;
         }
 
-        // const res = await axios.post("http://localhost:5000/refresh-token-backend", null, {
-        //   withCredentials: true,
-        // });
-        const res = await axios.post("https://fc-backend-664306765395.asia-south1.run.app/refresh-token-backend", null, {
+        const res = await axios.post(`${BACKEND_URL}/refresh-token-backend`, null, {
           withCredentials: true,
         });
 

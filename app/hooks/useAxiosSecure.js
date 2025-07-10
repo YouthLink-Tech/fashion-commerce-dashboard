@@ -1,12 +1,11 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
+import { BACKEND_URL } from "../config/config";
 
 // Create a single Axios instance
 const axiosSecure = axios.create({
-  // baseURL: 'http://localhost:5000',
-  // baseURL: 'https://fashion-commerce-backend.vercel.app',
-  baseURL: 'https://fc-backend-664306765395.asia-south1.run.app',
+  baseURL: `${BACKEND_URL}`,
   withCredentials: true,
 });
 
@@ -53,10 +52,7 @@ export const useAxiosSecure = () => {
           originalRequest._retry = true;
 
           try {
-            // const response = await axios.post("http://localhost:5000/refresh-token-backend", null, {
-            //   withCredentials: true,
-            // });
-            const response = await axios.post("https://fc-backend-664306765395.asia-south1.run.app/refresh-token-backend", null, {
+            const response = await axios.post(`${BACKEND_URL}/refresh-token-backend`, null, {
               withCredentials: true,
             });
 
