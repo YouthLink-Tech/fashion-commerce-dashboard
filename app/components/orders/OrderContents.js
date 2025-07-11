@@ -351,7 +351,7 @@ const OrderContents = () => {
       (order?.promoInfo?.promoDiscountValue || '').toString().includes(query) ||
       (order?.promoInfo?.promoCode || '').toLowerCase().includes(query) ||
       (order?.paymentInfo?.transactionId || '').toLowerCase().includes(query) ||
-      (order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
+      String(order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
       (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
       (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
       (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||
@@ -443,7 +443,7 @@ const OrderContents = () => {
           (order?.promoInfo?.promoDiscountValue || '').toString().includes(query) ||
           (order?.promoInfo?.promoCode || '').toLowerCase().includes(query) ||
           (order?.paymentInfo?.transactionId || '').toLowerCase().includes(query) ||
-          (order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
+          String(order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
           (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
           (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
           (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||

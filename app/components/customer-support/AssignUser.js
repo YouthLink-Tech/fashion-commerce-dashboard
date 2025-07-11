@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { RxCross2 } from 'react-icons/rx';
 import NotificationLoading from '../shared/Loading/NotificationLoading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { FaUserPlus } from "react-icons/fa6";
 
 const AssignUser = ({ messageId, selectedUsers, setSelectedUsers }) => {
 
@@ -50,8 +51,8 @@ const AssignUser = ({ messageId, selectedUsers, setSelectedUsers }) => {
         setIsDropdownOpen(open);
       }}>
       <DropdownTrigger>
-        <button className="text-green-600 hover:underline">
-          Assign User
+        <button className="text-blue-600 font-bold flex items-center gap-2 hover:bg-blue-50 rounded-lg px-3 py-1.5 hover:text-blue-700">
+          <FaUserPlus size={16} />Assign User
         </button>
       </DropdownTrigger>
 

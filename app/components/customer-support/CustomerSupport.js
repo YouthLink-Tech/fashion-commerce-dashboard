@@ -8,6 +8,8 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import SupportFilterDropdown from './SupportFilter';
 import AssignUser from './AssignUser';
 import { useSearchParams } from 'next/navigation';
+import { TbMessageFilled } from "react-icons/tb";
+import { Checkbox } from '@nextui-org/react';
 
 const CustomerSupportComponent = () => {
 
@@ -106,11 +108,11 @@ const CustomerSupportComponent = () => {
                 >
                   <div className='flex gap-4 items-center'>
                     <div className='flex flex-col gap-2 items-center justify-center'>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(item._id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
+                      <Checkbox
+                        isSelected={selectedIds.includes(item._id)}
+                        size='sm'
+                        onValueChange={(isSelected) => {
+                          if (isSelected) {
                             setSelectedIds([...selectedIds, item._id]);
                           } else {
                             setSelectedIds(selectedIds.filter((id) => id !== item._id));
@@ -118,7 +120,11 @@ const CustomerSupportComponent = () => {
                         }}
                         onClick={(e) => e.stopPropagation()}
                       />
-                      {item?.isRead ? null : <span className='text-blue-600'><GoDotFill size={20} /></span>}
+                      {!item?.isRead && (
+                        <span className="text-blue-600 pr-2">
+                          <GoDotFill size={18} />
+                        </span>
+                      )}
                     </div>
                     <div className='flex flex-col'>
                       <p className={`${item?.isRead ? "font-medium" : "font-bold"} text-neutral-900`}>{item.name}</p>
@@ -145,9 +151,9 @@ const CustomerSupportComponent = () => {
               <div className="p-4 flex items-center gap-4 bg-gray-50 border-b border-gray-200">
                 <button
                   onClick={() => handleMarkAsUnread(selectedIds)}
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 font-bold flex items-center gap-2 hover:bg-blue-50 rounded-lg px-3 py-1.5 hover:text-blue-700"
                 >
-                  Mark as Unread
+                  <TbMessageFilled size={16} /> Mark as Unread
                 </button>
               </div>
             )}
