@@ -148,7 +148,7 @@ const CustomerSupportComponent = () => {
 
           <div className="h-[56px] mt-[5px] px-2 flex items-center gap-4 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
             {selectedIds?.length > 0 && (
-              <div className="p-4 flex items-center gap-4 bg-gray-50 border-b border-gray-200">
+              <div className="py-4 px-2 flex items-center gap-4">
                 <button
                   onClick={() => handleMarkAsUnread(selectedIds)}
                   className="text-blue-600 font-bold flex items-center gap-2 hover:bg-blue-50 rounded-lg px-3 py-1.5 hover:text-blue-700"
@@ -158,7 +158,7 @@ const CustomerSupportComponent = () => {
               </div>
             )}
             {selectedIds?.length === 0 && selectedMessage?._id &&
-              <div className="p-4 flex items-center gap-4 bg-gray-50 border-b border-gray-200">
+              <div className="py-4 px-2 flex items-center gap-4">
                 <AssignUser
                   messageId={selectedMessage?._id}
                   selectedUsers={selectedUsers}
