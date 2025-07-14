@@ -9,7 +9,7 @@ export const placeRedXOrder = async (order) => {
     });
 
     const data = await response.json();
-    console.log(data, "data with tracking code");
+    // console.log(data, "data with tracking code");
 
     if (response.ok && data.trackingCode) {
       return data.trackingCode;

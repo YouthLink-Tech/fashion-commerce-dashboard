@@ -43,7 +43,7 @@ export async function POST(request) {
       // })),
     };
 
-    console.log("RedX payload:", payload);
+    // console.log("RedX payload:", payload);
 
     const response = await fetch("https://openapi.redx.com.bd/v1.0.0-beta/parcel", {
       method: "POST",
@@ -55,7 +55,7 @@ export async function POST(request) {
     });
 
     const data = await response.json();
-    console.log(data, "response from redx");
+    // console.log(data, "response from redx");
 
     if (data?.tracking_id) {
       return Response.json({ trackingCode: data.tracking_id });

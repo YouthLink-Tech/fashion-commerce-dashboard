@@ -374,8 +374,6 @@ const RestrictedAccessLoginPage = () => {
 
         // Handle other error messages returned by backend
         if (data.message) {
-          console.log(data.message, "errorMessage");
-
           setError(data.message);
           return;
         }

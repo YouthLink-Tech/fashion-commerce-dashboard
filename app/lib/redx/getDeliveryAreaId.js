@@ -14,13 +14,13 @@ export async function getDeliveryAreaId(postalCode, cityOrAreaName) {
     );
 
     const data = await response.json();
-    console.log(data, "data4");
+    // console.log(data, "data4");
 
 
     const matchedArea = data?.areas?.find(
       (area) => area.name.toLowerCase() === cityOrAreaName.toLowerCase()
     );
-    console.log(matchedArea, "matchedArea");
+    // console.log(matchedArea, "matchedArea");
 
 
     return matchedArea?.id || 14;

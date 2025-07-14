@@ -35,8 +35,8 @@ export async function lookupCityId(cityName) {
 };
 
 export async function lookupZoneId(cityId, zoneGuess) {
-  console.log(cityId, "cityId");
-  console.log(zoneGuess, "zoneGuess");
+  // console.log(cityId, "cityId");
+  // console.log(zoneGuess, "zoneGuess");
 
   const token = await getPathaoToken();
 
@@ -52,7 +52,7 @@ export async function lookupZoneId(cityId, zoneGuess) {
   );
 
   const data = await res.json();
-  console.log(data, "zone data from pathao");
+  // console.log(data, "zone data from pathao");
 
   if (!data?.data?.data) {
     throw new Error("Failed to get zones from Pathao");

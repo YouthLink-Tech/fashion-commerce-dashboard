@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 import ErrorSvg from '/public/not-found/no-results.png';
 import GoBackButton from '../components/ui/GoBackButton';
@@ -21,7 +20,7 @@ const NotFoundPage = () => {
         The page you are looking for doesn’t exist or has been moved. Let’s get you back on track.
       </p>
 
-      <GoBackButton defaultHref="/dashboard" />
+      <GoBackButton />
     </div>
   );
 };

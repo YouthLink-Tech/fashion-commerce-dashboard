@@ -9,7 +9,6 @@ export const placeBahokOrder = async (order) => {
     });
 
     const data = await response.json();
-    console.log(data, "data");
 
     if (response.ok && data.trackingCode) {
       return data.trackingCode;
