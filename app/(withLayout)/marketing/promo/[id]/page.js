@@ -72,13 +72,14 @@ const EditPromo = () => {
         setImage(promo?.imageUrl || null);
         setIsLoading(false);
       } catch (err) {
-        console.error(err); // Log error to the console for debugging
-        toast.error("Failed to fetch promo code details!");
+        // console.error(err); // Log error to the console for debugging
+        // toast.error("Failed to fetch promo code details!");
+        router.push('/marketing');
       }
     };
 
     fetchPromoCode();
-  }, [id, axiosSecure, setValue, session?.user?.accessToken, status]);
+  }, [id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {

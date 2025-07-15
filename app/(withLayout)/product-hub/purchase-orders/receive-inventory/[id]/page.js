@@ -45,13 +45,14 @@ const EditReceiveInventory = () => {
 
         setIsLoading(false);
       } catch (err) {
-        console.error(err); // Log error to the console for debugging
-        toast.error("Failed to fetch purchase order details!");
+        // console.error(err); // Log error to the console for debugging
+        // toast.error("Failed to fetch purchase order details!");
+        router.push('/product-hub/purchase-orders');
       }
     };
 
     fetchPurchaseOrderData();
-  }, [id, axiosSecure, setValue, session?.user?.accessToken, status]);
+  }, [id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
 
   const handleAddAllAccept = (index) => {
     setPurchaseOrderVariants(prevVariants => {

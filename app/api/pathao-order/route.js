@@ -40,14 +40,14 @@ export async function POST(request) {
       // item_description: order.productInformation.map(p => p.productTitle).join(', '),
     };
 
-    // const response = await fetch("https://api-hermes.pathao.com/aladdin/api/v1/orders", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
+    const response = await fetch("https://api-hermes.pathao.com/aladdin/api/v1/orders", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload),
+    });
 
     const data = await response.json();
 

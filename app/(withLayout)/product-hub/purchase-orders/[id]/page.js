@@ -163,11 +163,12 @@ const EditPurchaseOrderPage = () => {
 
       return order;
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch purchase order details!");
+      // console.error(err);
+      // toast.error("Failed to fetch purchase order details!");
+      router.push("/product-hub/purchase-orders")
       return null;
     }
-  }, [id, setValue, axiosSecure, reset, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosSecure, reset, session?.user?.accessToken, status, router]);
 
   // Initial load useEffect
   useEffect(() => {

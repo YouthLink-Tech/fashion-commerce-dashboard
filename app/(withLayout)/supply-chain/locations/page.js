@@ -98,6 +98,12 @@ const LocationsPage = () => {
         return;
       }
 
+      // ❌ Prevent turning OFF if it's the primary location
+      if (findLocation.isPrimaryLocation && findLocation.status === true) {
+        toast.error("Cannot disable a primary location. Please assign a new one first.");
+        return;
+      }
+
       // Exclude the _id field from the discount data
       const { _id, ...rest } = findLocation;
       const locationData = { ...rest, status: !currentStatus };

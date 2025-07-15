@@ -89,12 +89,13 @@ export default function EditShippingZone() {
         }
 
       } catch (error) {
-        toast.error("Failed to load shipping zone details.");
+        // toast.error("Failed to load shipping zone details.");
+        router.push('/supply-chain/zone/existing-zones');
       }
     };
 
     fetchShippingZone();
-  }, [params.id, setValue, axiosSecure, session?.user?.accessToken, status]);
+  }, [params.id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
 
   // Filter cities based on the search term and exclude selected cities
   const filteredCities = cities.filter((city) => city.toLowerCase().includes(searchTerm.toLowerCase()) &&

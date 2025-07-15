@@ -94,12 +94,13 @@ export default function EditCategory() {
         setImage(category?.imageUrl || null);
         setCategoryDetails(category);
       } catch (error) {
-        console.error('Error fetching category:', error);
-        toast.error('Error fetching category data.');
+        // console.error('Error fetching category:', error);
+        // toast.error('Error fetching category data.');
+        router.push('/product-hub/categories');
       }
     };
     fetchCategory();
-  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status]);
+  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
 
   // Close suggestions if clicking outside the input or suggestions
   useEffect(() => {

@@ -35,12 +35,13 @@ export default function EditSeason() {
         setValue('seasonName', season?.seasonName);
         setImage(season?.imageUrl || null);
       } catch (error) {
-        console.error('Error fetching season:', error);
-        toast.error('Error fetching season data.');
+        // console.error('Error fetching season:', error);
+        // toast.error('Error fetching season data.');
+        router.push('/product-hub/seasons');
       }
     };
     fetchSeason();
-  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status]);
+  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
 
   const uploadSingleFileToGCS = async (file) => {
     try {

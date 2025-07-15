@@ -84,10 +84,11 @@ const EditTransferOrder = () => {
 
       setIsLoading(false);
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch transfer order details!");
+      // console.error(err);
+      // toast.error("Failed to fetch transfer order details!");
+      router.push("/product-hub/transfers")
     }
-  }, [id, axiosSecure, session?.user?.accessToken, status]);
+  }, [id, axiosSecure, session?.user?.accessToken, status, router]);
 
   // Initial load useEffect
   useEffect(() => {

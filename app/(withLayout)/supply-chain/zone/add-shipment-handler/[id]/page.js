@@ -55,12 +55,13 @@ const EditShipmentHandler = () => {
         setValue('deliveryType', data?.deliveryType || []);
         setImage(data?.imageUrl);
       } catch (error) {
-        toast.error("Failed to load shipping zone details.");
+        // toast.error("Failed to load shipping zone details.");
+        router.push('/supply-chain/zone/add-shipping-zone');
       }
     };
 
     fetchShipmentHandler();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
 
   const handleDeliveryType = (option) => {
     let deliveryTypes;

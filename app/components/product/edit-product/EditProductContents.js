@@ -752,12 +752,19 @@ const EditProductContents = () => {
         setTabSelections(groupedSelections); // Update tabSelections with grouped data
 
       } catch (error) {
-        toast.error("Failed to load product details.");
+        // toast.error("Failed to load product details.");
+        if (decodedSeasonName) {
+          router.push(`/product-hub/products/existing-products/seasons/${decodedSeasonName}`);
+          return;
+        }
+        else {
+          router.push(`/product-hub/products/existing-products/${selectedCategory}`);
+        }
       }
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status, router, decodedSeasonName, selectedCategory]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {

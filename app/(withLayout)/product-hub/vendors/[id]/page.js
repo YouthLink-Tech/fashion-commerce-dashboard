@@ -42,12 +42,13 @@ const EditVendor = () => {
         setValue('contactPersonNumber', data?.contactPersonNumber);
         setValue('vendorAddress', data?.vendorAddress);
       } catch (error) {
-        toast.error("Failed to load this vendor details.");
+        // toast.error("Failed to load this vendor details.");
+        router.push('/product-hub/vendors');
       }
     };
 
     fetchVendorDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
 
   const onSubmit = async (data) => {
     try {

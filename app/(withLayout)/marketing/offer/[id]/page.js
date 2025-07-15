@@ -126,13 +126,14 @@ const EditOffer = () => {
         }
         setIsLoading(false);
       } catch (err) {
-        console.error(err); // Log error to the console for debugging
-        toast.error("Failed to fetch offer code details!");
+        // console.error(err); // Log error to the console for debugging
+        // toast.error("Failed to fetch offer code details!");
+        router.push('/marketing');
       }
     };
 
     fetchOfferData();
-  }, [id, axiosSecure, setValue, categoryList, session?.user?.accessToken, status]);
+  }, [id, axiosSecure, setValue, categoryList, session?.user?.accessToken, status, router]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {

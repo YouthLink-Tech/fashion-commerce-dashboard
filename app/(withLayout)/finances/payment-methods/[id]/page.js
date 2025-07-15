@@ -48,13 +48,14 @@ const EditPaymentMethod = () => {
         setPaymentDetails(data?.paymentDetails);
         setImage(data?.imageUrl);
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to load payment method details.");
+        // console.error(error);
+        // toast.error("Failed to load payment method details.");
+        router.push('/finances');
       }
     };
 
     fetchShipmentHandler();
-  }, [id, setValue, axiosSecure, status, session]);
+  }, [id, setValue, axiosSecure, status, session, router]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {

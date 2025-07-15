@@ -46,12 +46,13 @@ const EditFAQPage = () => {
         }
 
       } catch (error) {
-        toast.error("Failed to load FAQ details.");
+        // toast.error("Failed to load FAQ details.");
+        router.push("/settings/faq");
       }
     };
 
     fetchFAQDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
 
   const onSubmit = async (data) => {
 

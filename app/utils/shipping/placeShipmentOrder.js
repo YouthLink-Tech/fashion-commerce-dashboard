@@ -1,6 +1,6 @@
 import { placeBahokOrder } from "./bahok";
-import { placePathaoOrder } from "./pathao";
-import { placeRedXOrder } from "./redx";
+// import { placePathaoOrder } from "./pathao";
+// import { placeRedXOrder } from "./redx";
 import { placeSteadfastOrder } from "./steadfast";
 
 export const placeShipmentOrder = async (handler, order) => {
@@ -10,14 +10,14 @@ export const placeShipmentOrder = async (handler, order) => {
     case "steadfast":
       return await placeSteadfastOrder(order);
 
-    case "pathao":
-      return await placePathaoOrder(order);
+    // case "pathao":
+    //   return await placePathaoOrder(order);
 
     case "bahok":
       return await placeBahokOrder(order);
 
-    case "redx":
-      return await placeRedXOrder(order);
+    // case "redx":
+    //   return await placeRedXOrder(order);
 
     // case "sundarban":
     //   return await placeSundarbanOrder(order);
