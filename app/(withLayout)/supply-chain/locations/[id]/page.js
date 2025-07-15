@@ -1,7 +1,7 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
-import { Checkbox } from '@nextui-org/react';
+import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -17,10 +17,14 @@ const EditLocation = () => {
   const { id } = useParams();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isSelected, setIsSelected] = useState(false);
   const { data: session, status } = useSession();
-
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const [originalIsPrimary, setOriginalIsPrimary] = useState(false); // store original status
+  const [otherLocations, setOtherLocations] = useState([]); // to list in modal
+  const [newPrimaryId, setNewPrimaryId] = useState(null); // user must select one
+  const [newPrimaryName, setNewPrimaryName] = useState("");
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
@@ -30,6 +34,7 @@ const EditLocation = () => {
     const fetchLocationDetails = async () => {
       try {
         const { data } = await axiosSecure.get(`/getSingleLocationDetails/${id}`);
+        const otherRes = await axiosSecure.get(`/getAllOtherLocations/${id}`);
 
         setValue('locationName', data?.locationName);
         setValue('contactPersonName', data?.contactPersonName);
@@ -39,13 +44,16 @@ const EditLocation = () => {
         setValue('postalCode', data?.postalCode);
         setIsSelected(data?.isPrimaryLocation);
 
+        setOriginalIsPrimary(data?.isPrimaryLocation);
+        setOtherLocations(otherRes?.data || []);
+
       } catch (error) {
-        toast.error("Failed to load this location details.");
+        router.push("/supply-chain/locations");
       }
     };
 
     fetchLocationDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status]);
+  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
 
   const onSubmit = async (data) => {
     try {
@@ -61,6 +69,10 @@ const EditLocation = () => {
         postalCode,
         isPrimaryLocation: isSelected,
       };
+
+      if (!isSelected && newPrimaryId) {
+        locationData.newPrimaryId = newPrimaryId;
+      }
 
       const res = await axiosSecure.put(`/updateLocation/${id}`, locationData);
       if (res.data.modifiedCount > 0) {
@@ -220,10 +232,22 @@ const EditLocation = () => {
 
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Checkbox isSelected={isSelected} color="success" onValueChange={setIsSelected}>
+          <div className="flex justify-between items-center gap-2">
+            <Checkbox isSelected={isSelected} color="success"
+              onValueChange={(val) => {
+                if (!val && originalIsPrimary) {
+                  onOpen(); // open modal to force new selection
+                } else {
+                  setIsSelected(val); // normal behavior
+                }
+              }}>
               Set as Primary Location
             </Checkbox>
+            {!isSelected && newPrimaryName && (
+              <p className="text-sm text-green-600 font-semibold">
+                ✅ You selected <span className="font-bold">{newPrimaryName}</span> as the new Primary Location.
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
@@ -239,6 +263,69 @@ const EditLocation = () => {
         </div>
 
       </form>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="bg-gray-200">
+                <p className="text-sm text-gray-600">
+                  You are unchecking the current primary location. You must select another one.
+                </p>
+              </ModalHeader>
+              <ModalBody className="modal-body-scroll">
+                <div className="pt-3 flex flex-col gap-3">
+                  {otherLocations?.map((loc) => (
+                    <Checkbox
+                      key={loc._id}
+                      isSelected={newPrimaryId === loc._id}
+                      onValueChange={(checked) => {
+                        if (checked) {
+                          setNewPrimaryId(loc._id);
+                          setNewPrimaryName(loc.locationName); // 👈 ADD THIS
+                        } else {
+                          setNewPrimaryId(null);
+                          setNewPrimaryName(""); // 👈 CLEAR if unchecked
+                        }
+                      }}
+                    >
+                      {loc.locationName}
+                    </Checkbox>
+                  ))}
+                </div>
+              </ModalBody>
+              <ModalFooter className='flex justify-end items-center border'>
+                <div className='flex gap-4 items-center'>
+                  <Button size='sm' color='danger' variant="flat" onPress={() => {
+                    // Reset new primary selection
+                    setNewPrimaryId(null);
+                    setNewPrimaryName("");
+                    onClose(); // Close the modal
+                  }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    color="primary"
+                    onPress={() => {
+                      if (!newPrimaryId) {
+                        toast.error("You must select a new primary location.");
+                        return;
+                      }
+
+                      setIsSelected(false); // Uncheck current
+                      onOpenChange(); // Close modal
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                </div>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
     </div>
   );
 };
