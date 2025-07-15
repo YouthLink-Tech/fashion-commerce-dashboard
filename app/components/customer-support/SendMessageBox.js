@@ -1,9 +1,10 @@
-'use client';
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import { Controller, useForm } from 'react-hook-form';
 import DOMPurify from "dompurify";
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { FiSend } from "react-icons/fi";
 
 const SendMessageEditor = dynamic(() => import('@/app/utils/Editor/SendMessageEditor'), { ssr: false });
 
@@ -60,16 +61,16 @@ const SendMessageBox = ({ onSend }) => {
           <div className="flex justify-between items-center gap-4">
             <button
               type='submit'
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-400"
             >
-              Send
+              <FiSend size={18} />
             </button>
             <button
               type='button'
               onClick={handleCancel}
-              className="px-4 py-2 rounded text-gray-600 hover:text-black hover:bg-gray-100"
+              className="cursor-pointer hover:bg-gray-50 p-3 rounded-full"
             >
-              Cancel
+              <RiDeleteBinLine size={20} />
             </button>
           </div>
 

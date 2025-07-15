@@ -24,18 +24,50 @@ const CustomerSupportComponent = () => {
   const axiosSecure = useAxiosSecure();
   const [filter, setFilter] = useState("all"); // 'all' or 'unread'
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [expandedReplies, setExpandedReplies] = useState({});
+  const [isInitialMessageExpanded, setIsInitialMessageExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setSelectedMessage(null);
+  }, [searchQuery]);
 
   const displayedInboxes = useMemo(() => {
-    let baseList;
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    if (!existingCustomerSupport) return [];
 
-    if (filter === "unread") {
-      baseList = existingCustomerSupport?.filter(n => !n.isRead);
-    } else {
-      baseList = existingCustomerSupport;
-    }
+    // Filter unread if needed
+    let baseList = filter === "unread"
+      ? existingCustomerSupport.filter(n => !n?.isRead)
+      : existingCustomerSupport;
 
-    return baseList;
-  }, [existingCustomerSupport, filter]);
+    if (!normalizedQuery) return baseList;
+
+    return baseList.filter((item) => {
+      const {
+        supportId = '',
+        name = '',
+        email = '',
+        phone = '',
+        topic = '',
+        dateTime = ''
+      } = item;
+
+      const fieldsToSearch = [
+        supportId,
+        name,
+        email,
+        topic,
+        phone?.toString(),
+        new Date(dateTime).toLocaleString("en-US") // normalized date string
+      ];
+
+      return fieldsToSearch.some(field =>
+        field?.toLowerCase().includes(normalizedQuery)
+      );
+    });
+
+  }, [existingCustomerSupport, filter, searchQuery]);
 
   const handleOpenMessage = useCallback(async (item) => {
     setSelectedMessage(item);
@@ -142,6 +174,30 @@ const CustomerSupportComponent = () => {
     return doc.body.innerHTML;
   };
 
+  const toggleReplyExpand = (index) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  const getInitialPreviewTextFromCustomer = (text = "", wordLimit = 20) => {
+    const words = text.trim().split(/\s+/);
+    const isTruncated = words.length > wordLimit;
+    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
+    return { preview, isTruncated };
+  };
+
+  const getPreviewText = (html = "", wordLimit = 20) => {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const text = div.textContent || div.innerText || "";
+    const words = text.trim().split(/\s+/);
+    const isTruncated = words.length > wordLimit;
+    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
+    return { preview, isTruncated };
+  };
+
   useEffect(() => {
     if (!selectedMessageId || !existingCustomerSupport) return;
 
@@ -200,7 +256,10 @@ const CustomerSupportComponent = () => {
                       <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-neutral-600 truncate`}>{item.email}</p>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500">{formatMessageDate(item.dateTime)}</div>
+                  <div className="text-sm text-gray-500 flex flex-col items-end gap-2">
+                    <span className="text-gray-600 ml-2 font-semibold">#{item.supportId}</span>
+                    {formatMessageDate(item.dateTime)}
+                  </div>
                 </div>
 
               ))
@@ -233,53 +292,122 @@ const CustomerSupportComponent = () => {
                   setSelectedUsers={setSelectedUsers} />
               </div>
             }
+
+            {/* Search Customer Message */}
+            <div className='w-2/3 mx-auto'>
+              <li className="flex items-center relative group">
+                <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <g>
+                    <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                  </g>
+                </svg>
+                <input
+                  type="search"
+                  placeholder="Search By Support Details..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full text-sm h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white transition-[border-color,background-color] font-semibold text-neutral-600 duration-300 ease-in-out focus:outline-none focus:border-[#F4D3BA] hover:shadow-none focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base shadow placeholder:text-neutral-400"
+                />
+              </li>
+            </div>
+
           </div>
 
           {
             selectedMessage ? (
-              <div className="relative h-[calc(100vh-178px)]"> {/* whole page or panel height minus navbar */}
+              <div className="relative flex flex-col h-[calc(100vh-122px)] min-h-0"> {/* whole page or panel height minus navbar */}
 
                 {/* Scrollable message view */}
-                <div className="overflow-y-auto h-full">
+                <div className="flex-1 overflow-y-auto">
                   <div className="space-y-4 p-6">
-                    <h2 className="text-2xl font-bold text-gray-800">{selectedMessage?.topic}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedMessage?.topic} [{selectedMessage.supportId}]</h2>
                     <div className="text-sm text-gray-500">From: {selectedMessage?.name} ({selectedMessage?.email})</div>
                     <div className="text-sm text-gray-500">Phone: {selectedMessage?.phone}</div>
                     <hr />
-                    <div className="bg-gray-100 p-4 rounded">
-                      <div className="text-sm text-gray-500 mb-2">
-                        From:{" "}
-                        <span className="font-medium text-gray-700">
-                          {selectedMessage?.email}
-                        </span>
-                      </div>
-                      <p className="whitespace-pre-wrap text-gray-700">{selectedMessage?.message}</p>
-                      <p className="text-xs text-right text-gray-500 mt-1">{formatMessageDate(selectedMessage?.dateTime)}</p>
-                    </div>
+                    {(() => {
+                      const message = selectedMessage?.message || "";
+                      const { preview, isTruncated } = getInitialPreviewTextFromCustomer(message, 20);
+
+                      return (
+                        <div className="bg-blue-50 border-blue-200 border p-4 rounded">
+                          <div className="text-sm text-gray-500 mb-2">
+                            From:{" "}
+                            <span className="font-medium text-gray-700">
+                              {selectedMessage?.email}
+                            </span>
+                          </div>
+
+                          <p className="whitespace-pre-wrap text-gray-700">
+                            {isInitialMessageExpanded ? message : preview}
+                          </p>
+
+                          <div className="flex justify-between items-center mt-1">
+                            <p className="text-xs text-gray-500">
+                              {formatMessageDate(selectedMessage?.dateTime)}
+                            </p>
+
+                            {isTruncated && (
+                              <button
+                                onClick={() => setIsInitialMessageExpanded(prev => !prev)}
+                                className="text-sm text-blue-600 hover:underline"
+                              >
+                                {isInitialMessageExpanded ? "Show less" : "Show more"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Replies */}
-                    {selectedMessages?.replies?.map((reply, index) => (
-                      <div key={index} className="bg-blue-50 border border-blue-200 p-4 rounded">
-                        <div className="text-sm text-gray-500 mb-2">
-                          From:{" "}
-                          <span className="font-medium text-gray-700">
-                            {reply?.from === "support"
-                              ? "support@poshax.shop"
-                              : selectedMessage?.email}
-                          </span>
+                    {selectedMessages?.replies?.map((reply, index) => {
+                      const isExpanded = expandedReplies[index];
+                      const replyFrom =
+                        reply?.from === "support"
+                          ? "support@poshax.shop"
+                          : selectedMessage?.email;
+
+                      const htmlContent =
+                        reply?.from === "customer"
+                          ? extractVisibleMessage(reply?.html)
+                          : reply?.html;
+
+                      const { preview, isTruncated } = getPreviewText(htmlContent, 20);
+
+                      return (
+                        <div key={index} className={`${reply?.from === "support" ? "bg-gray-50 border-gray-200" : "bg-blue-50 border-blue-200"} border p-4 rounded relative`}>
+                          <div className="text-sm text-gray-500 mb-2">
+                            From: <span className="font-medium text-gray-700">{replyFrom}</span>
+                          </div>
+
+                          <div className="text-gray-800">
+                            {isExpanded ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: htmlContent
+                                }}
+                              />
+                            ) : (
+                              <p>{preview}</p>
+                            )}
+                          </div>
+
+                          <div className="flex justify-between items-center mt-2">
+                            <p className="text-xs text-gray-500">{formatMessageDate(reply?.dateTime)}</p>
+
+                            {/* Only show toggle if content is longer than 40 words */}
+                            {isTruncated && (
+                              <button
+                                className="text-sm text-blue-600 hover:underline"
+                                onClick={() => toggleReplyExpand(index)}
+                              >
+                                {isExpanded ? "Show less" : "Show more"}
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <div
-                          className="text-gray-800"
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              reply?.from === "customer"
-                                ? extractVisibleMessage(reply?.html)
-                                : reply?.html,
-                          }}
-                        />
-                        <p className="text-xs text-right text-gray-500 mt-1">{formatMessageDate(reply?.dateTime)}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
 
                   </div>
                 </div>
