@@ -469,10 +469,9 @@ const PDFDocument = ({ order }) => {
           <View style={styles.footerAlign}>
             <View style={styles.footerDetails}>
               <Text>{WEBSITE_NAME}</Text>
-              <Text>Mirpur, Dhaka, 1100</Text>
-              <Text>Email: fashion@commerce.com</Text>
-              <Text>Phone: +88 019 999 99999</Text>
-              <Text>www.fashioncommerce.com</Text>
+              <Text>Email: support@poshax.shop</Text>
+              <Text>Phone: 018-8383-1122</Text>
+              <Text>https://poshax.shop</Text>
             </View>
             <View>
               <Text style={styles.footer}>THANK YOU</Text>
