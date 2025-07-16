@@ -161,6 +161,13 @@ const CustomerSupportComponent = () => {
     return displayedInboxes?.find(m => m._id === selectedMessage?._id);
   }, [displayedInboxes, selectedMessage?._id]);
 
+  const toggleReplyExpand = (index) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
   const extractVisibleMessage = (html) => {
     if (!html) return "";
 
@@ -174,18 +181,30 @@ const CustomerSupportComponent = () => {
     return doc.body.innerHTML;
   };
 
-  const toggleReplyExpand = (index) => {
-    setExpandedReplies(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
-  };
-
   const getInitialPreviewTextFromCustomer = (text = "", wordLimit = 20) => {
     const words = text.trim().split(/\s+/);
     const isTruncated = words.length > wordLimit;
     const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
     return { preview, isTruncated };
+  };
+
+  const getLastReplyPreview = (replies = [], wordLimit = 5) => {
+    if (!replies?.length) return null;
+
+    const lastReply = replies[replies.length - 1];
+    const from = lastReply?.from === "support" ? "You" : "Customer";
+
+    const cleanHtml = extractVisibleMessage(lastReply?.html || "");
+
+    const div = document.createElement("div");
+    div.innerHTML = cleanHtml;
+    const text = div.textContent || div.innerText || "";
+
+    const words = text.trim().split(/\s+/);
+    const isTruncated = words.length > wordLimit;
+    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
+
+    return `${from}: ${preview}`;
   };
 
   const getPreviewText = (html = "", wordLimit = 20) => {
@@ -254,14 +273,22 @@ const CustomerSupportComponent = () => {
                       <p className={`${item?.isRead ? "font-medium" : "font-bold"} text-neutral-900`}>{item.name}</p>
                       <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-gray-400`}>{item.topic}</p>
                       <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-neutral-600 truncate`}>{item.email}</p>
+                      {item.replies &&
+                        <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-neutral-600 truncate`}>
+                          {getLastReplyPreview(item.replies)}
+                        </p>
+                      }
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 flex flex-col items-end gap-2">
                     <span className="text-gray-600 ml-2 font-semibold">#{item.supportId}</span>
-                    {formatMessageDate(item.dateTime)}
+                    {formatMessageDate(
+                      item?.replies?.length > 0
+                        ? item.replies[item.replies.length - 1]?.dateTime
+                        : item.dateTime
+                    )}
                   </div>
                 </div>
-
               ))
             ) : (
               <p className="px-6 py-4">No messages yet.</p>

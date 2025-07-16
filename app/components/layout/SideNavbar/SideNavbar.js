@@ -5,8 +5,6 @@ import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog, TbBrandAppleNews } from "react-icons/tb";
-import Image from "next/image";
-import logoWhiteImage from "/public/logos/logo.png";
 import { FaChevronRight, FaAngleDown } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,7 +20,7 @@ import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
 import { SidebarLoading } from "../../shared/Loading/SidebarLoading";
 import { MdSupportAgent } from "react-icons/md";
-import { WEBSITE_NAME } from "@/app/config/config";
+import Logo from "./Logo";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -220,17 +218,7 @@ const SideNavbar = ({ onClose }) => {
         transition={{ duration: 0.3, ease: "easeInOut" }} className="h-screen w-[262px] fixed z-50 overflow-y-auto custom-scrollbar bg-white">
 
         <div className="px-4 transition-colors duration-1000 sticky top-0 pt-1.5 z-10 bg-white">
-          <Link
-            href="/"
-            target="_blank"
-            className="flex items-center justify-center gap-2"
-          >
-            <Image
-              className="h-9 md:h-10 w-auto"
-              src={logoWhiteImage}
-              alt={WEBSITE_NAME}
-            />
-          </Link>
+          <Logo />
           <hr style={{ border: "0.5px solid #ccc", margin: "8px 0" }} />
         </div>
 

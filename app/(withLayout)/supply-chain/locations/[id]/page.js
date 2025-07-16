@@ -278,6 +278,7 @@ const EditLocation = () => {
                   {otherLocations?.map((loc) => (
                     <Checkbox
                       key={loc._id}
+                      color="success"
                       isSelected={newPrimaryId === loc._id}
                       onValueChange={(checked) => {
                         if (checked) {
@@ -306,7 +307,7 @@ const EditLocation = () => {
                   </Button>
                   <Button
                     size="sm"
-                    color="primary"
+                    className='bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-900 font-medium'
                     onPress={() => {
                       if (!newPrimaryId) {
                         toast.error("You must select a new primary location.");

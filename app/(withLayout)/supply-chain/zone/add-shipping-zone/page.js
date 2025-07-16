@@ -402,7 +402,10 @@ const AddShippingZone = () => {
                       <div className="group relative">
                         <button className='group'>
                           <RiDeleteBinLine
-                            onClick={(e) => handleDeleteShipmentHandler(e, shipmentHandler._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteShipmentHandler(e, shipmentHandler._id);
+                            }}
                             size={22}
                             className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
                           />
@@ -416,7 +419,10 @@ const AddShippingZone = () => {
                     <div className="group relative">
                       <button className='group'>
                         <AiOutlineEdit
-                          onClick={(e) => handleEditShipmentHandler(e, shipmentHandler._id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditShipmentHandler(e, shipmentHandler._id);
+                          }}
                           size={22}
                           className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
                         />
