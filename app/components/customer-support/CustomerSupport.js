@@ -1,6 +1,6 @@
 "use client";
 import useCustomerSupport from '@/app/hooks/useCustomerSupport';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Loading from '../shared/Loading/Loading';
 import { GoDotFill } from 'react-icons/go';
 import { formatMessageDate } from '../navbar/GetTimeAgo';
@@ -18,6 +18,7 @@ const CustomerSupportComponent = () => {
 
   const searchParams = useSearchParams();
   const selectedMessageId = searchParams.get("selectedMessageId");
+  const messageEndRef = useRef(null);
   const [existingCustomerSupport, isCustomerSupportPending, refetch] = useCustomerSupport();
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -27,10 +28,17 @@ const CustomerSupportComponent = () => {
   const [expandedReplies, setExpandedReplies] = useState({});
   const [isInitialMessageExpanded, setIsInitialMessageExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setSelectedMessage(null);
-  }, [searchQuery]);
+  }, [searchQuery, filter]);
+
+  const scrollToBottom = () => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const displayedInboxes = useMemo(() => {
     const normalizedQuery = searchQuery.toLowerCase().trim();
@@ -218,6 +226,12 @@ const CustomerSupportComponent = () => {
   };
 
   useEffect(() => {
+    if (selectedMessage || isOpen) {
+      setTimeout(scrollToBottom, 100); // Delay ensures DOM is ready
+    }
+  }, [selectedMessage, isOpen]);
+
+  useEffect(() => {
     if (!selectedMessageId || !existingCustomerSupport) return;
 
     const foundMessage = existingCustomerSupport.find(m => m._id === selectedMessageId);
@@ -281,7 +295,7 @@ const CustomerSupportComponent = () => {
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 flex flex-col items-end gap-2">
-                    <span className="text-gray-600 ml-2 font-semibold">#{item.supportId}</span>
+                    <span className="text-gray-600 ml-2 font-semibold">{item.supportId}</span>
                     {formatMessageDate(
                       item?.replies?.length > 0
                         ? item.replies[item.replies.length - 1]?.dateTime
@@ -435,12 +449,12 @@ const CustomerSupportComponent = () => {
                         </div>
                       );
                     })}
-
+                    <div ref={messageEndRef} />
                   </div>
                 </div>
 
                 {/* Sticky send message box */}
-                <SendMessageBox onSend={handleSend} />
+                <SendMessageBox onSend={handleSend} isOpen={isOpen} setIsOpen={setIsOpen} />
 
               </div>
             ) : (

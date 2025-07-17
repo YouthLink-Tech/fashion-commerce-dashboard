@@ -8,9 +8,8 @@ import { FiSend } from "react-icons/fi";
 
 const SendMessageEditor = dynamic(() => import('@/app/utils/Editor/SendMessageEditor'), { ssr: false });
 
-const SendMessageBox = ({ onSend }) => {
+const SendMessageBox = ({ onSend, isOpen, setIsOpen }) => {
   const { handleSubmit, control, reset, formState: { errors } } = useForm();
-  const [isOpen, setIsOpen] = useState(false);
 
   const onSubmit = (data) => {
     onSend(data); // parent handles sending
