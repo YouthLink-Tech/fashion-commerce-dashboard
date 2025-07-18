@@ -196,7 +196,7 @@ const CustomerSupportComponent = () => {
     return { preview, isTruncated };
   };
 
-  const getLastReplyPreview = (replies = [], wordLimit = 5) => {
+  const getLastReplyPreview = (replies = [], charLimit = 40) => {
     if (!replies?.length) return null;
 
     const lastReply = replies[replies.length - 1];
@@ -206,11 +206,10 @@ const CustomerSupportComponent = () => {
 
     const div = document.createElement("div");
     div.innerHTML = cleanHtml;
-    const text = div.textContent || div.innerText || "";
+    const text = (div.textContent || div.innerText || "").trim();
 
-    const words = text.trim().split(/\s+/);
-    const isTruncated = words.length > wordLimit;
-    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
+    const isTruncated = text.length > charLimit;
+    const preview = text.slice(0, charLimit) + (isTruncated ? "..." : "");
 
     return `${from}: ${preview}`;
   };
@@ -284,23 +283,25 @@ const CustomerSupportComponent = () => {
                       )}
                     </div>
                     <div className='flex flex-col'>
-                      <p className={`${item?.isRead ? "font-medium" : "font-bold"} text-neutral-900`}>{item.name}</p>
-                      <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-gray-400`}>{item.topic}</p>
-                      <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-neutral-600 truncate`}>{item.email}</p>
+                      <p className={`${item?.isRead ? "font-medium" : "font-bold"} text-neutral-900 md:text-sm 2xl:text-base`}>{item.name}</p>
+                      <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-gray-400`}>{item.topic}</p>
+                      <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-neutral-600 truncate`}>{item.email}</p>
                       {item.replies &&
-                        <p className={`${item?.isRead ? "" : "font-bold"} text-sm text-neutral-600 truncate`}>
+                        <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-neutral-600 truncate`}>
                           {getLastReplyPreview(item.replies)}
                         </p>
                       }
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 flex flex-col items-end gap-2">
-                    <span className="text-gray-600 ml-2 font-semibold">{item.supportId}</span>
-                    {formatMessageDate(
-                      item?.replies?.length > 0
-                        ? item.replies[item.replies.length - 1]?.dateTime
-                        : item.dateTime
-                    )}
+                  <div className="text-xs flex flex-col items-end gap-2">
+                    <span className="text-neutral-600 font-semibold">{item.supportId}</span>
+                    <span className='text-neutral-700'>
+                      {formatMessageDate(
+                        item?.replies?.length > 0
+                          ? item.replies[item.replies.length - 1]?.dateTime
+                          : item.dateTime
+                      )}
+                    </span>
                   </div>
                 </div>
               ))
