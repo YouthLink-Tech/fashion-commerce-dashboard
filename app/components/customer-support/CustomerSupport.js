@@ -372,7 +372,8 @@ const CustomerSupportComponent = () => {
                     <hr />
                     {(() => {
                       const message = selectedMessage?.message || "";
-                      const { preview, isTruncated } = getInitialPreviewTextFromCustomer(message, 20);
+                      const htmlContent = extractVisibleMessage(message); // Clean HTML
+                      const { preview, isTruncated } = getInitialPreviewTextFromCustomer(htmlContent, 20);
 
                       return (
                         <div className="bg-blue-50 border-blue-200 border p-4 rounded">
@@ -384,7 +385,19 @@ const CustomerSupportComponent = () => {
                           </div>
 
                           <p className="whitespace-pre-wrap text-gray-700">
-                            {isInitialMessageExpanded ? message : preview}
+                            {isInitialMessageExpanded ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: htmlContent
+                                }}
+                              />
+                            ) : (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: preview
+                                }}
+                              />
+                            )}
                           </p>
 
                           <div className="flex justify-between items-center mt-1">
