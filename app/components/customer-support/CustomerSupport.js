@@ -363,8 +363,12 @@ const CustomerSupportComponent = () => {
                 <div className="flex-1 overflow-y-auto">
                   <div className="space-y-4 p-6">
                     <h2 className="text-2xl font-bold text-gray-800">{selectedMessage?.topic} [{selectedMessage.supportId}]</h2>
-                    <div className="text-sm text-gray-500">From: {selectedMessage?.name} ({selectedMessage?.email})</div>
-                    <div className="text-sm text-gray-500">Phone: {selectedMessage?.phone}</div>
+                    <div className="text-sm text-gray-500">
+                      From: {selectedMessage?.name ? `${selectedMessage.name} (${selectedMessage.email})` : selectedMessage?.email}
+                    </div>
+                    {selectedMessage.phone &&
+                      <div className="text-sm text-gray-500">Phone: {selectedMessage?.phone}</div>
+                    }
                     <hr />
                     {(() => {
                       const message = selectedMessage?.message || "";
