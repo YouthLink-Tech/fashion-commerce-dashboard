@@ -16,7 +16,7 @@ export default function GoBackButton() {
   }, []);
 
   const handleClick = () => {
-    if (window.history.length > 1 && pathname !== "/") {
+    if (window.history.length > 1) {
       router.back(); // Go to last visited page
     } else {
       if (href && pathname === href) return;

@@ -22,7 +22,7 @@ export const getTimeAgo = (dateTimeStr) => {
   return `${years}y ago`;
 };
 
-export const formatMessageDate = (isoString) => {
+export const formatHeadingMessageDate = (isoString) => {
   const messageDate = new Date(isoString);
   const now = new Date();
 
@@ -45,4 +45,22 @@ export const formatMessageDate = (isoString) => {
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return `${monthNames[messageDate.getMonth()]} ${messageDate.getDate()}`;
   }
+};
+
+export const formatMessageDate = (isoString) => {
+  const messageDate = new Date(isoString);
+
+  const options = {
+    month: "long",     // Full month name, e.g., July
+    day: "numeric",    // Day of the month, e.g., 21
+    year: "numeric",   // Full year, e.g., 2025
+    hour: "numeric",   // Hour (12-hour format)
+    minute: "2-digit", // Minute with leading 0 if needed
+    hour12: true       // Use AM/PM
+  };
+
+  return new Intl.DateTimeFormat("en-US", {
+    ...options,
+    timeZone: "Asia/Dhaka"
+  }).format(messageDate);
 };

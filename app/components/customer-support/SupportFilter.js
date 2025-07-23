@@ -1,9 +1,10 @@
 import { Select, SelectItem } from '@nextui-org/react';
-import { useState } from 'react';
 
-const SupportFilterDropdown = ({ onFilterChange }) => {
-  const [selectedFilter, setSelectedFilter] = useState(new Set(['all']));
-
+const SupportFilterDropdown = ({
+  selectedFilter,
+  setSelectedFilter,
+  onFilterChange
+}) => {
   const filterOptions = [
     { key: 'all', label: 'All' },
     { key: 'unread', label: 'Unread' }
@@ -11,7 +12,7 @@ const SupportFilterDropdown = ({ onFilterChange }) => {
 
   return (
     <Select
-      label="Filter Messages"
+      label="Filter"
       selectionMode="single"
       size="sm"
       selectedKeys={selectedFilter}
@@ -20,7 +21,7 @@ const SupportFilterDropdown = ({ onFilterChange }) => {
         setSelectedFilter(new Set([selected]));
         onFilterChange(selected);
       }}
-      className="w-48"
+      className="w-28"
     >
       {filterOptions.map((option) => (
         <SelectItem key={option.key} value={option.key}>

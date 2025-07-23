@@ -3,16 +3,19 @@ import useCustomerSupport from '@/app/hooks/useCustomerSupport';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Loading from '../shared/Loading/Loading';
 import { GoDotFill } from 'react-icons/go';
-import { formatMessageDate } from '../navbar/GetTimeAgo';
+import { formatHeadingMessageDate, formatMessageDate } from '../navbar/GetTimeAgo';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import SupportFilterDropdown from './SupportFilter';
 import AssignUser from './AssignUser';
 import { useSearchParams } from 'next/navigation';
 import { TbMessageFilled } from "react-icons/tb";
-import { Checkbox } from '@nextui-org/react';
+import { Checkbox, DateRangePicker } from '@nextui-org/react';
 import SendMessageBox from './SendMessageBox';
 import toast from 'react-hot-toast';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { IoMdClose } from 'react-icons/io';
+import { today, getLocalTimeZone } from "@internationalized/date";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const CustomerSupportComponent = () => {
 
@@ -29,6 +32,8 @@ const CustomerSupportComponent = () => {
   const [isInitialMessageExpanded, setIsInitialMessageExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [selectedFilter, setSelectedFilter] = useState(new Set(['all']));
 
   useEffect(() => {
     setSelectedMessage(null);
@@ -40,15 +45,70 @@ const CustomerSupportComponent = () => {
     }
   };
 
+  const parseDate = (dateString) => {
+    return new Date(dateString); // Automatically parses ISO format
+  };
+
+  const { startDate, adjustedEndDate } = useMemo(() => {
+    const start = selectedDateRange?.start
+      ? new Date(
+        selectedDateRange.start.year,
+        selectedDateRange.start.month - 1,
+        selectedDateRange.start.day
+      )
+      : null;
+
+    const end = selectedDateRange?.end
+      ? new Date(
+        selectedDateRange.end.year,
+        selectedDateRange.end.month - 1,
+        selectedDateRange.end.day
+      )
+      : null;
+
+    const adjustedEnd = end
+      ? new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1)
+      : null;
+
+    return { startDate: start, adjustedEndDate: adjustedEnd };
+  }, [selectedDateRange]);
+
+  const handleFilterChange = (filter) => {
+    setFilter(filter);
+  };
+
+  const handleReset = () => {
+    setSelectedDateRange(null);
+  };
+
+  const currentDate = today(getLocalTimeZone());
+
   const displayedInboxes = useMemo(() => {
     const normalizedQuery = searchQuery.toLowerCase().trim();
     if (!existingCustomerSupport) return [];
 
-    // Filter unread if needed
-    let baseList = filter === "unread"
-      ? existingCustomerSupport.filter(n => !n?.isRead)
-      : existingCustomerSupport;
+    // Start with all
+    let baseList = existingCustomerSupport;
 
+    // Apply unread filter
+    if (filter === "unread") {
+      baseList = baseList.filter(n => !n?.isRead);
+    }
+
+    // Apply date range if selected
+    if (startDate && adjustedEndDate) {
+      const startDateObj = new Date(startDate);
+      const endDateObj = new Date(adjustedEndDate);
+      startDateObj.setHours(0, 0, 0, 0);
+      endDateObj.setHours(23, 59, 59, 999);
+
+      baseList = baseList.filter(item => {
+        const messageDate = parseDate(item.dateTime);
+        return messageDate >= startDateObj && messageDate <= endDateObj;
+      });
+    }
+
+    // Apply search query
     if (!normalizedQuery) return baseList;
 
     return baseList.filter((item) => {
@@ -58,7 +118,6 @@ const CustomerSupportComponent = () => {
         email = '',
         phone = '',
         topic = '',
-        dateTime = ''
       } = item;
 
       const fieldsToSearch = [
@@ -67,15 +126,13 @@ const CustomerSupportComponent = () => {
         email,
         topic,
         phone?.toString(),
-        new Date(dateTime).toLocaleString("en-US") // normalized date string
       ];
 
       return fieldsToSearch.some(field =>
         field?.toLowerCase().includes(normalizedQuery)
       );
     });
-
-  }, [existingCustomerSupport, filter, searchQuery]);
+  }, [existingCustomerSupport, filter, searchQuery, adjustedEndDate, startDate]);
 
   const handleOpenMessage = useCallback(async (item) => {
     setSelectedMessage(item);
@@ -196,7 +253,7 @@ const CustomerSupportComponent = () => {
     return { preview, isTruncated };
   };
 
-  const getLastReplyPreview = (replies = [], charLimit = 40) => {
+  const getLastReplyPreview = (replies = [], charLimit = 30) => {
     if (!replies?.length) return null;
 
     const lastReply = replies[replies.length - 1];
@@ -249,8 +306,52 @@ const CustomerSupportComponent = () => {
         {/* LEFT PANEL - Inbox */}
         <div className='lg:col-span-4 border-r overflow-y-auto custom-scrollbars'>
           <div className='flex justify-between items-center sticky top-0 z-10 bg-gray-50 border-b'>
-            <h1 className='py-4 px-6 text-xl font-semibold text-neutral-700'>Support Inbox</h1>
-            <SupportFilterDropdown onFilterChange={(value) => setFilter(value)} />
+            <h1 className='py-4 px-6 text-base 2xl:text-xl font-semibold text-neutral-700'>Support Inbox</h1>
+
+            <div className='flex justify-center items-center gap-4'>
+              <SupportFilterDropdown selectedFilter={selectedFilter}
+                setSelectedFilter={setSelectedFilter}
+                onFilterChange={handleFilterChange} />
+              <div>
+
+                <div className='flex items-center justify-start gap-2'>
+                  <DateRangePicker
+                    selectorIcon={<FaCalendarAlt size={16} />}
+                    selectorButtonPlacement="start" // Place icon at the start
+                    selectorButtonProps={{
+                      size: 'sm',
+                      variant: 'light',
+                      radius: 'full',
+                      isIconOnly: true, // Ensure button is icon-only
+                    }}
+                    visibleMonths={2}
+                    maxValue={currentDate}
+                    onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                    value={selectedDateRange} // Ensure this matches the expected format
+                    classNames={{
+                      inputWrapper: [
+                        '!bg-transparent', // Adjust background if needed
+                        'min-w-[40px]', // Ensure enough space for icon
+                      ],
+                      input: ['hidden'], // Hide input text completely
+                      segment: ['hidden'], // Hide date segments (mm/dd/yyyy)
+                      separator: ['hidden'], // Hide separator (-)
+                      selectorButton: [
+                        'w-10 h-10', // Fixed size for icon button
+                      ],
+                      selectorIcon: ['text-gray-500', 'w-5 h-5'], // Ensure icon is styled and visible
+                    }}
+                  />
+
+                  {(selectedDateRange?.start && selectedDateRange?.end) && (
+                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1 mr-1" onClick={handleReset}>
+                      <IoMdClose className="text-lg" />
+                    </button>
+                  )}
+                </div>
+
+              </div>
+            </div>
           </div>
 
           {
@@ -259,10 +360,10 @@ const CustomerSupportComponent = () => {
                 <div
                   key={item._id}
                   onClick={() => handleOpenMessage(item)}
-                  className={`flex justify-between items-center cursor-pointer px-6 py-4 hover:bg-gray-100 border-b transition-all ${selectedMessage?._id === item._id ? 'bg-blue-100 border-blue-300' : ''
+                  className={`flex justify-between items-center cursor-pointer px-3 py-3 2xl:px-6 2xl:py-4 hover:bg-gray-100 border-b transition-all ${selectedMessage?._id === item._id ? 'bg-blue-100 border-blue-300' : ''
                     }`}
                 >
-                  <div className='flex gap-4 items-center'>
+                  <div className='flex gap-0 2xl:gap-4 items-center'>
                     <div className='flex flex-col gap-2 items-center justify-center'>
                       <Checkbox
                         isSelected={selectedIds.includes(item._id)}
@@ -293,10 +394,9 @@ const CustomerSupportComponent = () => {
                       }
                     </div>
                   </div>
-                  <div className="text-xs flex flex-col items-end gap-2">
-                    <span className="text-neutral-600 font-semibold">{item.supportId}</span>
+                  <div className="text-[10px] 2xl:text-xs flex flex-col items-end gap-2">
                     <span className='text-neutral-700'>
-                      {formatMessageDate(
+                      {formatHeadingMessageDate(
                         item?.replies?.length > 0
                           ? item.replies[item.replies.length - 1]?.dateTime
                           : item.dateTime
@@ -362,7 +462,8 @@ const CustomerSupportComponent = () => {
                 {/* Scrollable message view */}
                 <div className="flex-1 overflow-y-auto">
                   <div className="space-y-4 p-6">
-                    <h2 className="text-2xl font-bold text-gray-800">{selectedMessage?.topic} [{selectedMessage.supportId}]</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedMessage?.topic}</h2>
+                    <h3 className='text-neutral-600 text-sm font-semibold'>{selectedMessage.supportId}</h3>
                     <div className="text-sm text-gray-500">
                       From: {selectedMessage?.name ? `${selectedMessage.name} (${selectedMessage.email})` : selectedMessage?.email}
                     </div>

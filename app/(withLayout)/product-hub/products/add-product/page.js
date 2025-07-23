@@ -566,7 +566,7 @@ const FirstStepOfAddProduct = () => {
   }, [setValue]);
 
   const generateProductID = (category) => {
-    const prefix = "FC"; // Automatically generated "FC"
+    const prefix = "PPX"; // Automatically generated "PPX"
     const currentYear = new Date().getFullYear();
     const yearCode = String(currentYear).slice(-3); // Last 3 digits of the year (e.g., "024" for 2024)
 
