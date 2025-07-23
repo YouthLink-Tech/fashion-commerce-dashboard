@@ -298,8 +298,6 @@ const CustomerSupportComponent = () => {
 
   if (isCustomerSupportPending) return <Loading />;
 
-  console.log(selectedDateRange, "selectedDateRange");
-
   return (
     <div className='relative'>
 
@@ -318,6 +316,7 @@ const CustomerSupportComponent = () => {
 
                 <div className='flex items-center justify-start gap-2'>
                   <DateRangePicker
+                    aria-label="Select date range"
                     selectorIcon={<FaCalendarAlt size={16} />}
                     selectorButtonPlacement="start" // Place icon at the start
                     selectorButtonProps={{
