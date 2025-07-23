@@ -37,7 +37,7 @@ const CustomerSupportComponent = () => {
 
   useEffect(() => {
     setSelectedMessage(null);
-  }, [searchQuery, filter]);
+  }, [searchQuery, filter, selectedDateRange]);
 
   const scrollToBottom = () => {
     if (messageEndRef.current) {
@@ -297,6 +297,8 @@ const CustomerSupportComponent = () => {
   }, [selectedMessageId, existingCustomerSupport, handleOpenMessage]);
 
   if (isCustomerSupportPending) return <Loading />;
+
+  console.log(selectedDateRange, "selectedDateRange");
 
   return (
     <div className='relative'>
