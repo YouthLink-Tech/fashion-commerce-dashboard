@@ -16,7 +16,8 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { FaCalendarAlt } from "react-icons/fa";
-import { extractVisibleMessage, getInitialPreviewTextFromCustomer, getPreviewText } from '@/app/utils/support/supportUtils';
+import { extractVisibleMessage, formatContentType, formatFileSize, getInitialPreviewTextFromCustomer, getPreviewText, isImage } from '@/app/utils/support/supportUtils';
+import Image from 'next/image';
 
 const CustomerSupportComponent = () => {
 
@@ -426,7 +427,8 @@ const CustomerSupportComponent = () => {
                     }
                     <hr />
                     {(() => {
-                      const message = selectedMessage?.message || "";
+                      const message = selectedMessage?.message?.html || "";
+                      const attachments = selectedMessage?.message?.attachments || [];
                       const htmlContent = extractVisibleMessage(message); // Clean HTML
                       const { preview, isTruncated } = getInitialPreviewTextFromCustomer(htmlContent, 20);
 
@@ -454,6 +456,49 @@ const CustomerSupportComponent = () => {
                               />
                             )}
                           </p>
+
+                          {attachments.length > 0 && (
+                            <div className="mt-3">
+                              <h4 className="text-sm font-medium text-gray-600">Attachments:</h4>
+                              <ul className="mt-1 space-y-2">
+                                {attachments.map((attachment, index) => (
+                                  <li key={index} className="flex items-center space-x-2">
+                                    {isImage(attachment.contentType) ? (
+                                      <div className="flex flex-col">
+                                        <a
+                                          href={attachment.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:underline"
+                                          title={`Type: ${formatContentType(attachment.contentType)}`}
+                                        >
+                                          {attachment.name} ({formatFileSize(attachment.size)})
+                                        </a>
+                                        <Image
+                                          src={attachment.url}
+                                          alt={attachment.name}
+                                          height={2000}
+                                          width={2000}
+                                          className="mt-1 max-w-xs rounded border border-gray-200"
+                                          style={{ maxHeight: '200px', objectFit: 'contain' }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <a
+                                        href={attachment.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                        title={`Type: ${formatContentType(attachment.contentType)}`}
+                                      >
+                                        {attachment.name} ({formatFileSize(attachment.size)})
+                                      </a>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
 
                           <div className="flex justify-between items-center mt-1">
                             <p className="text-xs text-gray-500">
@@ -487,6 +532,7 @@ const CustomerSupportComponent = () => {
                           : reply?.html;
 
                       const { preview, isTruncated } = getPreviewText(htmlContent, 20);
+                      const attachments = reply?.attachments || [];
 
                       return (
                         <div key={index} className={`${reply?.from === "support" ? "bg-gray-50 border-gray-200" : "bg-blue-50 border-blue-200"} border p-4 rounded relative`}>
@@ -505,6 +551,49 @@ const CustomerSupportComponent = () => {
                               <p>{preview}</p>
                             )}
                           </div>
+
+                          {attachments.length > 0 && (
+                            <div className="mt-3">
+                              <h4 className="text-sm font-medium text-gray-600">Attachments:</h4>
+                              <ul className="mt-1 space-y-2">
+                                {attachments.map((attachment, index) => (
+                                  <li key={index} className="flex items-center space-x-2">
+                                    {isImage(attachment.contentType) ? (
+                                      <div className="flex flex-col">
+                                        <a
+                                          href={attachment.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:underline"
+                                          title={`Type: ${formatContentType(attachment.contentType)}`}
+                                        >
+                                          {attachment.name} ({formatFileSize(attachment.size)})
+                                        </a>
+                                        <Image
+                                          src={attachment.url}
+                                          alt={attachment.name}
+                                          height={2000}
+                                          width={2000}
+                                          className="mt-1 max-w-xs rounded border border-gray-200"
+                                          style={{ maxHeight: '200px', objectFit: 'contain' }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <a
+                                        href={attachment.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                        title={`Type: ${formatContentType(attachment.contentType)}`}
+                                      >
+                                        {attachment.name} ({formatFileSize(attachment.size)})
+                                      </a>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
 
                           <div className="flex justify-between items-center mt-2">
                             <p className="text-xs text-gray-500">{formatMessageDate(reply?.dateTime)}</p>

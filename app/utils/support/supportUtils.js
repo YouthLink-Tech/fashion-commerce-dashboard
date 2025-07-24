@@ -45,3 +45,24 @@ export const getPreviewText = (html = "", wordLimit = 20) => {
   const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
   return { preview, isTruncated };
 };
+
+// Utility to check if attachment is an image
+export const isImage = (contentType) => contentType && contentType.startsWith('image/');
+
+// Utility to format file size (e.g., "46.8 KB")
+export const formatFileSize = (bytes) => {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+};
+
+// Utility to format content type (e.g., "image/png" -> "Image")
+export const formatContentType = (contentType) => {
+  if (!contentType) return 'File';
+  if (contentType.startsWith('image/')) return 'Image';
+  if (contentType === 'application/pdf') return 'PDF';
+  if (contentType.includes('text/')) return 'Text';
+  if (contentType.includes('application/')) return contentType.split('/')[1].toUpperCase();
+  return 'File';
+};
