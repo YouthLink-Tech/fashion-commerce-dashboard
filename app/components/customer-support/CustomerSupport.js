@@ -16,8 +16,9 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { FaCalendarAlt } from "react-icons/fa";
-import { extractVisibleMessage, formatContentType, formatFileSize, getInitialPreviewTextFromCustomer, getPreviewText, isImage } from '@/app/utils/support/supportUtils';
-import Image from 'next/image';
+import { extractVisibleMessage, formatContentType, formatFileSize, getIcon, getInitialPreviewTextFromCustomer, getPreviewText } from '@/app/utils/support/supportUtils';
+import { TbArrowBigDownFilled } from "react-icons/tb";
+import { saveAs } from 'file-saver';
 
 const CustomerSupportComponent = () => {
 
@@ -458,44 +459,48 @@ const CustomerSupportComponent = () => {
                           </p>
 
                           {attachments.length > 0 && (
-                            <div className="mt-3">
-                              <h4 className="text-sm font-medium text-gray-600">Attachments:</h4>
-                              <ul className="mt-1 space-y-2">
-                                {attachments.map((attachment, index) => (
-                                  <li key={index} className="flex items-center space-x-2">
-                                    {isImage(attachment.contentType) ? (
-                                      <div className="flex flex-col">
+                            <div className="mt-5">
+                              <h4 className="text-xs font-medium text-gray-600">Attachments:</h4>
+                              <ul className="flex items-center flex-wrap gap-2">
+                                {attachments.map((attachment, index) => {
+                                  const handleDownload = async () => {
+                                    try {
+                                      const response = await fetch(attachment.url);
+                                      const blob = await response.blob();
+                                      saveAs(blob, attachment.name);
+                                    } catch (error) {
+                                      console.error('Download failed:', error);
+                                    }
+                                  };
+                                  return (
+                                    <li key={index} className="flex items-center space-x-2 py-2">
+                                      <div className="relative group hover:bg-gray-200">
                                         <a
                                           href={attachment.url}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-blue-600 hover:underline"
+                                          className="flex items-center gap-2 px-3 py-1 border border-gray-300 rounded-md hover:cursor-pointer min-w-[260px] max-w-[260px]"
                                           title={`Type: ${formatContentType(attachment.contentType)}`}
                                         >
-                                          {attachment.name} ({formatFileSize(attachment.size)})
+                                          {getIcon(attachment.contentType)}
+                                          <div className="flex flex-col flex-1">
+                                            <span className="text-blue-600 text-sm">
+                                              {attachment.name.length > 20 ? `${attachment.name.slice(0, 20)}...` : attachment.name}
+                                            </span>
+                                            <p className="text-xs text-neutral-500">{formatFileSize(attachment.size)}</p>
+                                          </div>
                                         </a>
-                                        <Image
-                                          src={attachment.url}
-                                          alt={attachment.name}
-                                          height={2000}
-                                          width={2000}
-                                          className="mt-1 max-w-xs rounded border border-gray-200"
-                                          style={{ maxHeight: '200px', objectFit: 'contain' }}
-                                        />
+                                        <button
+                                          onClick={handleDownload}
+                                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none text-[#666666]"
+                                          title="Download attachment"
+                                        >
+                                          <TbArrowBigDownFilled size={22} />
+                                        </button>
                                       </div>
-                                    ) : (
-                                      <a
-                                        href={attachment.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
-                                        title={`Type: ${formatContentType(attachment.contentType)}`}
-                                      >
-                                        {attachment.name} ({formatFileSize(attachment.size)})
-                                      </a>
-                                    )}
-                                  </li>
-                                ))}
+                                    </li>
+                                  );
+                                })}
                               </ul>
                             </div>
                           )}
@@ -553,44 +558,48 @@ const CustomerSupportComponent = () => {
                           </div>
 
                           {attachments.length > 0 && (
-                            <div className="mt-3">
-                              <h4 className="text-sm font-medium text-gray-600">Attachments:</h4>
-                              <ul className="mt-1 space-y-2">
-                                {attachments.map((attachment, index) => (
-                                  <li key={index} className="flex items-center space-x-2">
-                                    {isImage(attachment.contentType) ? (
-                                      <div className="flex flex-col">
+                            <div className="mt-5">
+                              <h4 className="text-xs font-medium text-gray-600">Attachments:</h4>
+                              <ul className="flex items-center flex-wrap gap-2">
+                                {attachments.map((attachment, index) => {
+                                  const handleDownload = async () => {
+                                    try {
+                                      const response = await fetch(attachment.url);
+                                      const blob = await response.blob();
+                                      saveAs(blob, attachment.name);
+                                    } catch (error) {
+                                      console.error('Download failed:', error);
+                                    }
+                                  };
+                                  return (
+                                    <li key={index} className="flex items-center space-x-2 py-2">
+                                      <div className="relative group hover:bg-gray-200">
                                         <a
                                           href={attachment.url}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-blue-600 hover:underline"
+                                          className="flex items-center gap-2 px-3 py-1 border border-gray-300 rounded-md hover:cursor-pointer min-w-[260px] max-w-[260px]"
                                           title={`Type: ${formatContentType(attachment.contentType)}`}
                                         >
-                                          {attachment.name} ({formatFileSize(attachment.size)})
+                                          {getIcon(attachment.contentType)}
+                                          <div className="flex flex-col flex-1">
+                                            <span className="text-blue-600 text-sm">
+                                              {attachment.name.length > 20 ? `${attachment.name.slice(0, 20)}...` : attachment.name}
+                                            </span>
+                                            <p className="text-xs text-neutral-500">{formatFileSize(attachment.size)}</p>
+                                          </div>
                                         </a>
-                                        <Image
-                                          src={attachment.url}
-                                          alt={attachment.name}
-                                          height={2000}
-                                          width={2000}
-                                          className="mt-1 max-w-xs rounded border border-gray-200"
-                                          style={{ maxHeight: '200px', objectFit: 'contain' }}
-                                        />
+                                        <button
+                                          onClick={handleDownload}
+                                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none text-[#666666]"
+                                          title="Download attachment"
+                                        >
+                                          <TbArrowBigDownFilled size={22} />
+                                        </button>
                                       </div>
-                                    ) : (
-                                      <a
-                                        href={attachment.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
-                                        title={`Type: ${formatContentType(attachment.contentType)}`}
-                                      >
-                                        {attachment.name} ({formatFileSize(attachment.size)})
-                                      </a>
-                                    )}
-                                  </li>
-                                ))}
+                                    </li>
+                                  );
+                                })}
                               </ul>
                             </div>
                           )}

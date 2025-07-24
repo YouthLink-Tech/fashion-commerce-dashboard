@@ -1,3 +1,6 @@
+import { BsFileEarmarkPdfFill } from "react-icons/bs";
+import { FcFile, FcImageFile, FcVideoFile } from "react-icons/fc";
+
 export const extractVisibleMessage = (html) => {
   if (!html) return "";
 
@@ -46,9 +49,6 @@ export const getPreviewText = (html = "", wordLimit = 20) => {
   return { preview, isTruncated };
 };
 
-// Utility to check if attachment is an image
-export const isImage = (contentType) => contentType && contentType.startsWith('image/');
-
 // Utility to format file size (e.g., "46.8 KB")
 export const formatFileSize = (bytes) => {
   if (!bytes) return '0 B';
@@ -65,4 +65,33 @@ export const formatContentType = (contentType) => {
   if (contentType.includes('text/')) return 'Text';
   if (contentType.includes('application/')) return contentType.split('/')[1].toUpperCase();
   return 'File';
+};
+
+export const getIcon = (contentType) => {
+  if (contentType.includes('image')) {
+    return (
+      <span className=''>
+        <FcImageFile size={24} />
+      </span>
+    );
+  } else if (contentType.includes('pdf')) {
+    return (
+      <span className='text-red-600'>
+        <BsFileEarmarkPdfFill size={24} />
+      </span>
+    );
+  } else if (contentType.includes('video')) {
+    return (
+      <span className=''>
+        <FcVideoFile size={24} />
+      </span>
+    );
+  } else {
+    // Generic file icon for other types
+    return (
+      <span className=''>
+        <FcFile size={24} />
+      </span>
+    );
+  }
 };
