@@ -2,9 +2,9 @@
   {
     "origin": [
       "http://localhost:3000",
-      "https://fashion-commerce-pi.vercel.app",
-      "https://fc-frontend-664306765395.asia-south1.run.app",
-      "https://poshax-backend-664306765395.asia-south1.run.app"
+      "https://poshax.shop",
+      "https://px-portal-025.poshax.shop",
+      "https://poshax-backend-664306765395.asia-southeast1.run.app"
     ],
     "responseHeader": ["Content-Type"],
     "method": ["PUT", "GET", "POST", "DELETE", "HEAD"],
