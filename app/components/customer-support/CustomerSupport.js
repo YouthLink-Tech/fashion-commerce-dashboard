@@ -16,6 +16,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { FaCalendarAlt } from "react-icons/fa";
+import { extractVisibleMessage, getInitialPreviewTextFromCustomer, getPreviewText } from '@/app/utils/support/supportUtils';
 
 const CustomerSupportComponent = () => {
 
@@ -233,54 +234,6 @@ const CustomerSupportComponent = () => {
     }));
   };
 
-  const extractVisibleMessage = (html) => {
-    if (!html) return "";
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    // Remove Gmail's quoted history
-    const quote = doc.querySelector(".gmail_quote");
-    if (quote) quote.remove();
-
-    return doc.body.innerHTML;
-  };
-
-  const getInitialPreviewTextFromCustomer = (text = "", wordLimit = 20) => {
-    const words = text.trim().split(/\s+/);
-    const isTruncated = words.length > wordLimit;
-    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
-    return { preview, isTruncated };
-  };
-
-  const getLastReplyPreview = (replies = [], charLimit = 30) => {
-    if (!replies?.length) return null;
-
-    const lastReply = replies[replies.length - 1];
-    const from = lastReply?.from === "support" ? "You" : "Customer";
-
-    const cleanHtml = extractVisibleMessage(lastReply?.html || "");
-
-    const div = document.createElement("div");
-    div.innerHTML = cleanHtml;
-    const text = (div.textContent || div.innerText || "").trim();
-
-    const isTruncated = text.length > charLimit;
-    const preview = text.slice(0, charLimit) + (isTruncated ? "..." : "");
-
-    return `${from}: ${preview}`;
-  };
-
-  const getPreviewText = (html = "", wordLimit = 20) => {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const text = div.textContent || div.innerText || "";
-    const words = text.trim().split(/\s+/);
-    const isTruncated = words.length > wordLimit;
-    const preview = words.slice(0, wordLimit).join(" ") + (isTruncated ? "..." : "");
-    return { preview, isTruncated };
-  };
-
   useEffect(() => {
     if (selectedMessage || isOpen) {
       setTimeout(scrollToBottom, 100); // Delay ensures DOM is ready
@@ -386,13 +339,13 @@ const CustomerSupportComponent = () => {
                     </div>
                     <div className='flex flex-col'>
                       <p className={`${item?.isRead ? "font-medium" : "font-bold"} text-neutral-900 md:text-sm 2xl:text-base`}>{item.name}</p>
-                      <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-gray-400`}>{item.topic}</p>
+                      <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-gray-400`}>{item.topic} ({item.supportId})</p>
                       <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-neutral-600 truncate`}>{item.email}</p>
-                      {item.replies &&
+                      {/* {item.replies &&
                         <p className={`${item?.isRead ? "" : "font-bold"} md:text-xs 2xl:text-sm text-neutral-600 truncate`}>
                           {getLastReplyPreview(item.replies)}
                         </p>
-                      }
+                      } */}
                     </div>
                   </div>
                   <div className="text-[10px] 2xl:text-xs flex flex-col items-end gap-2">

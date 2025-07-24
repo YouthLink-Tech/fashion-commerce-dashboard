@@ -50,7 +50,6 @@ const Notifications = () => {
       setExistingCustomerSupport(res.data);
     } catch (error) {
       console.error('Error fetching category:', error);
-      toast.error('Error fetching category data.');
     }
   }, [axiosSecure, existingUserData._id]); // Dependencies
 
