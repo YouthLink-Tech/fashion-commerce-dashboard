@@ -2011,6 +2011,12 @@ const OrderContents = () => {
                   placeholder="Enter declined reason"
                   value={declinedReason}
                   onChange={(e) => setDeclinedReason(e.target.value)}
+                  isInvalid={declinedReason.length > 0 && declinedReason.length < 10}
+                  errorMessage={
+                    declinedReason.length > 0 && declinedReason.length < 10
+                      ? "Minimum 10 characters required"
+                      : ""
+                  }
                 />
               </div>
 
@@ -2025,6 +2031,12 @@ const OrderContents = () => {
                   if (!declinedReason) {
                     toast.error("Please enter declined reason.");
                     return; // Stop execution if no tracking number is provided
+                  }
+
+                  // Check if declined reason is less than 10 characters
+                  if (declinedReason.length < 10) {
+                    toast.error("Minimum 10 characters required!");
+                    return;
                   }
 
                   // Update order status with tracking number and selected handler
