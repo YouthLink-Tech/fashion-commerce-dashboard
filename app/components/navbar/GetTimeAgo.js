@@ -1,11 +1,19 @@
 export const getTimeAgo = (dateTimeStr) => {
-  // Convert "May 5, 2025 | 5:50 PM" -> "May 5, 2025 5:50 PM"
-  const cleanedDateStr = dateTimeStr.replace('|', '').trim();
-  const past = new Date(cleanedDateStr);
+
+  // Expect dateTimeStr to be in ISO 8601 format (e.g., "2025-05-05T11:50:00.000Z")
+  const past = new Date(dateTimeStr);
   const now = new Date();
 
+  if (isNaN(past.getTime())) {
+    console.error(`Invalid date: ${dateTimeStr}`);
+    return "Invalid date";
+  }
+
   const diffMs = now - past;
-  if (isNaN(past)) return 'Invalid date';
+  if (diffMs < 0) {
+    console.warn(`Future date detected: ${dateTimeStr}`);
+    return "Just now"; // Handle future dates gracefully
+  }
 
   const seconds = Math.floor(diffMs / 1000);
   const minutes = Math.floor(diffMs / (1000 * 60));
