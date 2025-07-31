@@ -47,11 +47,6 @@ const HomepageContent = () => {
     }
   }, [heroBannerImageList, setValue]);
 
-  const handleGoToPreviewPageAfterUpload = (imageUrl, imageUrl2, imageUrl3) => {
-    // const previewURL = `/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}&centerImage=${encodeURIComponent(imageUrl2)}&rightImage=${encodeURIComponent(imageUrl3)}`;
-    // window.open(previewURL, '_blank');
-  };
-
   const handleStatusChange = (e) => {
     setStatus(e.target.checked); // true or false
   };
@@ -209,13 +204,7 @@ const HomepageContent = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-between gap-6 items-center mt-6 pb-6">
-
-            {heroBannerImageList?.map((hero) => (
-              <button key={hero?._id} type='button' className='text-blue-600 border-blue-500 font-bold border-b' onClick={() => handleGoToPreviewPageAfterUpload(hero?.leftImgUrl, hero?.centerImgUrl, hero?.rightImgUrl)}>
-                Preview
-              </button>
-            ))}
+          <div className="flex justify-end gap-6 items-center mt-6 pb-6">
 
             <button
               type='submit'

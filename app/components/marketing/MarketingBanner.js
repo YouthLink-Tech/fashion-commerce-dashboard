@@ -4,10 +4,12 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { MdOutlineFileUpload } from 'react-icons/md';
+import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import SelectImage from './SelectImage';
+import { useDisclosure } from '@nextui-org/react';
 
 const MarketingBanner = () => {
 
@@ -17,13 +19,28 @@ const MarketingBanner = () => {
   const [selectedPosition, setSelectedPosition] = useState("");
   const [sizeError, setSizeError] = useState(false);
   const [marketingBannerList = [], isMarketingBannerPending, refetch] = useMarketingBanners();
+  const shouldShowPreview = Boolean(image?.src);
+  const [previousImages, setPreviousImages] = useState([]);
+  const [tempImage, setTempImage] = useState(null);
+  const [dbImageUrl, setDbImageUrl] = useState(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     if (marketingBannerList && marketingBannerList.length > 0) {
+      const dbUrl = marketingBannerList[0]?.url;
+      setDbImageUrl(dbUrl); // ⬅️ Add this
       setSelectedPosition(marketingBannerList[0]?.position); // Assuming you want the first banner's position
-      setImage({ src: marketingBannerList[0]?.url, file: null });
+      setImage({ src: dbUrl, file: null });
+      setPreviousImages(marketingBannerList[0]?.previousUrls);
     }
   }, [marketingBannerList]);
+
+  // Sync tempImage with current image whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setTempImage(image);
+    }
+  }, [isOpen, image]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -87,10 +104,10 @@ const MarketingBanner = () => {
     setSelectedPosition(e.target.value);
   };
 
-  const handleGoToPreviewPageAfterUpload = (imageUrl, position) => {
-    // const previewURL = `/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
-    // window.open(previewURL, '_blank');
-  }
+  const handleGoToPreviewPageBeforeUpload = (image, position) => {
+    const previewURL = `/preview/previewMarketingBanner/?image=${encodeURIComponent(image)}&position=${encodeURIComponent(position)}`;
+    window.open(previewURL, '_blank');
+  };
 
   const onSubmit = async () => {
 
@@ -108,9 +125,9 @@ const MarketingBanner = () => {
         toast.error('Image upload failed, cannot proceed.');
         return;
       }
-    } else if (marketingBannerList?.length > 0) {
-      // Use the existing URL if no new image was uploaded
-      imageUrl = marketingBannerList[0]?.url;
+    } else if (image?.src) {
+      // If selecting from previous uploads
+      imageUrl = image.src;
     }
 
     if (marketingBannerList?.length > 0) {
@@ -157,7 +174,8 @@ const MarketingBanner = () => {
           ), {
             position: "bottom-right",
             duration: 5000
-          })
+          });
+          setDbImageUrl(imageUrl);
           refetch();
         }
         else {
@@ -175,7 +193,7 @@ const MarketingBanner = () => {
 
   return (
     <div className='max-w-screen-2xl flex flex-col xl:flex-row justify-between gap-6'>
-      <form onSubmit={handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg my-6 h-fit'>
+      <form onSubmit={handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-12 rounded-lg my-6 h-fit space-y-4'>
 
         <div className='flex flex-col w-full'>
           <label htmlFor='selectedPosition' className='font-semibold text-gray-700 mb-1'>
@@ -202,52 +220,81 @@ const MarketingBanner = () => {
           </div>
         </div>
 
-        <div className='flex flex-col gap-4 p-5 md:p-7'>
-          <input
-            id='imageUpload'
-            type='file'
-            className='hidden'
-            onChange={handleImageChange}
-          />
-          <label
-            htmlFor='imageUpload'
-            className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-          >
-            <MdOutlineFileUpload size={60} />
-            <div className='space-y-1.5 text-center'>
-              <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                Upload Thumbnail
-              </h5>
-              <p className='text-sm text-gray-500'>
-                Photo Should be in PNG, JPEG or JPG format
-              </p>
+        <div className="flex flex-col gap-6 bg-white rounded-xl">
+          {/* Upload & Select */}
+          <div className="flex flex-col md:flex-row gap-6 w-full">
+            {/* Upload Section */}
+            <div className="flex-1 w-full">
+              <input
+                id="imageUpload"
+                type="file"
+                className="hidden"
+                accept="image/png, image/jpeg, image/jpg"
+                onChange={handleImageChange}
+              />
+              <label
+                htmlFor="imageUpload"
+                className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-gray-300 p-8 bg-gray-50 cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300"
+              >
+                <MdOutlineFileUpload size={48} className="text-blue-500" />
+                <div className="text-center">
+                  <h5 className="text-xl font-semibold text-gray-900">Upload New Thumbnail</h5>
+                  <p className="text-sm text-gray-500">Supports PNG, JPG, or JPEG (Max 5MB)</p>
+                </div>
+              </label>
+              {sizeError && (
+                <p className="mt-3 text-sm text-red-500 text-center font-medium">
+                  Please upload or select a valid thumbnail
+                </p>
+              )}
             </div>
-          </label>
-          {sizeError && (
-            <p className="text-red-600 text-center">Please select image</p>
-          )}
 
+            {/* Select from Previous Section */}
+            <div className="flex-1 w-full">
+              <SelectImage
+                previousImages={previousImages}
+                setImage={setImage}
+                tempImage={tempImage}
+                setTempImage={setTempImage}
+                dbImageUrl={dbImageUrl}
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onOpenChange={onOpenChange}
+                axiosSecure={axiosSecure}
+                refetch={refetch}
+                setSizeError={setSizeError}
+              />
+            </div>
+          </div>
+
+          {/* Preview Selected Image */}
           {image && (
-            <div className='relative'>
+            <div className="relative rounded-xl border border-gray-200">
               <Image
                 src={image.src}
-                alt='Uploaded image'
+                alt="Uploaded image preview"
                 height={3000}
                 width={3000}
-                className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                className="w-full h-[250px] object-contain bg-white rounded-xl"
               />
               <button
+                type='button'
                 onClick={handleImageRemove}
-                className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
               >
-                <RxCross2 size={24} />
+                <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
               </button>
             </div>
           )}
         </div>
 
         {/* Submit Button */}
-        <div className={`flex justify-end items-center px-5 md:px-7`}>
+        <div className={`flex ${image?.src ? "justify-between" : "justify-end"} items-center`}>
+
+          {shouldShowPreview &&
+            <button type='button' className='text-blue-600 font-bold border-b border-blue-500' onClick={() => handleGoToPreviewPageBeforeUpload(image.src, selectedPosition)}>
+              Preview
+            </button>
+          }
 
           <button
             type='submit'
@@ -258,28 +305,6 @@ const MarketingBanner = () => {
         </div>
 
       </form>
-
-      <div className='flex-1 flex flex-col gap-6 items-center justify-center my-6 h-fit'>
-
-        {marketingBannerList?.map((marketing, index) => (
-          <div key={index} className="rounded-lg bg-white p-5 md:p-7 drop-shadow dark:bg-[#18181B]">
-            <Image width={1200} height={1200} alt='marketing-banner' className="h-fit lg:h-[285px] w-[650px] rounded-lg object-contain" src={marketing?.url} />
-            <div className="flex justify-between pt-8">
-              <div className='flex flex-col items-start gap-3'>
-                <p className='text-neutral-500'> <span>Position: </span>
-                  {["left", "right", "center"].includes(marketing?.position)
-                    ? marketing.position.charAt(0).toUpperCase() + marketing.position.slice(1)
-                    : marketing.position}
-                </p>
-              </div>
-              <button type='button' className='text-blue-600 font-bold border-b border-blue-500' onClick={() => handleGoToPreviewPageAfterUpload(marketing?.url, marketing?.position)}>
-                Preview
-              </button>
-            </div>
-          </div>
-        ))}
-
-      </div>
 
     </div>
   );
