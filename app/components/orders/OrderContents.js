@@ -1549,15 +1549,13 @@ const OrderContents = () => {
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isOwner ? (
-                                    checkUndoAvailability(order) && (
-                                      <button
-                                        onClick={() => handleActions(order._id, '', true)}
-                                        className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
-                                      >
-                                        <FaUndo />
-                                      </button>
-                                    )
+                                  {isOwner && checkUndoAvailability(order) && order.orderStatus !== "Return Requested" ? (
+                                    <button
+                                      onClick={() => handleActions(order._id, '', true)}
+                                      className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                                    >
+                                      <FaUndo />
+                                    </button>
                                   ) : (
                                     <></>
                                   )}
@@ -1962,6 +1960,12 @@ const OrderContents = () => {
                   placeholder="Enter on hold reason"
                   value={onHoldReason}
                   onChange={(e) => setOnHoldReason(e.target.value)}
+                  isInvalid={onHoldReason.length > 0 && onHoldReason.length < 10}
+                  errorMessage={
+                    onHoldReason.length > 0 && onHoldReason.length < 10
+                      ? "Minimum 10 characters required"
+                      : ""
+                  }
                 />
               </div>
 
@@ -1975,6 +1979,12 @@ const OrderContents = () => {
                   if (!onHoldReason) {
                     toast.error("Please enter on hold reason.");
                     return; // Stop execution if no tracking number is provided
+                  }
+
+                  // Check if declined reason is less than 10 characters
+                  if (onHoldReason.length < 10) {
+                    toast.error("Minimum 10 characters required!");
+                    return;
                   }
 
                   // Update order status with tracking number and selected handler
