@@ -249,7 +249,7 @@ const PDFDocument = ({ order }) => {
     const productTotal = (
       product?.discountInfo
         ? product?.discountInfo?.finalPriceAfterDiscount *
-        product?.sku.toFixed(2)
+        product?.sku
         : product?.regularPrice * product?.sku
     ).toFixed(2); // Original price without discount
 
