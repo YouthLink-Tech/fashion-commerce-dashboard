@@ -22,8 +22,7 @@ export async function POST(request) {
       address: `${order?.deliveryInfo?.address1 || ""}, ${order?.deliveryInfo?.address2 || ""}, ${order?.deliveryInfo?.city || ""}, ${order?.deliveryInfo?.postalCode || ""}`,
       district: order?.deliveryInfo?.city, // Bahok expects a district name; adjust if needed
       price: order?.totalAmount || 0,
-      instruction: order?.deliveryInfo?.noteToSeller || "Handle with care",
-      description: order?.productInformation?.map(p => p.productTitle).join(", ") || "E-commerce order",
+      instruction: order?.deliveryInfo?.noteToSeller || "",
       ex: 2, // 1 if exchange, otherwise 2
     };
 
