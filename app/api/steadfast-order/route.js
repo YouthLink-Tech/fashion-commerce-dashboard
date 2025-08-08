@@ -18,7 +18,7 @@ export async function POST(request) {
       recipient_phone: order?.customerInfo?.phoneNumber,
       recipient_address: `${order?.deliveryInfo?.address1 || ""}, ${order?.deliveryInfo?.address2 || ""}, ${order?.deliveryInfo?.city || ""}, ${order?.deliveryInfo?.postalCode || ""}`,
       cod_amount: order?.totalAmount || 0,
-      note: order?.deliveryInfo?.noteToSeller || "Handle with care",
+      note: order?.deliveryInfo?.noteToSeller || "",
     };
 
     const response = await fetch("https://portal.packzy.com/api/v1/create_order", {
