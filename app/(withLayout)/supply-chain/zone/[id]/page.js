@@ -19,7 +19,9 @@ export default function EditShippingZone() {
   const router = useRouter();
   const params = useParams();
   const axiosSecure = useAxiosSecure();
-  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
+  const [selectedShipmentHandlerId, setSelectedShipmentHandlerId] = useState("");
+  const [shippingCharges, setShippingCharges] = useState({});
+  const [shippingDurations, setShippingDurations] = useState({});
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,7 +46,9 @@ export default function EditShippingZone() {
 
         setValue('shippingZone', data?.shippingZone);
         setSelectedCities(data?.selectedCity);
-        setSelectedShipmentHandler(data?.selectedShipmentHandler);
+        setSelectedShipmentHandlerId(data?.selectedShipmentHandlerId);
+        setShippingCharges(data?.shippingCharges);
+        setShippingDurations(data?.shippingDurations);
 
         // Set shipping charges based on delivery types
         if (data?.shippingCharges) {
@@ -137,11 +141,13 @@ export default function EditShippingZone() {
   };
 
   // if needed then apply edit option for logo selection
-  // const toggleLogoSelection = (shipmentHandler) => {
-  //   if (selectedShipmentHandler?._id === shipmentHandler._id) {
-  //     setSelectedShipmentHandler(null);
+  // const toggleLogoSelection = (shipmentHandlerId) => {
+  //   // If the same handler is clicked again, deselect it
+  //   if (selectedShipmentHandlerId?._id === shipmentHandlerId) {
+  //     setSelectedShipmentHandlerId(null);
   //   } else {
-  //     setSelectedShipmentHandler(shipmentHandler);
+  //     // Replace the selection with the newly clicked handler
+  //     setSelectedShipmentHandlerId(shipmentHandlerId);
   //     setSizeError(false); // Clear error when a handler is selected
   //   }
   // };
@@ -150,7 +156,7 @@ export default function EditShippingZone() {
     let hasError = false;
 
     // Validate shipment handler selection
-    if (!selectedShipmentHandler) {
+    if (!selectedShipmentHandlerId) {
       setSizeError(true);
       hasError = true;
     };
@@ -161,36 +167,30 @@ export default function EditShippingZone() {
     }
 
     // Prepare shipping charges and times objects
-    let shippingCharges = {};
-    let shippingDurations = {};
+    let updatedCharges = {};
+    let updatedDurations = {};
 
-    // Handle single delivery type
-    if (selectedShipmentHandler?.deliveryType.length === 1) {
-      const deliveryType = selectedShipmentHandler.deliveryType[0];
-      shippingCharges[deliveryType] = formData.shippingCharge;
-      shippingDurations[deliveryType] = formData.shippingTime;
-    }
+    // Loop through the state, not the empty object
+    const allTypes = Array.from(new Set([
+      ...Object.keys(shippingCharges || {}),
+      ...Object.keys(shippingDurations || {})
+    ]));
 
-    // Handle multiple delivery types (STANDARD and EXPRESS)
-    if (selectedShipmentHandler?.deliveryType.length === 2) {
-      if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
-        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
-        shippingDurations['STANDARD'] = formData.shippingDaysStandard;
-      }
-      if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
-        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
-        shippingDurations['EXPRESS'] = formData.shippingHourExpress;
-      }
-    }
+    allTypes.forEach((type) => {
+      const chargeField = `shippingCharge${type}`;
+      const durationField = `shippingTime${type}`;
+      updatedCharges[type] = formData[chargeField];
+      updatedDurations[type] = formData[durationField];
+    });
 
     if (hasError) return; // Early return if there are validation errors
 
     try {
       const updatedShippingZone = {
         shippingZone: formData.shippingZone,
-        selectedShipmentHandler: selectedShipmentHandler,
-        shippingCharges,
-        shippingDurations,
+        selectedShipmentHandlerId,
+        shippingCharges: updatedCharges,
+        shippingDurations: updatedDurations,
         selectedCity: selectedCities
       };
 
@@ -363,7 +363,7 @@ export default function EditShippingZone() {
                 <div
                   key={shipmentHandler?._id}  // Always use unique keys
                   // onClick={() => toggleLogoSelection(shipmentHandler)}
-                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
+                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandlerId === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
                 >
                   {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />}
                   <p className="text-center">{shipmentHandler?.shipmentHandlerName}</p>
@@ -373,119 +373,62 @@ export default function EditShippingZone() {
               {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
             </div>
 
-            {selectedShipmentHandler?.deliveryType.length === 1 && <div className="w-full mt-4">
-              {/* Conditionally render shipping charge input fields based on deliveryType */}
-              <div className='flex flex-col md:flex-row gap-6 items-center justify-between w-full'>
-                <div className='w-full'>
-                  <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Charge
-                  </label>
-                  <input
-                    type="number"
-                    disabled
-                    placeholder={`Enter Shipping Charge for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingCharge', { required: 'Shipping Charge is required' })}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                  />
-                  {errors.shippingCharge && (
-                    <p className="text-red-600 text-left">{errors?.shippingCharge?.message}</p>
-                  )}
-                </div>
+            {Object.keys(shippingCharges || {}).length > 0 && (
+              <div className="w-full mt-4">
+                <div className="flex flex-col gap-6">
+                  {Object.keys(shippingCharges).map((type) => (
+                    <div
+                      key={type}
+                      className="flex flex-col md:flex-row gap-6 items-center justify-between w-full"
+                    >
+                      {/* Charge input */}
+                      <div className="w-full">
+                        <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                          {type} Charge
+                        </label>
+                        <input
+                          type="number"
+                          disabled
+                          defaultValue={shippingCharges[type] || ""}
+                          placeholder={`Enter Shipping Charge for ${type}`}
+                          {...register(`shippingCharge${type}`, {
+                            required: `${type} Shipping Charge is required`,
+                          })}
+                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        />
+                        {errors[`shippingCharge${type}`] && (
+                          <p className="text-red-600 text-left">
+                            {errors[`shippingCharge${type}`]?.message}
+                          </p>
+                        )}
+                      </div>
 
-                <div className='w-full'>
-                  <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                  />
-                  {errors.shippingTime && (
-                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
-                  )}
-                </div>
-              </div>
-            </div>}
-
-            {/* Shipping Charge Input */}
-            {selectedShipmentHandler?.deliveryType?.length === 2 && <div className="w-full mt-4">
-              {/* Conditionally render shipping charge input fields based on deliveryType */}
-
-              <div className='flex flex-col items-center justify-center gap-4 w-full'>
-                <div className='flex items-center w-full gap-4'>
-                  <div className='w-full'>
-                    {/* Input for STANDARD shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Charge
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      placeholder="Enter Shipping Charge for STANDARD"
-                      {...register('shippingChargeStandard', { required: 'STANDARD Shipping Charge is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    />
-                    {errors.shippingChargeStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingChargeStandard?.message}</p>
-                    )}
-                  </div>
-                  <div className='w-full'>
-                    {/* Input for STANDARD shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Days
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      placeholder="Enter Shipping days for STANDARD"
-                      {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    />
-                    {errors.shippingDaysStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className='flex items-center w-full gap-4'>
-                  <div className='w-full'>
-                    {/* Input for EXPRESS shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      EXPRESS Charge
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      placeholder="Add Shipping Charge for EXPRESS"
-                      {...register('shippingChargeExpress', { required: 'EXPRESS Shipping Charge is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    />
-                    {errors.shippingChargeExpress && (
-                      <p className="text-red-600 text-left">{errors?.shippingChargeExpress?.message}</p>
-                    )}
-                  </div>
-                  <div className='w-full'>
-                    {/* Input for EXPRESS shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      EXPRESS Hours
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      placeholder="Add Shipping hour for EXPRESS"
-                      {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    />
-                    {errors.shippingHourExpress && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourExpress?.message}</p>
-                    )}
-                  </div>
+                      {/* Duration input */}
+                      <div className="w-full">
+                        <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                          {type} {type === "EXPRESS" ? "Hours" : "Days"}
+                        </label>
+                        <input
+                          type="text"
+                          disabled
+                          defaultValue={shippingDurations?.[type] || ""}
+                          placeholder={`Enter Shipping ${type === "EXPRESS" ? "hours" : "days"} for ${type}`}
+                          {...register(`shippingTime${type}`, {
+                            required: `${type} Shipping ${type === "EXPRESS" ? "Hour" : "Days"} is required`,
+                          })}
+                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        />
+                        {errors[`shippingTime${type}`] && (
+                          <p className="text-red-600 text-left">
+                            {errors[`shippingTime${type}`]?.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>}
+            )}
 
           </div>
 

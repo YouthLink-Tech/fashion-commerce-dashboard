@@ -76,9 +76,12 @@ const AddSeason = () => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
 
+    // Use your fallback default image URL if none selected or uploaded
+    const fallbackImageUrl = "https://storage.googleapis.com/fashion-commerce-pdf/1748156001971_season_2964502.png";
+
     const seasonData = {
       seasonName: data?.seasonName,
-      imageUrl: selectedDefaultImage === null ? image : selectedDefaultImage,
+      imageUrl: selectedDefaultImage || image || fallbackImageUrl,
     };
 
     try {

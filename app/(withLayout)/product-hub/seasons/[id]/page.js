@@ -85,9 +85,11 @@ export default function EditSeason() {
   const onSubmit = async (data) => {
     try {
 
+      const fallbackImageUrl = "https://storage.googleapis.com/fashion-commerce-pdf/1748156001971_season_2964502.png";
+
       const updatedSeason = {
         seasonName: data?.seasonName,
-        imageUrl: image
+        imageUrl: image || fallbackImageUrl,
       };
 
       const res = await axiosSecure.put(`/editSeason/${params.id}`, updatedSeason);

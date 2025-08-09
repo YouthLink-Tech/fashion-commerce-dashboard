@@ -195,6 +195,7 @@ const ThirdStepOfAddProduct = () => {
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
     const storedShowInventory = localStorage.getItem('showInventory');
+    const selectedShippingZoneIds = selectedShipmentHandler.map(zone => zone._id);
 
     const wholeProductData = {
       publishDate: storedFormattedDate,
@@ -219,7 +220,7 @@ const ThirdStepOfAddProduct = () => {
       tags: storedTags,
       season: storedSeason,
       productVariants: storedVariants,
-      shippingDetails: selectedShipmentHandler,
+      selectedShippingZoneIds: selectedShippingZoneIds,
       productId: storedProductId,
       status: "active",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
@@ -411,6 +412,11 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                   (handler) => handler.shippingZone === shipping?.shippingZone
                 );
 
+                const handler = shipmentHandlerList.find(h => h._id === shipping.selectedShipmentHandlerId);
+
+                // Derive delivery types from shippingCharges keys (or shippingDurations keys)
+                const deliveryTypes = shipping.shippingCharges ? Object.keys(shipping.shippingCharges) : [];
+
                 return (
                   <tr key={index}
                     className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
@@ -432,35 +438,41 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                     {/* Shipment Handlers */}
                     <td className="px-2 py-1 md:px-4 md:py-2">
                       <div className="flex items-center justify-center md:gap-4">
-                        {shipmentHandlerList?.map((handler, handlerIndex) => (
-                          shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
-                            <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                              {handler?.imageUrl && (
-                                <Image
-                                  src={handler.imageUrl}
-                                  alt="shipping"
-                                  width={100}
-                                  height={100}
-                                  className="mb-2 object-contain h-32 w-32"
-                                />
-                              )}
-                            </div>
-                          )
-                        ))}
+                        <div className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
+                          {handler?.imageUrl && (
+                            <Image
+                              src={handler.imageUrl}
+                              alt="shipping"
+                              width={100}
+                              height={100}
+                              className="mb-2 object-contain h-32 w-32"
+                            />
+                          )}
+                        </div>
                       </div>
                     </td>
 
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: ৳ {shipping?.shippingCharges[type]}
-                      </div>
-                    ))}</td>
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
+                      deliveryTypes.map((type, idx) => (
+                        <div key={idx}>
+                          {type}: ৳ {shipping.shippingCharges[type] ?? "—"}
+                        </div>
+                      ))
+                    ) : (
+                      "—"
+                    )}
+                    </td>
 
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
-                      </div>
-                    ))}</td>
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
+                      deliveryTypes.map((type, idx) => (
+                        <div key={idx}>
+                          {type}: {shipping.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
+                        </div>
+                      ))
+                    ) : (
+                      "—"
+                    )}
+                    </td>
                   </tr>
                 );
               })}

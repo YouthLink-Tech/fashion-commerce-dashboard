@@ -2,6 +2,7 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ const ExistingZones = () => {
   const [shippingList, isShippingPending, refetch] = useShippingZones();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('inside dhaka');
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
   const role = permissions?.find(
@@ -119,7 +121,7 @@ const ExistingZones = () => {
     });
   };
 
-  if (isShippingPending || isUserLoading) {
+  if (isShippingPending || isUserLoading || isShipmentHandlerPending) {
     return <Loading />
   }
 
@@ -208,47 +210,64 @@ const ExistingZones = () => {
             </thead>
 
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredShippingList?.map((zone, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
-                    {zone?.shippingZone}
-                  </td>
-                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
-                    {zone?.selectedShipmentHandler?.shipmentHandlerName}
-                  </td>
-                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
-                    {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: ৳ {zone?.shippingCharges[type]}
-                      </div>
-                    ))}
-                  </td>
-                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
-                    {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: {zone?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
-                      </div>
-                    ))}
-                  </td>
-                  {isAuthorized && <td className="p-3">
-                    <div className="flex gap-2 items-center">
-                      <div className='flex justify-end items-center gap-2'>
+              {filteredShippingList?.map((zone, index) => {
 
-                        {/* Edit Button */}
-                        <button onClick={() => router.push(`/supply-chain/zone/${zone?._id}`)}>
-                          <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
-                        </button>
+                const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
 
-                        {/* Delete Button */}
-                        {isOwner && <button onClick={() => handleDelete(zone?._id)}>
-                          <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
-                        </button>}
+                // Derive delivery types from shippingCharges keys (or shippingDurations keys)
+                const deliveryTypes = zone.shippingCharges ? Object.keys(zone.shippingCharges) : [];
 
+                return (
+                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                    <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
+                      {zone?.shippingZone}
+                    </td>
+                    <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
+                      {handler?.shipmentHandlerName ?? 'N/A'}
+                    </td>
+                    <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
+                      {deliveryTypes.length > 0 ? (
+                        deliveryTypes.map((type, idx) => (
+                          <div key={idx}>
+                            {type}: ৳ {zone.shippingCharges[type] ?? "—"}
+                          </div>
+                        ))
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
+                      {deliveryTypes.length > 0 ? (
+                        deliveryTypes.map((type, idx) => (
+                          <div key={idx}>
+                            {type}: {zone.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
+                          </div>
+                        ))
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    {isAuthorized && <td className="p-3">
+                      <div className="flex gap-2 items-center">
+                        <div className='flex justify-end items-center gap-2'>
+
+                          {/* Edit Button */}
+                          <button onClick={() => router.push(`/supply-chain/zone/${zone?._id}`)}>
+                            <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                          </button>
+
+                          {/* Delete Button */}
+                          {isOwner && <button onClick={() => handleDelete(zone?._id)}>
+                            <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                          </button>}
+
+                        </div>
                       </div>
-                    </div>
-                  </td>}
-                </tr>
-              ))}
+                    </td>}
+                  </tr>
+                )
+              }
+              )}
             </tbody>
 
           </table>

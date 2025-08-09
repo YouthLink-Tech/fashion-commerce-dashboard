@@ -96,6 +96,7 @@ const EditProductContents = () => {
   const [productVariants, setProductVariants] = useState([]);
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
+  const [selectedShippingZoneIds, setSelectedShippingZoneIds] = useState([]);
   const [productStatus, setProductStatus] = useState("");
   const [productId, setProductId] = useState("");
   const [seasonList, isSeasonPending] = useSeasons();
@@ -724,32 +725,10 @@ const EditProductContents = () => {
         setSelectedSeasons(data?.season || []);
         setSelectedProductIds(data?.restOfOutfit || []);
         setShowInventory(data?.isInventoryShown);
+        setSelectedShippingZoneIds(data?.selectedShippingZoneIds);
 
         // Assuming existingData.productVariants contains variants for all locations
         setExistingVariants(data?.productVariants); // Store all variants
-
-        // Set tabSelections based on shippingDetails
-        const dhakaSuburb = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
-
-        const groupedSelections = {
-          "Inside Dhaka": [],
-          "Dhaka Suburbs": [],
-          "Outside Dhaka": [],
-        };
-
-        data?.shippingDetails?.forEach((shipping) => {
-          if (shipping?.selectedCity?.includes("Dhaka")) {
-            groupedSelections["Inside Dhaka"].push({ ...shipping, selected: true });
-          } else if (
-            shipping?.selectedCity?.some((city) => dhakaSuburb.includes(city))
-          ) {
-            groupedSelections["Dhaka Suburbs"].push({ ...shipping, selected: true });
-          } else {
-            groupedSelections["Outside Dhaka"].push({ ...shipping, selected: true });
-          }
-        });
-
-        setTabSelections(groupedSelections); // Update tabSelections with grouped data
 
       } catch (error) {
         // toast.error("Failed to load product details.");
@@ -859,6 +838,34 @@ const EditProductContents = () => {
 
   // Example usage:
   const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList || []);
+
+  useEffect(() => {
+    if (!shippingList || !selectedShippingZoneIds?.length) return;
+
+    const dhakaSuburb = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
+
+    const groupedSelections = {
+      "Inside Dhaka": [],
+      "Dhaka Suburbs": [],
+      "Outside Dhaka": [],
+    };
+
+    const selectedZones = shippingList.filter(zone =>
+      selectedShippingZoneIds.includes(zone._id)
+    );
+
+    selectedZones.forEach((shipping) => {
+      if (shipping?.selectedCity?.includes("Dhaka")) {
+        groupedSelections["Inside Dhaka"].push({ ...shipping, selected: true });
+      } else if (shipping?.selectedCity?.some(city => dhakaSuburb.includes(city))) {
+        groupedSelections["Dhaka Suburbs"].push({ ...shipping, selected: true });
+      } else {
+        groupedSelections["Outside Dhaka"].push({ ...shipping, selected: true });
+      }
+    });
+
+    setTabSelections(groupedSelections);
+  }, [shippingList, selectedShippingZoneIds]);
 
   const onSubmit = async (data) => {
 
@@ -1036,6 +1043,7 @@ const EditProductContents = () => {
           finalData.push(existing);
         }
       });
+      const selectedShippingZoneIds = selectedShipmentHandler.map(zone => zone._id);
 
       const updatedProductData = {
         productTitle: data?.productTitle,
@@ -1058,7 +1066,7 @@ const EditProductContents = () => {
         vendors: selectedVendors,
         tags: selectedTags,
         productVariants: finalData,
-        shippingDetails: selectedShipmentHandler,
+        selectedShippingZoneIds,
         status: data?.status,
         season: selectedSeasons,
         sizeGuideImageUrl: selectedImageUrl,
@@ -1940,6 +1948,11 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                         (handler) => handler.shippingZone === shipping?.shippingZone
                       );
 
+                      const handler = shipmentHandlerList.find(h => h._id === shipping.selectedShipmentHandlerId);
+
+                      // Derive delivery types from shippingCharges keys (or shippingDurations keys)
+                      const deliveryTypes = shipping.shippingCharges ? Object.keys(shipping.shippingCharges) : [];
+
                       return (
                         <tr key={index}
                           className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
@@ -1961,35 +1974,39 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                           {/* Shipment Handlers */}
                           <td className="px-2 py-1 md:px-4 md:py-2">
                             <div className="flex items-center justify-center md:gap-4">
-                              {shipmentHandlerList?.map((handler, handlerIndex) => (
-                                shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
-                                  <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                                    {handler?.imageUrl && (
-                                      <Image
-                                        src={handler.imageUrl}
-                                        alt="shipping"
-                                        width={100}
-                                        height={100}
-                                        className="mb-2 object-contain h-32 w-32"
-                                      />
-                                    )}
-                                  </div>
-                                )
-                              ))}
+                              {handler?.imageUrl && (
+                                <Image
+                                  src={handler.imageUrl}
+                                  alt="shipping"
+                                  width={100}
+                                  height={100}
+                                  className="mb-2 object-contain h-32 w-32"
+                                />
+                              )}
                             </div>
                           </td>
 
-                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                            <div key={idx}>
-                              {type}: ৳ {shipping?.shippingCharges[type]}
-                            </div>
-                          ))}</td>
+                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
+                            deliveryTypes.map((type, idx) => (
+                              <div key={idx}>
+                                {type}: ৳ {shipping.shippingCharges[type] ?? "—"}
+                              </div>
+                            ))
+                          ) : (
+                            "—"
+                          )}
+                          </td>
 
-                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                            <div key={idx}>
-                              {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
-                            </div>
-                          ))}</td>
+                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
+                            deliveryTypes.map((type, idx) => (
+                              <div key={idx}>
+                                {type}: {shipping.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
+                              </div>
+                            ))
+                          ) : (
+                            "—"
+                          )}
+                          </td>
                         </tr>
                       );
                     })}

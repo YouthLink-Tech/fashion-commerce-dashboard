@@ -34,6 +34,7 @@ import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import { useSearchParams } from 'next/navigation';
 import { placeShipmentOrder } from '@/app/utils/shipping/placeShipmentOrder';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 
 const PrintButton = dynamic(() => import("@/app/components/orders/PrintButton"), { ssr: false });
 
@@ -90,6 +91,7 @@ const OrderContents = () => {
   const [declinedReason, setDeclinedReason] = useState("");
   const [isDeclinedModalOpen, setDeclinedModalOpen] = useState(false);
   const [shippingList, isShippingPending] = useShippingZones();
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [selectedHandler, setSelectedHandler] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
@@ -1142,11 +1144,18 @@ const OrderContents = () => {
   };
 
   const matchingShipmentHandlers = useMemo(() => {
-    if (!shippingList || !orderToUpdate?.deliveryInfo?.city) return [];
+    if (!shippingList || !orderToUpdate?.deliveryInfo?.city || !shipmentHandlerList) return [];
 
-    return shippingList?.filter(zone => zone?.selectedCity?.includes(orderToUpdate?.deliveryInfo?.city))?.map(zone => zone?.selectedShipmentHandler).filter(Boolean) || []; // Ensure no null or undefined values
+    // Filter zones for the current city
+    const filteredZones = shippingList.filter(zone => zone?.selectedCity?.includes(orderToUpdate?.deliveryInfo?.city));
 
-  }, [shippingList, orderToUpdate?.deliveryInfo?.city]);
+    // Map zone's shipment handler IDs to actual shipment handler objects
+    const handlers = filteredZones
+      .map(zone => shipmentHandlerList.find(handler => handler._id === zone.selectedShipmentHandlerId))
+      .filter(Boolean); // remove null or undefined if any handler is missing
+
+    return handlers;
+  }, [shippingList, orderToUpdate?.deliveryInfo?.city, shipmentHandlerList]);
 
   useEffect(() => {
     if (paginatedOrders?.length === 0) {
@@ -1154,7 +1163,7 @@ const OrderContents = () => {
     }
   }, [paginatedOrders]);
 
-  if (isOrderListPending || isShippingPending || isUserLoading) {
+  if (isOrderListPending || isShippingPending || isUserLoading || isShipmentHandlerPending) {
     return <Loading />;
   };
 

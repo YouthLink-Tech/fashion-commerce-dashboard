@@ -17,6 +17,7 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useSession } from 'next-auth/react';
 
 const currentModule = "Supply Chain";
 
@@ -24,6 +25,7 @@ const AddShippingZone = () => {
   const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const [selectedShipmentHandlerId, setSelectedShipmentHandlerId] = useState("");
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [sizeError, setSizeError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending, refetch] = useShipmentHandlers();
@@ -38,8 +40,26 @@ const AddShippingZone = () => {
     (group) => group.modules?.[currentModule]?.access === true
   )?.role;
   const isOwner = role === "Owner";
+  const { data: session, status } = useSession();
 
   const { register, handleSubmit, resetField, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    if (!selectedShipmentHandlerId || typeof window === "undefined") return; // Avoid fetching without an ID
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
+    const fetchShipmentHandlerData = async () => {
+      try {
+        const { data } = await axiosSecure.get(`/getSingleShipmentHandler/${selectedShipmentHandlerId}`);
+        setSelectedShipmentHandler(data); // Store fetched data in state
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchShipmentHandlerData();
+  }, [selectedShipmentHandlerId, session?.user?.accessToken, status, axiosSecure]); // Re-fetch when selectedId changes
 
   // Filter cities based on the search term and exclude selected cities
   const filteredCities = cities.filter(
@@ -83,13 +103,13 @@ const AddShippingZone = () => {
   };
 
   // Function to handle selection (only one allowed)
-  const toggleLogoSelection = (shipmentHandler) => {
+  const toggleLogoSelection = (shipmentHandlerId) => {
     // If the same handler is clicked again, deselect it
-    if (selectedShipmentHandler?._id === shipmentHandler._id) {
-      setSelectedShipmentHandler(null);
+    if (selectedShipmentHandlerId?._id === shipmentHandlerId) {
+      setSelectedShipmentHandlerId(null);
     } else {
       // Replace the selection with the newly clicked handler
-      setSelectedShipmentHandler(shipmentHandler);
+      setSelectedShipmentHandlerId(shipmentHandlerId);
       setSizeError(false); // Clear error when a handler is selected
     }
   };
@@ -175,7 +195,7 @@ const AddShippingZone = () => {
     // Check if cities and shipping handlers are selected
     let hasError = false;
 
-    if (!selectedShipmentHandler) {
+    if (!selectedShipmentHandler && !selectedShipmentHandlerId) {
       setSizeError(true);
       hasError = true;
     }
@@ -216,7 +236,7 @@ const AddShippingZone = () => {
 
     const shippingData = {
       shippingZone,
-      selectedShipmentHandler,
+      selectedShipmentHandlerId,
       shippingCharges,
       shippingDurations,
       selectedCity: selectedCities
@@ -391,11 +411,11 @@ const AddShippingZone = () => {
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
                   key={shipmentHandler._id}
-                  onClick={() => toggleLogoSelection(shipmentHandler)} // Click to select handler
-                  className={`relative cursor-pointer border-2 rounded-md w-40 h-44 min-w-[120px] min-h-[170px]
-        ${shipmentHandler?.imageUrl ? "p-2" : "p-8"} 
-        ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
-                >
+                  onClick={() => toggleLogoSelection(shipmentHandler?._id)} // Click to select handler
+                  className={`relative cursor-pointer border-2 rounded-md w-40 h-44 min-w-[120px] min-h-[170px] 
+                  ${shipmentHandler?.imageUrl ? "p-2" : "p-8"} 
+                  ${selectedShipmentHandlerId === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}>
+
                   {/* Icons Section */}
                   <div className="absolute top-2 right-2 flex items-center justify-between space-x-2">
                     {isOwner &&

@@ -23,6 +23,8 @@ import CustomPagination from '@/app/components/shared/pagination/CustomPaginatio
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
+import useShippingZones from '@/app/hooks/useShippingZones';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -39,6 +41,8 @@ const SeasonPage = () => {
   // Decode the URL-encoded category name
   const decodedSeasonName = decodeURIComponent(id);
 
+  const [shippingList, isShippingPending] = useShippingZones();
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [productDetails, setProductDetails] = useState([]);
   const [showLowStock, setShowLowStock] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
@@ -220,6 +224,17 @@ const SeasonPage = () => {
     // Calculate total SKU for all product variants
     const totalSku = product?.productVariants?.reduce((acc, variant) => acc + variant?.sku, 0) || 0;
 
+    // Get matching shipping zones
+    const matchingZones = shippingList?.filter(zone =>
+      product?.selectedShippingZoneIds?.includes(zone._id)
+    ) || [];
+
+    // Get matching shipment handlers
+    const matchingHandlerNames = matchingZones.map(zone => {
+      const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
+      return handler?.shipmentHandlerName?.toLowerCase() || '';
+    });
+
     const matchesSearch =
       product?.productTitle?.toLowerCase().includes(query) ||
       product?.productId?.toLowerCase().includes(query) ||
@@ -231,8 +246,8 @@ const SeasonPage = () => {
       product?.season?.some(season => season.toString().toLowerCase().includes(query)) || // Convert season to string
       product?.availableColors?.some(color => color?.value?.toLowerCase().includes(query)) ||
       product?.vendors?.some(vendor => vendor?.value?.toLowerCase().includes(query)) ||
-      product?.shippingDetails?.some(shipping => shipping?.shippingZone?.toLowerCase().includes(query)) ||
-      product?.shippingDetails?.some(shipping => shipping?.selectedShipmentHandler?.shipmentHandlerName?.toLowerCase().includes(query)) ||
+      matchingZones.some(zone => zone.shippingZone?.toLowerCase().includes(query)) ||
+      matchingHandlerNames.some(name => name.includes(query)) ||
       totalSku.toString().includes(query); // Convert total SKU to string for searching
 
     return isDateInRange && matchesSearch;
@@ -265,6 +280,17 @@ const SeasonPage = () => {
         // Calculate total SKU for all product variants
         const totalSku = product?.productVariants?.reduce((acc, variant) => acc + variant?.sku, 0) || 0;
 
+        // Get matching shipping zones
+        const matchingZones = shippingList?.filter(zone =>
+          product?.selectedShippingZoneIds?.includes(zone._id)
+        ) || [];
+
+        // Get matching shipment handlers
+        const matchingHandlerNames = matchingZones.map(zone => {
+          const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
+          return handler?.shipmentHandlerName?.toLowerCase() || '';
+        });
+
         const matchesSearch =
           product?.productTitle?.toLowerCase().includes(query) ||
           product?.productId?.toLowerCase().includes(query) ||
@@ -276,8 +302,8 @@ const SeasonPage = () => {
           product?.season?.some(season => season.toString().toLowerCase().includes(query)) || // Convert season to string
           product?.availableColors?.some(color => color?.value?.toLowerCase().includes(query)) ||
           product?.vendors?.some(vendor => vendor?.value?.toLowerCase().includes(query)) ||
-          product?.shippingDetails?.some(shipping => shipping?.shippingZone?.toLowerCase().includes(query)) ||
-          product?.shippingDetails?.some(shipping => shipping?.selectedShipmentHandler?.shipmentHandlerName?.toLowerCase().includes(query)) ||
+          matchingZones.some(zone => zone.shippingZone?.toLowerCase().includes(query)) ||
+          matchingHandlerNames.some(name => name.includes(query)) ||
           totalSku.toString().includes(query); // Convert total SKU to string for searching
 
         return isDateInRange && matchesSearch;
@@ -285,7 +311,7 @@ const SeasonPage = () => {
       : productDetails;
 
     return getOrderCounts(filteredBaseList)
-  }, [adjustedEndDate, isFilterActive, productDetails, searchQuery, startDate]);
+  }, [adjustedEndDate, isFilterActive, productDetails, searchQuery, startDate, shipmentHandlerList, shippingList]);
 
   // Append counts to tabs
   const tabsWithCounts = useMemo(() => {
@@ -380,7 +406,7 @@ const SeasonPage = () => {
     }
   }, [paginatedProducts]);
 
-  if (isLocationPending || isUserLoading || status === "loading") {
+  if (isLocationPending || isUserLoading || status === "loading" || isShippingPending || isShipmentHandlerPending) {
     return <Loading />
   };
 
@@ -588,12 +614,28 @@ const SeasonPage = () => {
                                 <td className="text-xs p-3 text-gray-700 text-center">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>--</div>} </td>
                               )}
                               {column === 'Shipping Zones' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || '--'}</td>
+                                <td className="text-xs p-3 text-gray-700 text-center">
+                                  {product?.selectedShippingZoneIds?.length
+                                    ? shippingList
+                                      .filter(zone => product.selectedShippingZoneIds.includes(zone._id))
+                                      .map(zone => zone.shippingZone)
+                                      .join(', ')
+                                    : '--'}
+                                </td>
                               )}
                               {column === 'Shipment Handlers' && (
                                 <td key="Shipment Handlers" className="text-xs p-3 text-gray-700 text-center">
-                                  {product?.shippingDetails
-                                    ? Array.from(new Set(product.shippingDetails.map(detail => detail.selectedShipmentHandler.shipmentHandlerName)))
+                                  {product?.selectedShippingZoneIds?.length
+                                    ? Array.from(
+                                      new Set(
+                                        shippingList
+                                          .filter(zone => product.selectedShippingZoneIds.includes(zone._id))
+                                          .map(zone => {
+                                            const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
+                                            return handler?.shipmentHandlerName || '';
+                                          })
+                                      )
+                                    ).filter(Boolean) // remove empty strings
                                       .join(', ')
                                     : '--'}
                                 </td>

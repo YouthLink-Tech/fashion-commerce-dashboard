@@ -137,7 +137,7 @@ const Seasons = () => {
               {/* Image */}
               <Image
                 className="object-cover rounded-lg px-4"
-                src={season?.imageUrl === null ? "https://storage.googleapis.com/fashion-commerce-pdf/1748156001971_season_2964502.png" : season?.imageUrl}
+                src={season?.imageUrl}
                 alt="season-image"
                 layout="fill"
                 objectFit="contain"
