@@ -1553,7 +1553,8 @@ const OrderContents = () => {
                                     order.orderStatus !== "Return Requested" &&
                                     order.orderStatus !== "Processing" &&
                                     order.orderStatus !== "On Hold" &&
-                                    order.orderStatus !== "Delivered" ? (
+                                    order.orderStatus !== "Delivered" &&
+                                    order.orderStatus !== "Refunded" ? (
                                     <button
                                       onClick={() => handleActions(order._id, '', true)}
                                       className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
