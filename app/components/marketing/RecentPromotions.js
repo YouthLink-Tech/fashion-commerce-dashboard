@@ -559,6 +559,14 @@ const RecentPromotions = () => {
                       {column === 'Promo Code / Offer Title' && (
                         <td key="promoCodeOfferTitle" className="text-xs p-3 text-gray-700">
                           {item?.promoCode || item?.offerTitle}
+                          {item?.isWelcomeEmailPromoCode && (
+                            <span
+                              title="Welcome email promo code"
+                              className="ml-2 px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800 font-semibold select-none"
+                            >
+                              Welcome Promo
+                            </span>
+                          )}
                         </td>
                       )}
                       {column === 'Type' && (

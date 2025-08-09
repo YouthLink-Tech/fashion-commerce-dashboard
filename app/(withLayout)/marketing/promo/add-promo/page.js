@@ -1,7 +1,7 @@
 "use client";
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
-import { DatePicker, Tab, Tabs } from '@nextui-org/react';
+import { Checkbox, DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,7 @@ const AddPromo = () => {
   const [dateError, setDateError] = useState(false);
   const [promoDescription, setPromoDescription] = useState("");
   const [image, setImage] = useState(null);
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -126,7 +127,8 @@ const AddPromo = () => {
         minAmount: minAmount ? minAmount : 0,
         promoDescription,
         imageUrl: image === null ? "" : image,
-        promoStatus: true
+        promoStatus: true,
+        isWelcomeEmailPromoCode: isSelected,
       };
 
       const response = await axiosSecure.post('/addPromoCode', discountData);
@@ -324,6 +326,10 @@ const AddPromo = () => {
               </div>
             </div>
           </div>
+
+          <Checkbox isSelected={isSelected} color='success' className={`mt-1 ${isSelected ? "font-semibold" : ""}`} onValueChange={setIsSelected}>
+            Set as Welcome Email Promo Code
+          </Checkbox>
 
           <div className='flex justify-end items-center'>
 

@@ -1549,7 +1549,11 @@ const OrderContents = () => {
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isOwner && checkUndoAvailability(order) && order.orderStatus !== "Return Requested" ? (
+                                  {isOwner && checkUndoAvailability(order) &&
+                                    order.orderStatus !== "Return Requested" &&
+                                    order.orderStatus !== "Processing" &&
+                                    order.orderStatus !== "On Hold" &&
+                                    order.orderStatus !== "Delivered" ? (
                                     <button
                                       onClick={() => handleActions(order._id, '', true)}
                                       className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"

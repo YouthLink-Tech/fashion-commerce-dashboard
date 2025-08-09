@@ -223,35 +223,6 @@ const Marketing = () => {
               </div>
             }
 
-            {/* bKash Card */}
-            {isAuthorized &&
-              <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
-                {/* Set the container to maintain the aspect ratio */}
-                <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
-                  <Image
-                    alt="promo"
-                    src="https://i.ibb.co.com/whx7gqH/download-1.png" // Ensure this path is correct
-                    layout="fill"
-                    className="object-contain" // Ensures the full image is visible
-                  />
-                </div>
-                <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
-                  <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
-                    Enjoy bKash Cashback Offer!
-                  </h3>
-                  <p className="text-neutral-500 text-sm flex-grow">
-                    Avail exciting cashback offers with bKash. Use bKash to pay for your purchases and get instant cashback directly to your account. Hurry, limited-time offer!
-                    Enjoy seamless transactions and more rewards with bKash.
-                  </p>
-                  <button
-                    className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
-                  >
-                    Start Cashback
-                  </button>
-                </div>
-              </div>
-            }
-
           </div>
 
         </div>

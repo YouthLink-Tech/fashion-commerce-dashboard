@@ -16,9 +16,20 @@ export async function POST(request) {
       invoice: order?.orderNumber,
       recipient_name: order?.customerInfo?.customerName,
       recipient_phone: order?.customerInfo?.phoneNumber,
-      recipient_address: `${order?.deliveryInfo?.address1 || ""}, ${order?.deliveryInfo?.address2 || ""}, ${order?.deliveryInfo?.city || ""}, ${order?.deliveryInfo?.postalCode || ""}`,
+      alternative_phone: order?.customerInfo?.phoneNumber2 || "",
+      recipient_address: [
+        order?.deliveryInfo?.address1 || "",
+        order?.deliveryInfo?.address2 || "",
+        order?.deliveryInfo?.city || "",
+        order?.deliveryInfo?.postalCode || ""
+      ].filter(Boolean).join(", "),
       cod_amount: order?.totalAmount || 0,
       note: order?.deliveryInfo?.noteToSeller || "",
+      total_lot: order?.productInformation?.reduce(
+        (sum, product) => sum + (Number(product.sku) || 0),
+        0
+      ),
+      delivery_type: 0,
     };
 
     const response = await fetch("https://portal.packzy.com/api/v1/create_order", {

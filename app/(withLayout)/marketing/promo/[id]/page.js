@@ -1,6 +1,6 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Checkbox, Tab, Tabs } from '@nextui-org/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -32,6 +32,7 @@ const EditPromo = () => {
   const [image, setImage] = useState(null);
   const [dateError, setDateError] = useState(false);
   const { data: session, status } = useSession();
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -66,6 +67,7 @@ const EditPromo = () => {
         setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
         setValue('maxAmount', promo?.maxAmount || 0);
         setValue('minAmount', promo?.minAmount || 0);
+        setIsSelected(promo?.isWelcomeEmailPromoCode);
 
         setPromoDiscountType(promo?.promoDiscountType);
         setPromoDescription(promo?.promoDescription || "");
@@ -157,6 +159,7 @@ const EditPromo = () => {
         minAmount: minAmount || 0,
         promoDescription,
         imageUrl: image === null ? "" : image,
+        isWelcomeEmailPromoCode: isSelected,
       };
 
       const res = await axiosSecure.put(`/updatePromo/${id}`, updatedDiscount);
@@ -361,6 +364,10 @@ const EditPromo = () => {
             </div>
 
           </div>
+
+          <Checkbox isSelected={isSelected} color='success' className={`${isSelected ? "font-semibold" : ""}`} onValueChange={setIsSelected}>
+            Set as Welcome Email Promo Code
+          </Checkbox>
 
           <div className='flex justify-end items-center'>
 
