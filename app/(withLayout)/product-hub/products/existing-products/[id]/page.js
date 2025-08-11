@@ -618,9 +618,7 @@ const ProductPage = () => {
                               {column === 'Shipping Zones' && (
                                 <td key="Shipping Zones" className="text-xs p-3 text-gray-700 text-center">
                                   {product?.selectedShippingZoneIds?.length
-                                    ? shippingList
-                                      .filter(zone => product.selectedShippingZoneIds.includes(zone._id))
-                                      .map(zone => zone.shippingZone)
+                                    ? shippingList?.filter(zone => product?.selectedShippingZoneIds.includes(zone._id))?.map(zone => zone?.shippingZone)
                                       .join(', ')
                                     : '--'}
                                 </td>
@@ -630,10 +628,9 @@ const ProductPage = () => {
                                   {product?.selectedShippingZoneIds?.length
                                     ? Array.from(
                                       new Set(
-                                        shippingList
-                                          .filter(zone => product.selectedShippingZoneIds.includes(zone._id))
+                                        shippingList?.filter(zone => product?.selectedShippingZoneIds?.includes(zone._id))
                                           .map(zone => {
-                                            const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
+                                            const handler = shipmentHandlerList?.find(h => h._id === zone?.selectedShipmentHandlerId);
                                             return handler?.shipmentHandlerName || '';
                                           })
                                       )

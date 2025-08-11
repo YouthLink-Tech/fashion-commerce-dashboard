@@ -138,6 +138,7 @@ const RightSlides = ({ image3, setImage3, setSizeError3, sizeError3, axiosSecure
           </p>
           <p className="text-[11px]">Max image size is 10 MB</p>
           <p className="text-[11px]">Up to 6 images allowed</p>
+          <p className="text-[11px] text-gray-500">Required size : 450 (W) × 600 (H)</p>
         </div>
       </label>
 

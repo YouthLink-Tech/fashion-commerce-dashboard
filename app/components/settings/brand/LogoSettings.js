@@ -245,11 +245,12 @@ const LogoSettings = () => {
               or drag and drop
             </p>
             <p className="text-[11px]">Max image size is 10 MB</p>
-            <p className="text-[11px]"></p>
+            <p className="text-[11px] text-gray-500">Required size: 244 (W) x 72 (H)</p>
+            <p className="text-[11px] text-amber-600 font-semibold">Transparent background</p>
           </div>
         </label>
         {sizeError && (
-          <p className="text-red-600 text-center mt-4">Please upload the desktop banner with text.</p>
+          <p className="text-left pt-1 text-red-500 font-semibold text-xs">Please upload the desktop banner with text.</p>
         )}
         {image && (
           <div className='relative mt-8'>
@@ -300,11 +301,12 @@ const LogoSettings = () => {
               or drag and drop
             </p>
             <p className="text-[11px]">Max image size is 10 MB</p>
-            <p className="text-[11px]"></p>
+            <p className="text-[11px] text-gray-500">Required size: 72 (W) x 72 (H)</p>
+            <p className="text-[11px] text-amber-600 font-semibold">Transparent background</p>
           </div>
         </label>
         {sizeError2 && (
-          <p className="text-red-600 text-center mt-4">Please upload the mobile logo (logo only).</p>
+          <p className="text-left text-red-500 font-semibold text-xs pt-1">Please upload the mobile logo (logo only).</p>
         )}
         {image2 && (
           <div className='relative mt-8'>

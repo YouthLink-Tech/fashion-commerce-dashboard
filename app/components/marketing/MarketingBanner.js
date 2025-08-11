@@ -17,13 +17,16 @@ const MarketingBanner = () => {
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState("");
-  const [sizeError, setSizeError] = useState(false);
+  const [sizeError, setSizeError] = useState("");
   const [marketingBannerList = [], isMarketingBannerPending, refetch] = useMarketingBanners();
   const shouldShowPreview = Boolean(image?.src);
   const [previousImages, setPreviousImages] = useState([]);
   const [tempImage, setTempImage] = useState(null);
   const [dbImageUrl, setDbImageUrl] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [dragging, setDragging] = useState(false);
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
   useEffect(() => {
     if (marketingBannerList && marketingBannerList.length > 0) {
@@ -44,36 +47,46 @@ const MarketingBanner = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    const maxSizeMB = 10;
+    if (file) processFile(file);
+  };
 
-    if (!file) {
-      setSizeError(true);
-      toast.error("Please select a file.");
+  const processFile = (file) => {
+    if (!VALID_TYPES.includes(file.type)) {
+      setSizeError('Invalid file type. Please upload JPG, PNG, WEBP, or JPEG.');
       return;
     }
 
-    if (!allowedTypes.includes(file.type)) {
-      setSizeError(true);
-      toast.error("Only PNG, JPEG, JPG, and WEBP formats are allowed.");
-      return;
-    }
-
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      setSizeError(true);
-      toast.error("Image size should not exceed 10MB.");
+    if (file.size > MAX_FILE_SIZE) {
+      setSizeError('Image must be smaller than 10MB.');
       return;
     }
 
     setImage({
       src: URL.createObjectURL(file),
-      file,
+      file
     });
-    setSizeError(false);
+    setSizeError('');
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
   const handleImageRemove = () => {
     setImage(null);
+    setSizeError("Please upload or select marketing banner.")
   };
 
   const uploadSingleFileToGCS = async (image) => {
@@ -112,10 +125,10 @@ const MarketingBanner = () => {
   const onSubmit = async () => {
 
     if (!image) {
-      setSizeError(true);
+      setSizeError("Please upload or select marketing banner");
       return;
     }
-    setSizeError(false);
+    setSizeError("");
 
     let imageUrl = '';
     // If the image is new, upload it
@@ -196,8 +209,8 @@ const MarketingBanner = () => {
       <form onSubmit={handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-12 rounded-lg my-6 h-fit space-y-4'>
 
         <div className='flex flex-col w-full'>
-          <label htmlFor='selectedPosition' className='font-semibold text-gray-700 mb-1'>
-            Content Layout Position
+          <label htmlFor="selectedPosition" className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+            Content Layout Position <span className="text-red-600 pl-1">*</span>
           </label>
           <div className='relative'>
             <select
@@ -225,6 +238,9 @@ const MarketingBanner = () => {
           <div className="flex flex-col md:flex-row gap-6 w-full">
             {/* Upload Section */}
             <div className="flex-1 w-full">
+              <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+                Marketing Banner Thumbnail <span className="text-red-600 pl-1">*</span>
+              </label>
               <input
                 id="imageUpload"
                 type="file"
@@ -234,17 +250,28 @@ const MarketingBanner = () => {
               />
               <label
                 htmlFor="imageUpload"
-                className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-gray-300 p-8 bg-gray-50 cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300"
+                className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                  } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
               >
                 <MdOutlineFileUpload size={48} className="text-blue-500" />
-                <div className="text-center">
-                  <h5 className="text-xl font-semibold text-gray-900">Upload New Thumbnail</h5>
-                  <p className="text-sm text-gray-500">Supports PNG, JPG, or JPEG (Max 5MB)</p>
+                <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                  <p className="text-[13px]">
+                    <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                      Click to upload
+                    </span>{" "}
+                    or drag and drop
+                  </p>
+                  <p className="text-[11px]">Max image size is 10 MB</p>
+                  <p className="text-[11px] text-gray-500">Required size : 1000 (W) x 250 (H)</p>
+                  <p className="text-[11px] text-amber-600 font-semibold">Transparent background</p>
                 </div>
               </label>
               {sizeError && (
-                <p className="mt-3 text-sm text-red-500 text-center font-medium">
-                  Please upload or select a valid thumbnail
+                <p className="text-left pt-3 text-red-500 font-semibold text-xs">
+                  {sizeError}
                 </p>
               )}
             </div>

@@ -138,6 +138,7 @@ const CenterSlides = ({ image2, setImage2, setSizeError2, sizeError2, axiosSecur
           </p>
           <p className="text-[11px]">Max image size is 10 MB</p>
           <p className="text-[11px]">Up to 6 images allowed</p>
+          <p className="text-[11px] text-gray-500">Required size : 900 (W) x 400 (H)</p>
         </div>
       </label>
 

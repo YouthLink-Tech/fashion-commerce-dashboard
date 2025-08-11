@@ -157,7 +157,7 @@ const SelectImage = ({ previousImages, setImage, isOpen, onOpen, onOpenChange, a
                   onPress={() => {
                     if (tempImage?.src) {
                       setImage(tempImage);
-                      setSizeError(false);
+                      setSizeError("");
                     }
                     onClose();
                   }}
