@@ -154,7 +154,7 @@ const EditShipmentHandler = () => {
         contactPersonNumber: data?.contactPersonNumber,
         officeAddress: data?.officeAddress,
         trackingUrl: data?.trackingUrl ? data?.trackingUrl : "",
-        imageUrl: image === null ? DEFAULT_IMAGE_URL : image,
+        imageUrl: image || DEFAULT_IMAGE_URL,
         deliveryType
       };
 
