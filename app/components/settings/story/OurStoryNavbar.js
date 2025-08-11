@@ -330,7 +330,15 @@ const OurStoryNavbar = () => {
                     <label className='font-semibold text-[#9F5216]' htmlFor="description">Upload Cover Image <span className='text-red-600'>*</span></label>
                     <FileUploadZone
                       inputId="image-upload-1"
-                      description="Maximum file size is 10 MB"
+                      description={
+                        <>
+                          Maximum file size is 10 MB
+                          <br />
+                          <span className="text-[11px] text-gray-500">
+                            Required size: 450 (W) x 450 (H)
+                          </span>
+                        </>
+                      }
                       accept={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
                       onFileSelect={handleCoverImgChange}
                       requiredError={sizeError1}
@@ -379,7 +387,16 @@ const OurStoryNavbar = () => {
                     <label className='font-semibold text-[#9F5216]' htmlFor="description">Upload Staff Image <span className='text-red-600'>*</span></label>
                     <FileUploadZone
                       inputId="image-upload-2"
-                      description="Maximum file size is 10 MB"
+                      description={
+                        <>
+                          Maximum file size is 10 MB
+                          <br />
+                          <span className="text-[11px] text-gray-500">
+                            Required size: 385 (W) x 1100 (H)
+                          </span>
+                          <p className="text-[11px] text-amber-600 font-semibold pt-1">Transparent background</p>
+                        </>
+                      }
                       accept={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
                       onFileSelect={handleStaffImgChange}
                       requiredError={sizeError2}
@@ -447,7 +464,15 @@ const OurStoryNavbar = () => {
                         </label>
                         <FileUploadZone
                           inputId={`media-upload-${index}`}
-                          description="Maximum file size is 100 MB"
+                          description={
+                            <>
+                              Maximum file size is 50 MB
+                              <br />
+                              <span className="text-[11px] text-gray-500">
+                                Required size: 640 (W) x 360 (H)
+                              </span>
+                            </>
+                          }
                           accept={['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'video/mp4']}
                           onFileSelect={(file) => handleMediaSelect(index, file)}
                           requiredError={requiredFileErrors[index]}

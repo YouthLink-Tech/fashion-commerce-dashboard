@@ -20,6 +20,10 @@ const AddShipmentHandler = () => {
   const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
   const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748149508141_default-image.png";
+  const [dragging, setDragging] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
   const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm();
 
@@ -42,15 +46,46 @@ const AddShipmentHandler = () => {
     }
   };
 
-  const handleImageChange = async (event) => {
+  const handleImageChange = (event) => {
     const file = event.target.files[0];
+    if (file) processFile(file);
+  };
+
+  const processFile = async (file) => {
+    if (!VALID_TYPES.includes(file.type)) {
+      setImageError('Invalid file type. Please upload JPG, PNG, WEBP, or JPEG.');
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError('Image must be smaller than 10MB.');
+      return;
+    }
+
     if (file) {
       // Immediately upload the selected image to GCS
       const uploadedImageUrl = await uploadSingleFileToGCS(file);
       if (uploadedImageUrl) {
         setImage(uploadedImageUrl);
+        setImageError("");
       }
     }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
   const handleImageRemove = () => {
@@ -137,7 +172,7 @@ const AddShipmentHandler = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Add Shipment Handler</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Add Shipment Handler</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/supply-chain/zone/add-shipping-zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -149,7 +184,7 @@ const AddShipmentHandler = () => {
 
             {/* Shipment handler name Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipment Handler Name *</label>
+              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Shipment Handler Name <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Shipment Handler Name"
@@ -163,7 +198,7 @@ const AddShipmentHandler = () => {
 
             {/* Contact person name of the Shipment handler Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Name *</label>
+              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Name <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Contact Person Name"
@@ -177,7 +212,7 @@ const AddShipmentHandler = () => {
 
             {/* Contact person number of the Shipment handler Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Number *</label>
+              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Number <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="number"
                 placeholder="Add Contact Person Number"
@@ -191,7 +226,7 @@ const AddShipmentHandler = () => {
 
             {/* Office Address of the Shipment handler Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Office Address</label>
+              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Office Address</label>
               <input
                 type="text"
                 placeholder="Add Office Address"
@@ -202,7 +237,7 @@ const AddShipmentHandler = () => {
 
             {/* Tracking URL of the Shipment handler Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Tracking URL</label>
+              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Tracking URL</label>
               <input
                 type="text"
                 placeholder="Add tracking url"
@@ -213,7 +248,7 @@ const AddShipmentHandler = () => {
 
             {/* Delivery type of the Shipment handler Input */}
             <div className="flex flex-col w-full gap-4">
-              <label className="font-medium text-[#9F5216]">Select Delivery Type *</label>
+              <label className="flex justify-start font-semibold text-neutral-500 text-sm">Select Delivery Type <span className="text-red-600 pl-1">*</span></label>
               {/* Standard Option */}
               <div className='flex items-center gap-4'>
                 <div
@@ -263,6 +298,9 @@ const AddShipmentHandler = () => {
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+            <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 text-sm">
+              Shipment Handler Thumbnail
+            </label>
             <input
               id='imageUpload'
               type='file'
@@ -271,18 +309,29 @@ const AddShipmentHandler = () => {
             />
             <label
               htmlFor='imageUpload'
-              className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
             >
               <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
+              <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                <p className="text-[13px]">
+                  <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
                 </p>
+                <p className="text-[11px]">Max image size is 10 MB</p>
+                <p className="text-[11px] text-gray-500">Required size: Flexible (W) x 60 (H)</p>
+                <p className="text-[10px] text-amber-600 font-semibold pt-1">Transparent background</p>
               </div>
             </label>
+
+            {imageError && (
+              <p className="text-left text-red-500 font-semibold text-xs">{imageError}</p>
+            )}
 
             {image && (
               <div className='relative'>

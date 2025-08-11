@@ -18,6 +18,7 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/shared/switch/CustomSwitch';
 import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { MdCancel } from 'react-icons/md';
 
 const SecondStepOfAddProduct = () => {
 
@@ -592,16 +593,25 @@ const SecondStepOfAddProduct = () => {
                   {variant?.imageUrls?.length < 6 && (
                     <label
                       htmlFor={`imageUpload-${index}`}
-                      className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer'
+                      className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer hover:border-blue-300'
                       onDrop={(event) => handleDrop(event, index)}
                       onDragOver={handleDragOver}
                     >
                       <LuImagePlus size={30} />
-                      <div className='space-y-1.5 text-center'>
-                        <h5 className='whitespace-nowrap text-xs font-medium tracking-tight'>
-                          <span className='text-blue-500 underline'>Click to upload</span> or <br />
-                          drag and drop
-                        </h5>
+                      <div className='space-y-1.5 text-center text-neutral-500 font-semibold w-[125px]'>
+                        <p className="text-[11px]">
+                          <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                            Click to upload
+                          </span>{" "}
+                          or
+                        </p>
+                        <p className="text-[10px]">drag and drop</p>
+                        <p className="text-[10px]">Max image size : 10 MB</p>
+                        <div className='py-1'>
+                          <p className="text-[10px] text-gray-500">Required size</p>
+                          <p className="text-[10px] text-gray-500">750 (W) x 1000 (H)</p>
+                        </div>
+                        <p className="text-[10px] text-amber-600 font-semibold pt-1">Transparent background</p>
                       </div>
                     </label>
                   )}
@@ -635,10 +645,10 @@ const SecondStepOfAddProduct = () => {
                                       className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-cover"
                                     />
                                     <button
+                                      type='button'
                                       onClick={() => handleImageRemove(index, imgIndex)}
-                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
                                     >
-                                      <RxCross2 size={20} />
+                                      <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
                                     </button>
                                   </li>
                                 )}
@@ -673,10 +683,10 @@ const SecondStepOfAddProduct = () => {
                                       className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-contain"
                                     />
                                     <button
+                                      type='button'
                                       onClick={() => handleImageRemove(index, imgIndex + 3)}
-                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
                                     >
-                                      <RxCross2 size={20} />
+                                      <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
                                     </button>
                                   </li>
                                 )}
