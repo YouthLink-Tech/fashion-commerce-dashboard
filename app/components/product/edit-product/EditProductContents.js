@@ -1148,7 +1148,8 @@ const EditProductContents = () => {
         className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between flex-wrap gap-4'>
+      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between items-center flex-wrap gap-4'>
+
         <div className="flex-1 flex items-center gap-3 w-full">
 
           <button className={`relative py-1 transition-all duration-300
@@ -1180,25 +1181,28 @@ const EditProductContents = () => {
 
         </div>
 
-        {decodedSeasonName ? (
-          <Link
-            className='flex items-center gap-2 text-[10px] md:text-base justify-end'
-            href={`/product-hub/products/existing-products/seasons/${decodedSeasonName}`}>
-            <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
-              <FaArrowLeft />
-            </span>
-            Go Back
-          </Link>
-        ) : (
-          <Link
-            className='flex items-center gap-2 text-[10px] md:text-base justify-end'
-            href={`/product-hub/products/existing-products/${selectedCategory}`}>
-            <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
-              <FaArrowLeft />
-            </span>
-            Go Back
-          </Link>
-        )}
+        <div className='flex-1'>
+          {decodedSeasonName ? (
+            <Link
+              className='flex items-center gap-2 text-[10px] md:text-base justify-end'
+              href={`/product-hub/products/existing-products/seasons/${decodedSeasonName}`}>
+              <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
+                <FaArrowLeft />
+              </span>
+              Go Back
+            </Link>
+          ) : (
+            <Link
+              className='flex items-center gap-2 text-[10px] md:text-base justify-end'
+              href={`/product-hub/products/existing-products/${selectedCategory}`}>
+              <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
+                <FaArrowLeft />
+              </span>
+              Go Back
+            </Link>
+          )}
+        </div>
+
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -1206,7 +1210,7 @@ const EditProductContents = () => {
         {activeTab === "product" &&
           <div className='relative'>
             <div className='max-w-screen-2xl px-6 mx-auto pb-3'>
-              <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl text-neutral-700'>UPDATE PRODUCT DETAILS</h3>
+              <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>UPDATE PRODUCT DETAILS</h3>
             </div>
 
             <div className='max-w-screen-2xl mx-auto'>
@@ -1214,43 +1218,48 @@ const EditProductContents = () => {
                 <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3 h-fit'>
                   <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                     <p className='w-full text-xl text-neutral-700'>PRODUCT ID: <strong>{productId}</strong></p>
-                    <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-                    <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
-                    {errors.productTitle?.type === "required" && (
-                      <p className="text-red-600 text-left">Product Title is required</p>
-                    )}
-                    <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
-                      Details About This Product *
-                    </label>
-                    <Controller
-                      name="productDetails"
-                      defaultValue=""
-                      control={control}
-                      rules={{
-                        required: "Product details are required.",
-                        validate: (value) => {
-                          const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
-                          return strippedText.length >= 10 || "Product details must be at least 10 characters.";
-                        },
-                      }}
-                      render={({ field }) => <Editor
-                        // value={productDetails}
-                        value={field.value}
-                        onChange={(value) => {
-                          field.onChange(value);
-                          setProductDetails(value);
+
+                    <div>
+                      <label htmlFor='productTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Title <span className="text-red-600 pl-1">*</span></label>
+                      <input id='productTitle' {...register("productTitle", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Title' type="text" />
+                      {errors.productTitle?.type === "required" && (
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Title is required</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor='productDetails' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Details About This Product <span className="text-red-600 pl-1">*</span></label>
+                      <Controller
+                        name="productDetails"
+                        defaultValue=""
+                        control={control}
+                        rules={{
+                          required: "Product details are required.",
+                          validate: (value) => {
+                            const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                            return strippedText.length >= 10 || "Product details must be at least 10 characters.";
+                          },
                         }}
-                      />}
-                    />
-                    {errors.productDetails && (
-                      <p className="text-red-600 text-left pt-1">{errors.productDetails.message}</p>
-                    )}
+                        render={({ field }) => <Editor
+                          // value={productDetails}
+                          value={field.value}
+                          onChange={(value) => {
+                            field.onChange(value);
+                            setProductDetails(value);
+                          }}
+                        />}
+                      />
+                      {errors.productDetails && (
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.productDetails.message}</p>
+                      )}
+                    </div>
+
                   </div>
 
                   <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                     <div className='flex flex-col rounded-md relative'>
-                      <label htmlFor="category" className='text-xs px-2'>Category</label>
+                      <label htmlFor="category" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Category <span className="text-red-600 pl-1">*</span></label>
                       <select
                         id="category"
                         className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
@@ -1268,7 +1277,7 @@ const EditProductContents = () => {
                         ))}
                       </select>
                       {errors.category && (
-                        <p className="text-red-600 text-left">{errors.category.message}</p>
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.category.message}</p>
                       )}
                     </div>
 
@@ -1276,7 +1285,7 @@ const EditProductContents = () => {
                       <div className="flex flex-col gap-1 w-full">
                         <CheckboxGroup
                           className="gap-1"
-                          label="Select size"
+                          label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
                           orientation="horizontal"
                           value={groupSelected}
                           onChange={handleGroupSelectedChange}
@@ -1292,7 +1301,7 @@ const EditProductContents = () => {
                           ))}
                         </CheckboxGroup>
                         {sizeError2 && (
-                          <p className="text-red-600 text-left">Please select at least one size.</p>
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
                         )}
                       </div>
                     )}
@@ -1301,7 +1310,7 @@ const EditProductContents = () => {
                       <div className="flex flex-col gap-1 w-full">
                         <CheckboxGroup
                           className="gap-1"
-                          label="Unselect sizes"
+                          label={<p className="font-semibold text-neutral-500 text-sm pb-1">Deselect sizes <span className="text-red-600 pl-1">*</span></p>}
                           orientation="horizontal"
                           value={groupSelected2}
                           onChange={handleGroupSelected2Change}
@@ -1310,11 +1319,11 @@ const EditProductContents = () => {
                             <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
                           ))}
                         </CheckboxGroup>
-                        <p className="mt-4 ml-1 text-default-500">
-                          Selected: {groupSelected2?.join(", ")}
+                        <p className="my-2 ml-1 text-default-500 text-sm font-semibold">
+                          Selected: <span>{groupSelected2?.join(", ")}</span>
                         </p>
                         {sizeError3 && (
-                          <p className="text-red-600 text-left">Please select at least one size.</p>
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
                         )}
                       </div>
                     )}
@@ -1329,10 +1338,10 @@ const EditProductContents = () => {
                           render={({ field }) => (
                             <div>
                               <Select
-                                label="Sub-categories"
+                                label={<p className="font-semibold text-neutral-500 text-sm">Sub Category <span className="text-red-600 pl-1">*</span></p>}
                                 selectionMode="multiple"
                                 value={selectedSubCategories}
-                                placeholder="Select Sub-categories"
+                                placeholder="Select Sub Categories"
                                 selectedKeys={new Set(selectedSubCategories)}
                                 onSelectionChange={(keys) => {
                                   handleSubCategoryArray(keys);
@@ -1348,9 +1357,9 @@ const EditProductContents = () => {
 
                               {/* Conditional Error Display */}
                               {errors.subCategories ? (
-                                <p className="text-red-600 text-left">{errors.subCategories.message}</p>
+                                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.subCategories.message}</p>
                               ) : (
-                                sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
+                                sizeError4 && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Sub-Category is required.</p>
                               )}
                             </div>
                           )}
@@ -1358,27 +1367,29 @@ const EditProductContents = () => {
                       </div>
                     )}
 
-                    <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
-                    <div className="parent-container">
-                      <ReactSelect
-                        options={colorList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        components={{ Option: ColorOption }}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        value={selectedAvailableColors}
-                        onChange={handleColorChange}
-                      />
+                    <div>
+                      <label htmlFor='availableColors' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Available Colors <span className="text-red-600 pl-1">*</span></label>
+                      <div className="parent-container">
+                        <ReactSelect
+                          options={colorList}
+                          isMulti
+                          className="w-full border rounded-md creatable-select-container"
+                          components={{ Option: ColorOption }}
+                          menuPortalTarget={menuPortalTarget}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                          menuPlacement="auto"
+                          value={selectedAvailableColors}
+                          onChange={handleColorChange}
+                        />
+                      </div>
+                      {colorError && (
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">Colors are required</p>
+                      )}
                     </div>
-                    {colorError && (
-                      <p className="text-red-600 text-left">Colors are required</p>
-                    )}
 
                     <div className="flex flex-col gap-3">
                       <RadioGroup
-                        label="Is New Arrival?"
+                        label={<p className="font-semibold text-neutral-500 text-sm">Is New Arrival? <span className="text-red-600 pl-1">*</span></p>}
                         value={selectedNewArrival}
                         onValueChange={handleNewArrivalChange}
                         orientation="horizontal"
@@ -1388,13 +1399,13 @@ const EditProductContents = () => {
                       </RadioGroup>
                       <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
                       {newArrivalError && (
-                        <p className="text-red-600 text-left">New Arrival Selection is required</p>
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
                       )}
                     </div>
 
                     <div className="flex flex-col gap-3">
                       <RadioGroup
-                        label="Is Trending?"
+                        label={<p className="font-semibold text-neutral-500 text-sm">Is Trending? <span className="text-red-600 pl-1">*</span></p>}
                         value={isTrending}
                         onValueChange={handleTrendingChange}
                         orientation="horizontal"
@@ -1404,38 +1415,44 @@ const EditProductContents = () => {
                       </RadioGroup>
                       <p className="text-default-500 text-small">Selected: {isTrending}</p>
                       {trendingError && (
-                        <p className="text-red-600 text-left">Trending Selection is required</p>
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">Trending Selection is required</p>
                       )}
                     </div>
 
                   </div>
 
                   <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-                    <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
-                    <Controller
-                      name="materialCare"
-                      defaultValue=""
-                      control={control}
-                      render={() => <Editor
-                        value={materialCare}
-                        onChange={(value) => {
-                          setMaterialCare(value);
-                        }}
-                      />}
-                    />
 
-                    <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
-                    <Controller
-                      name="sizeFit"
-                      defaultValue=""
-                      control={control}
-                      render={() => <Editor
-                        value={sizeFit}
-                        onChange={(value) => {
-                          setSizeFit(value);
-                        }}
-                      />}
-                    />
+                    <div>
+                      <label htmlFor='materialCare' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Material Care</label>
+                      <Controller
+                        name="materialCare"
+                        defaultValue=""
+                        control={control}
+                        render={() => <Editor
+                          value={materialCare}
+                          onChange={(value) => {
+                            setMaterialCare(value);
+                          }}
+                        />}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor='sizeFit' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Size Fit</label>
+                      <Controller
+                        name="sizeFit"
+                        defaultValue=""
+                        control={control}
+                        render={() => <Editor
+                          value={sizeFit}
+                          onChange={(value) => {
+                            setSizeFit(value);
+                          }}
+                        />}
+                      />
+                    </div>
+
                   </div>
                 </div>
 
@@ -1443,10 +1460,10 @@ const EditProductContents = () => {
                   <div className='flex flex-col gap-4 h-fit'>
                     <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                       <div>
-                        <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                        <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
+                        <label htmlFor="regularPrice" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Regular Price ৳ <span className="text-red-600 pl-1">*</span></label>
+                        <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Price' type="number" />
                         {errors.regularPrice?.type === "required" && (
-                          <p className="text-red-600 text-left">Product Price is required</p>
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Price is required</p>
                         )}
                       </div>
 
@@ -1456,15 +1473,15 @@ const EditProductContents = () => {
                           selectedKey={discountType}
                           onSelectionChange={handleTabChange}
                         >
-                          <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Discount (%)</Tab>
-                          <Tab className='text-[#9F5216]' key="Flat" title="Flat">Flat Discount (taka)</Tab>
+                          <Tab key="Percentage" title="Percentage"><span className='font-semibold text-neutral-500 text-sm'>Discount (%)</span></Tab>
+                          <Tab key="Flat" title="Flat"><span className='font-semibold text-neutral-500 text-sm'>Flat Discount (৳)</span></Tab>
                         </Tabs>
 
                         <input
                           type="number"
                           disabled={!isOwner}
                           {...register('discountValue')}
-                          className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                          className='custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold'
                           placeholder={`Enter ${discountType} Discount`} // Correct placeholder
                         />
                       </div>
@@ -1472,7 +1489,7 @@ const EditProductContents = () => {
 
                     <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                       <div>
-                        <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                        <label htmlFor="batchCode" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Batch Code <span className="text-red-600 pl-1">*</span></label>
                         <input
                           id={`batchCode`}
                           autoComplete="off"
@@ -1484,7 +1501,7 @@ const EditProductContents = () => {
                             },
                           })}
                           placeholder={`Enter Batch Code`}
-                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                          className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           type="text"
                           onChange={(e) => {
                             // Convert input to uppercase and remove non-alphanumeric characters
@@ -1492,16 +1509,16 @@ const EditProductContents = () => {
                           }}
                         />
                         {errors.batchCode && (
-                          <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.batchCode.message}</p>
                         )}
                       </div>
                       <div>
-                        <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
+                        <label htmlFor="weight" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Weight (gram)</label>
                         <input
                           id={`weight`}
                           {...register(`weight`)}
                           placeholder={`Enter Weight`}
-                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                          className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           type="number"
                         />
                       </div>
@@ -1509,41 +1526,45 @@ const EditProductContents = () => {
 
                     <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
-                      <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
-                      <div className="parent-container">
-                        <ReactSelect
-                          options={tagList}
-                          isMulti
-                          className="w-full border rounded-md creatable-select-container"
-                          value={selectedTags}
-                          menuPortalTarget={menuPortalTarget}
-                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                          menuPlacement="auto"
-                          onChange={handleTagChange}
-                        />
+                      <div>
+                        <label htmlFor="tags" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Tag <span className="text-red-600 pl-1">*</span></label>
+                        <div className="parent-container">
+                          <ReactSelect
+                            options={tagList}
+                            isMulti
+                            className="w-full border rounded-md creatable-select-container"
+                            value={selectedTags}
+                            menuPortalTarget={menuPortalTarget}
+                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                            menuPlacement="auto"
+                            onChange={handleTagChange}
+                          />
+                        </div>
+                        {tagError && (
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">Tags are required</p>
+                        )}
                       </div>
-                      {tagError && (
-                        <p className="text-red-600 text-left">Tags are required</p>
-                      )}
 
-                      <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
-                      <div className="parent-container">
-                        <ReactSelect
-                          options={vendorList}
-                          isMulti
-                          className="w-full border rounded-md creatable-select-container"
-                          value={selectedVendors}
-                          menuPortalTarget={menuPortalTarget}
-                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                          menuPlacement="auto"
-                          onChange={handleVendorChange}
-                        />
+                      <div>
+                        <label htmlFor="vendors" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Vendor</label>
+                        <div className="parent-container">
+                          <ReactSelect
+                            options={vendorList}
+                            isMulti
+                            className="w-full border rounded-md creatable-select-container"
+                            value={selectedVendors}
+                            menuPortalTarget={menuPortalTarget}
+                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                            menuPlacement="auto"
+                            onChange={handleVendorChange}
+                          />
+                        </div>
                       </div>
 
                       <div className="w-full mx-auto" ref={dropdownRef}>
 
                         {/* Search Box */}
-                        <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
+                        <label htmlFor='seasons' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Collection <span className="text-red-600 pl-1">*</span></label>
 
                         <input
                           type="text"
@@ -1551,7 +1572,7 @@ const EditProductContents = () => {
                           onChange={(e) => setSearchTerm(e.target.value)}
                           onClick={() => setIsDropdownOpen(true)} // dropdown on input click
                           placeholder="Search & Select by Seasonal Collection"
-                          className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                          className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         />
 
                         {/* Dropdown list for search results */}
@@ -1585,13 +1606,13 @@ const EditProductContents = () => {
                           </div>
                         )}
 
-                        {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+                        {seasonError && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Season is required</p>}
 
                       </div>
 
                       <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
                         {/* Search Box */}
-                        <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Complete Your Outfit Section</label>
+                        <label htmlFor='completeOutfit' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Complete Your Outfit Section</label>
 
                         <input
                           type="text"
@@ -1599,7 +1620,7 @@ const EditProductContents = () => {
                           onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
                           onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
                           placeholder="Search & Select by Seasonal Collection"
-                          className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                          className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         />
 
                         {/* Dropdown list for search results */}
@@ -1651,24 +1672,26 @@ const EditProductContents = () => {
                         />
                         <label
                           htmlFor='imageUpload'
-                          className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
-                            } p-6 cursor-pointer`}
+                          className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                            } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
                           onDragOver={handleDragOver}
                           onDragLeave={handleDragLeave}
                           onDrop={handleDrop}
                         >
                           <MdOutlineFileUpload size={60} />
-                          <div className='space-y-1.5 text-center'>
-                            <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                              Upload or Drag Media
-                            </h5>
-                            <p className='text-sm text-gray-500'>
-                              Photo Should be in PNG, JPEG or JPG format
+                          <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                            <p className="text-[13px]">
+                              <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                                Click to upload
+                              </span>{" "}
+                              or drag and drop
                             </p>
+                            <p className="text-[11px]">Max image size is 10 MB</p>
+                            <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
                           </div>
                         </label>
                         {sizeError && (
-                          <p className="text-red-600 text-center">Select image</p>
+                          <p className="text-left text-red-500 font-semibold text-xs">Select product thumbnail image</p>
                         )}
                         {image && (
                           <div className='relative'>
@@ -1704,9 +1727,9 @@ const EditProductContents = () => {
             <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
               <div className='flex flex-wrap items-center justify-between px-6 gap-4 text-neutral-700'>
 
-                <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>UPDATE INVENTORY VARIANTS</h3>
+                <h3 className='font-semibold text-lg lg:text-2xl text-neutral-600'>UPDATE INVENTORY VARIANTS</h3>
 
-                <p className="font-semibold text-xl md:text-2xl xl:text-3xl">
+                <p className="font-semibold text-lg lg:text-2xl text-neutral-600">
                   {productVariants?.length > 0 ? (
                     `${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0)} ${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0) === 1 ? 'Item' : 'Items'}`
                   ) : (
@@ -1720,35 +1743,35 @@ const EditProductContents = () => {
                   <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                     <div className='flex items-center gap-2 md:gap-4'>
                       <div className='w-1/3'>
-                        <label className='font-medium text-[#9F5216]'>Color</label>
+                        <label htmlFor="color" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Color</label>
                         <input
                           type="text"
                           value={variant.color.label}
-                          className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           disabled
                         />
                       </div>
                       <div className='w-1/3'>
-                        <label className='font-medium text-[#9F5216]'>Size</label>
+                        <label htmlFor="size" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Size</label>
                         <input
                           type="text"
                           value={variant.size}
-                          className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           disabled
                         />
                       </div>
                       <div className='md:w-1/3'>
-                        <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
+                        <label htmlFor={`sku-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">SKU <span className="text-red-600 pl-1">*</span></label>
                         <input
                           id={`sku-${index}`}
                           {...register(`sku-${index}`, { required: true })}
                           value={variant.sku}
                           onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           type="number"
                         />
                         {errors[`sku-${index}`] && (
-                          <p className="text-red-600 text-left">SKU is required</p>
+                          <p className="text-left text-red-500 font-semibold text-xs pt-2">SKU is required</p>
                         )}
                       </div>
                     </div>
@@ -1774,9 +1797,8 @@ const EditProductContents = () => {
                               <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
                                 Click to upload
                               </span>{" "}
-                              or
+                              or drag and drop
                             </p>
-                            <p className="text-[10px]">drag and drop</p>
                             <p className="text-[10px]">Max image size : 10 MB</p>
                             <div className='py-1'>
                               <p className="text-[10px] text-gray-500">Required size</p>
@@ -1787,7 +1809,7 @@ const EditProductContents = () => {
                         </label>
                       )}
                       {sizeError5 && (
-                        <p className="text-red-600 text-center">Please select at least one image</p>
+                        <p className="text-left text-red-500 font-semibold text-xs pt-2">Please select at least one image</p>
                       )}
 
                       <div>
@@ -1891,7 +1913,7 @@ const EditProductContents = () => {
         {activeTab === "shipping" &&
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto relative'>
 
-            <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6 text-neutral-700'>UPDATE SHIPPING DETAILS</h3>
+            <h3 className='font-semibold text-lg lg:text-2xl text-neutral-600 px-6'>UPDATE SHIPPING DETAILS</h3>
 
             <div className='flex flex-wrap items-center gap-3 mt-2 px-6 pb-6'>
 
@@ -1942,10 +1964,10 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                     <tr className={`rounded-lg bg-gray-50`}>
                       <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
                         <Checkbox
-                          isSelected={filteredShippingList?.length > 0 && (tabSelections[activeTab2]?.length === filteredShippingList.length)}
+                          isSelected={filteredShippingList?.length > 0 && (tabSelections[activeTab2]?.length === filteredShippingList?.length)}
                           onChange={toggleSelectAll}
                           color="success"
-                          size="lg"
+                          size="md"
                         />
                       </th>
                       <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
@@ -1957,14 +1979,14 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
 
                   <tbody>
                     {filteredShippingList?.map((shipping, index) => {
-                      const isSelected = selectedShipmentHandler.some(
-                        (handler) => handler.shippingZone === shipping?.shippingZone
+                      const isSelected = selectedShipmentHandler?.some(
+                        (handler) => handler?.shippingZone === shipping?.shippingZone
                       );
 
-                      const handler = shipmentHandlerList.find(h => h._id === shipping.selectedShipmentHandlerId);
+                      const handler = shipmentHandlerList?.find(h => h?._id === shipping?.selectedShipmentHandlerId);
 
                       // Derive delivery types from shippingCharges keys (or shippingDurations keys)
-                      const deliveryTypes = shipping.shippingCharges ? Object.keys(shipping.shippingCharges) : [];
+                      const deliveryTypes = shipping?.shippingCharges ? Object.keys(shipping?.shippingCharges) : [];
 
                       return (
                         <tr key={index}
@@ -1975,7 +1997,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                               isSelected={isSelected}
                               onChange={() => toggleCardSelection(shipping)}
                               color="success"
-                              size='lg'
+                              size='md'
                             />
                           </td>
 
@@ -1989,7 +2011,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                             <div className="flex items-center justify-center md:gap-4">
                               {handler?.imageUrl && (
                                 <Image
-                                  src={handler.imageUrl}
+                                  src={handler?.imageUrl}
                                   alt="shipping"
                                   width={100}
                                   height={100}
@@ -1999,10 +2021,10 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                             </div>
                           </td>
 
-                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
-                            deliveryTypes.map((type, idx) => (
+                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes?.length > 0 ? (
+                            deliveryTypes?.map((type, idx) => (
                               <div key={idx}>
-                                {type}: ৳ {shipping.shippingCharges[type] ?? "—"}
+                                {type}: ৳ {shipping?.shippingCharges[type] ?? "—"}
                               </div>
                             ))
                           ) : (
@@ -2010,10 +2032,10 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                           )}
                           </td>
 
-                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
-                            deliveryTypes.map((type, idx) => (
+                          <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes?.length > 0 ? (
+                            deliveryTypes?.map((type, idx) => (
                               <div key={idx}>
-                                {type}: {shipping.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
+                                {type}: {shipping?.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
                               </div>
                             ))
                           ) : (

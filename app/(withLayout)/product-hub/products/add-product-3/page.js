@@ -329,7 +329,7 @@ const ThirdStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>SELECT SHIPPING DETAILS</h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/product-hub/products"
@@ -393,10 +393,10 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
               <tr className='rounded-lg bg-gray-50'>
                 <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
                   <Checkbox
-                    isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
+                    isSelected={filteredShippingList?.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList?.length)}
                     onChange={toggleSelectAll}
                     color="success"
-                    size="lg"
+                    size="md"
                   />
                 </th>
                 <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
@@ -408,14 +408,14 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
             <tbody>
               {filteredShippingList?.map((shipping, index) => {
-                const isSelected = selectedShipmentHandler.some(
-                  (handler) => handler.shippingZone === shipping?.shippingZone
+                const isSelected = selectedShipmentHandler?.some(
+                  (handler) => handler?.shippingZone === shipping?.shippingZone
                 );
 
-                const handler = shipmentHandlerList.find(h => h._id === shipping.selectedShipmentHandlerId);
+                const handler = shipmentHandlerList?.find(h => h?._id === shipping?.selectedShipmentHandlerId);
 
                 // Derive delivery types from shippingCharges keys (or shippingDurations keys)
-                const deliveryTypes = shipping.shippingCharges ? Object.keys(shipping.shippingCharges) : [];
+                const deliveryTypes = shipping?.shippingCharges ? Object.keys(shipping?.shippingCharges) : [];
 
                 return (
                   <tr key={index}
@@ -426,7 +426,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                         isSelected={isSelected}
                         onChange={() => toggleCardSelection(shipping)}
                         color="success"
-                        size='lg'
+                        size='md'
                       />
                     </td>
 
@@ -441,7 +441,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                         <div className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
                           {handler?.imageUrl && (
                             <Image
-                              src={handler.imageUrl}
+                              src={handler?.imageUrl}
                               alt="shipping"
                               width={100}
                               height={100}
@@ -452,10 +452,10 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                       </div>
                     </td>
 
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
-                      deliveryTypes.map((type, idx) => (
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes?.length > 0 ? (
+                      deliveryTypes?.map((type, idx) => (
                         <div key={idx}>
-                          {type}: ৳ {shipping.shippingCharges[type] ?? "—"}
+                          {type}: ৳ {shipping?.shippingCharges[type] ?? "—"}
                         </div>
                       ))
                     ) : (
@@ -463,10 +463,10 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                     )}
                     </td>
 
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes.length > 0 ? (
-                      deliveryTypes.map((type, idx) => (
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{deliveryTypes?.length > 0 ? (
+                      deliveryTypes?.map((type, idx) => (
                         <div key={idx}>
-                          {type}: {shipping.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
+                          {type}: {shipping?.shippingDurations?.[type] ?? "—"} {type === "EXPRESS" ? "hours" : "days"}
                         </div>
                       ))
                     ) : (

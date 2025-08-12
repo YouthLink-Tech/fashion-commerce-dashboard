@@ -844,7 +844,7 @@ const FirstStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
-          <h3 className='flex-1 font-semibold text-[13px] md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
+          <h3 className='flex-1 font-semibold text-lg lg:text-2xl text-neutral-600'>PRODUCT CONFIGURATION</h3>
 
           <Link // Trigger the modal on click
             className="flex items-center gap-2 text-[10px] md:text-base justify-end"
@@ -865,43 +865,46 @@ const FirstStepOfAddProduct = () => {
 
           <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 h-fit'>
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-              <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
-              {errors.productTitle?.type === "required" && (
-                <p className="text-red-600 text-left">Product Title is required</p>
-              )}
+              <div>
+                <label htmlFor='productTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Title <span className="text-red-600 pl-1">*</span></label>
+                <input id='productTitle' {...register("productTitle", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Title' type="text" />
+                {errors.productTitle?.type === "required" && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Title is required</p>
+                )}
+              </div>
 
-              <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
-                Details About This Product *
-              </label>
-              <Controller
-                name="productDetails"
-                defaultValue=""
-                rules={{
-                  required: "Product details are required.",
-                  validate: (value) => {
-                    const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
-                    return strippedText.length >= 10 || "Product details must be at least 10 characters.";
-                  },
-                }}
-                control={control}
-                render={({ field }) => <Editor
-                  value={field.value}
-                  onChange={(value) => {
-                    field.onChange(value);
-                    localStorage.setItem('productDetails', value); // Update local storage
+              <div>
+                <label htmlFor='productDetails' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Details About This Product <span className="text-red-600 pl-1">*</span></label>
+                <Controller
+                  name="productDetails"
+                  defaultValue=""
+                  rules={{
+                    required: "Product details are required.",
+                    validate: (value) => {
+                      const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                      return strippedText.length >= 10 || "Product details must be at least 10 characters.";
+                    },
                   }}
-                />}
-              />
-              {errors.productDetails && (
-                <p className="text-red-600 text-left pt-1">{errors.productDetails.message}</p>
-              )}
+                  control={control}
+                  render={({ field }) => <Editor
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      localStorage.setItem('productDetails', value); // Update local storage
+                    }}
+                  />}
+                />
+                {errors.productDetails && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.productDetails.message}</p>
+                )}
+              </div>
+
             </div>
 
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
               <div className='flex flex-col rounded-md relative'>
-                <label htmlFor="category" className='text-xs px-2'>Category</label>
+                <label htmlFor="category" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Category <span className="text-red-600 pl-1">*</span></label>
                 <select
                   id="category"
                   className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
@@ -919,7 +922,7 @@ const FirstStepOfAddProduct = () => {
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="text-red-600 text-left">{errors.category.message}</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.category.message}</p>
                 )}
               </div>
 
@@ -927,7 +930,7 @@ const FirstStepOfAddProduct = () => {
                 <div className="flex flex-col gap-1 w-full">
                   <CheckboxGroup
                     className="gap-1"
-                    label="Select size"
+                    label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
                     orientation="horizontal"
                     value={groupSelected}
                     onChange={handleGroupSelectedChange}
@@ -943,7 +946,7 @@ const FirstStepOfAddProduct = () => {
                     ))}
                   </CheckboxGroup>
                   {sizeError2 && (
-                    <p className="text-red-600 text-left">Please select at least one size.</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size range.</p>
                   )}
                 </div>
               )}
@@ -952,7 +955,7 @@ const FirstStepOfAddProduct = () => {
                 <div className="flex flex-col gap-1 w-full">
                   <CheckboxGroup
                     className="gap-1"
-                    label="Unselect sizes"
+                    label={<p className="font-semibold text-neutral-500 text-sm pb-1">Deselect sizes <span className="text-red-600 pl-1">*</span></p>}
                     orientation="horizontal"
                     value={groupSelected2}
                     onChange={handleGroupSelected2Change}
@@ -961,11 +964,11 @@ const FirstStepOfAddProduct = () => {
                       <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
                     ))}
                   </CheckboxGroup>
-                  <p className="mt-4 ml-1 text-default-500">
-                    Selected: {groupSelected2?.join(", ")}
+                  <p className="my-2 ml-1 text-default-500 text-sm font-semibold">
+                    Selected: <span>{groupSelected2?.join(", ")}</span>
                   </p>
                   {sizeError3 && (
-                    <p className="text-red-600 text-left">Please select at least one size.</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
                   )}
                 </div>
               )}
@@ -980,10 +983,10 @@ const FirstStepOfAddProduct = () => {
                     render={({ field }) => (
                       <div>
                         <Select
-                          label="Sub-categories"
+                          label={<p className="font-semibold text-neutral-500 text-sm">Sub Category <span className="text-red-600 pl-1">*</span></p>}
                           selectionMode="multiple"
                           value={selectedSubCategories}
-                          placeholder="Select Sub-categories"
+                          placeholder="Select Sub Categories"
                           selectedKeys={new Set(selectedSubCategories)}
                           onSelectionChange={(keys) => {
                             handleSubCategoryArray(keys);
@@ -999,9 +1002,9 @@ const FirstStepOfAddProduct = () => {
 
                         {/* Conditional Error Display */}
                         {errors.subCategories ? (
-                          <p className="text-red-600 text-left">{errors.subCategories.message}</p>
+                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.subCategories.message}</p>
                         ) : (
-                          sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
+                          sizeError4 && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Sub Category is required.</p>
                         )}
                       </div>
                     )}
@@ -1009,35 +1012,37 @@ const FirstStepOfAddProduct = () => {
                 </div>
               )}
 
-              <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
-              <Controller
-                name="availableColors"
-                control={control}
-                defaultValue={selectedAvailableColors}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <div className="parent-container">
-                    <ReactSelect
-                      {...field}
-                      options={colorList}
-                      isMulti
-                      className="w-full border rounded-md creatable-select-container"
-                      components={{ Option: ColorOption }}
-                      menuPortalTarget={menuPortalTarget}
-                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                      menuPlacement="auto"
-                      value={selectedAvailableColors}
-                      onChange={(newValue) => {
-                        setSelectedAvailableColors(newValue);
-                        field.onChange(newValue);
-                      }}
-                    />
-                  </div>
+              <div>
+                <label htmlFor='availableColors' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Available Colors <span className="text-red-600 pl-1">*</span></label>
+                <Controller
+                  name="availableColors"
+                  control={control}
+                  defaultValue={selectedAvailableColors}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <div className="parent-container">
+                      <ReactSelect
+                        {...field}
+                        options={colorList}
+                        isMulti
+                        className="w-full border rounded-md creatable-select-container"
+                        components={{ Option: ColorOption }}
+                        menuPortalTarget={menuPortalTarget}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        menuPlacement="auto"
+                        value={selectedAvailableColors}
+                        onChange={(newValue) => {
+                          setSelectedAvailableColors(newValue);
+                          field.onChange(newValue);
+                        }}
+                      />
+                    </div>
+                  )}
+                />
+                {errors.availableColors && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Colors are required</p>
                 )}
-              />
-              {errors.availableColors && (
-                <p className="text-red-600 text-left">Colors are required</p>
-              )}
+              </div>
 
               <Controller
                 name="newArrival"
@@ -1048,7 +1053,7 @@ const FirstStepOfAddProduct = () => {
                   <div className="flex flex-col gap-3">
                     <RadioGroup
                       {...field}
-                      label="Is New Arrival?"
+                      label={<p className="font-semibold text-neutral-500 text-sm">Is New Arrival? <span className="text-red-600 pl-1">*</span></p>}
                       value={selectedNewArrival}
                       onValueChange={setSelectedNewArrival}
                       orientation="horizontal"
@@ -1058,7 +1063,7 @@ const FirstStepOfAddProduct = () => {
                     </RadioGroup>
                     <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
                     {errors.newArrival && (
-                      <p className="text-red-600 text-left">New Arrival Selection is required</p>
+                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
                     )}
                   </div>
                 )}
@@ -1073,7 +1078,7 @@ const FirstStepOfAddProduct = () => {
                   <div className="flex flex-col gap-3">
                     <RadioGroup
                       {...field}
-                      label="Is Trending?"
+                      label={<p className="font-semibold text-neutral-500 text-sm">Is Trending? <span className="text-red-600 pl-1">*</span></p>}
                       value={isTrending}
                       onValueChange={setIsTrending}
                       orientation="horizontal"
@@ -1083,7 +1088,7 @@ const FirstStepOfAddProduct = () => {
                     </RadioGroup>
                     <p className="text-default-500 text-small">Selected: {isTrending}</p>
                     {errors.trending && (
-                      <p className="text-red-600 text-left">Trending Selection is required</p>
+                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">Trending Selection is required</p>
                     )}
                   </div>
                 )}
@@ -1092,33 +1097,39 @@ const FirstStepOfAddProduct = () => {
             </div>
 
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-              <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
-              <Controller
-                name="materialCare"
-                defaultValue=""
-                control={control}
-                render={() => <Editor
-                  value={materialCare}
-                  onChange={(value) => {
-                    setMaterialCare(value);
-                    localStorage.setItem('materialCare', value); // Update local storage
-                  }}
-                />}
-              />
 
-              <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
-              <Controller
-                name="sizeFit"
-                defaultValue=""
-                control={control}
-                render={() => <Editor
-                  value={sizeFit}
-                  onChange={(value) => {
-                    setSizeFit(value);
-                    localStorage.setItem('sizeFit', value); // Update local storage
-                  }}
-                />}
-              />
+              <div>
+                <label htmlFor='materialCare' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Material Care</label>
+                <Controller
+                  name="materialCare"
+                  defaultValue=""
+                  control={control}
+                  render={() => <Editor
+                    value={materialCare}
+                    onChange={(value) => {
+                      setMaterialCare(value);
+                      localStorage.setItem('materialCare', value); // Update local storage
+                    }}
+                  />}
+                />
+              </div>
+
+              <div>
+                <label htmlFor='sizeFit' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Size Fit</label>
+                <Controller
+                  name="sizeFit"
+                  defaultValue=""
+                  control={control}
+                  render={() => <Editor
+                    value={sizeFit}
+                    onChange={(value) => {
+                      setSizeFit(value);
+                      localStorage.setItem('sizeFit', value); // Update local storage
+                    }}
+                  />}
+                />
+              </div>
+
             </div>
           </div>
 
@@ -1126,10 +1137,10 @@ const FirstStepOfAddProduct = () => {
             <div className='flex flex-col gap-4 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
+                  <label htmlFor="regularPrice" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Regular Price ৳ <span className="text-red-600 pl-1">*</span></label>
+                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Price' type="number" />
                   {errors.regularPrice?.type === "required" && (
-                    <p className="text-red-600 text-left">Product Price is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Price is required</p>
                   )}
                 </div>
 
@@ -1139,14 +1150,14 @@ const FirstStepOfAddProduct = () => {
                     selectedKey={discountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab key="Percentage" title="Percentage" className='text-[#9F5216]'>Discount (%)</Tab>
-                    <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (৳)</Tab>
+                    <Tab key="Percentage" title="Percentage"><span className='font-semibold text-neutral-500 text-sm'>Discount (%)</span></Tab>
+                    <Tab key="Flat" title="Flat"><span className='font-semibold text-neutral-500 text-sm'>Flat Discount (৳)</span></Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('discountValue')}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    className='custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold'
                     placeholder={`Enter ${discountType} Discount`} // Correct placeholder
                   />
                 </div>
@@ -1154,7 +1165,7 @@ const FirstStepOfAddProduct = () => {
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                  <label htmlFor="batchCode" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Batch Code <span className="text-red-600 pl-1">*</span></label>
                   <input
                     id={`batchCode`}
                     autoComplete="off"
@@ -1166,7 +1177,7 @@ const FirstStepOfAddProduct = () => {
                       },
                     })}
                     placeholder={`Enter Batch Code`}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                    className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     type="text"
                     onChange={(e) => {
                       // Convert input to uppercase and remove non-alphanumeric characters
@@ -1174,16 +1185,16 @@ const FirstStepOfAddProduct = () => {
                     }}
                   />
                   {errors.batchCode && (
-                    <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.batchCode.message}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight (gram)</label>
+                  <label htmlFor="weight" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Weight (gram)</label>
                   <input
                     id={`weight`}
                     {...register(`weight`)}
                     placeholder={`Enter Weight (gram)`}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                    className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     type="number"
                   />
                 </div>
@@ -1191,71 +1202,75 @@ const FirstStepOfAddProduct = () => {
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-                <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
-                <Controller
-                  name="tags"
-                  control={control}
-                  defaultValue={selectedTags}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
-                        {...field}
-                        options={tagList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedTags}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedTags(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
-                    </div>
+                <div>
+                  <label htmlFor="tags" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Tag <span className="text-red-600 pl-1">*</span></label>
+                  <Controller
+                    name="tags"
+                    control={control}
+                    defaultValue={selectedTags}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <div className="parent-container">
+                        <ReactSelect
+                          {...field}
+                          options={tagList}
+                          isMulti
+                          className="w-full border rounded-md creatable-select-container"
+                          value={selectedTags}
+                          menuPortalTarget={menuPortalTarget}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                          menuPlacement="auto"
+                          onChange={(newValue) => {
+                            setSelectedTags(newValue);
+                            field.onChange(newValue);
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+                  {errors.tags && (
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Tags are required</p>
                   )}
-                />
-                {errors.tags && (
-                  <p className="text-red-600 text-left">Tags are required</p>
-                )}
+                </div>
 
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
-                <Controller
-                  name="vendors"
-                  control={control}
-                  defaultValue={selectedVendors}
-                  render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
-                        {...field}
-                        options={vendorList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedVendors}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedVendors(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
-                    </div>
-                  )}
-                />
+                <div>
+                  <label htmlFor="vendors" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Vendor</label>
+                  <Controller
+                    name="vendors"
+                    control={control}
+                    defaultValue={selectedVendors}
+                    render={({ field }) => (
+                      <div className="parent-container">
+                        <ReactSelect
+                          {...field}
+                          options={vendorList}
+                          isMulti
+                          className="w-full border rounded-md creatable-select-container"
+                          value={selectedVendors}
+                          menuPortalTarget={menuPortalTarget}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                          menuPlacement="auto"
+                          onChange={(newValue) => {
+                            setSelectedVendors(newValue);
+                            field.onChange(newValue);
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+                </div>
 
                 <div className="w-full mx-auto" ref={dropdownRef}>
-                  {/* Search Box */}
-                  <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
 
+                  {/* Search Box */}
+                  <label htmlFor='seasons' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Collection <span className="text-red-600 pl-1">*</span></label>
                   <input
                     type="text"
                     value={isDropdownOpen ? searchTerm : selectedSeasons.join(", ")} // Show selected IDs when closed
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onClick={() => setIsDropdownOpen(true)} // dropdown on input click
                     placeholder="Search & Select by Seasonal Collection"
-                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
 
                   {/* Dropdown list for search results */}
@@ -1289,22 +1304,21 @@ const FirstStepOfAddProduct = () => {
                     </div>
                   )}
 
-                  {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+                  {seasonError && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Season is required</p>}
 
                 </div>
 
                 <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
 
                   {/* Search Box */}
-                  <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Complete Your Outfit Section</label>
-
+                  <label htmlFor='completeOutfit' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Complete Your Outfit Section</label>
                   <input
                     type="text"
                     value={isDropdownOpenForCompleteOutfit ? searchTermForCompleteOutfit : selectedProductIds.map(product => product.productId).join(", ")} // Show selected IDs when closed
                     onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
                     onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
                     placeholder="Search & Select by Seasonal Collection"
-                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
 
                   {/* Dropdown list for search results */}
@@ -1355,24 +1369,26 @@ const FirstStepOfAddProduct = () => {
                   />
                   <label
                     htmlFor='imageUpload'
-                    className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
-                      } p-6 cursor-pointer`}
+                    className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                      } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                   >
                     <MdOutlineFileUpload size={60} />
-                    <div className='space-y-1.5 text-center'>
-                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                        Upload or Drag Media
-                      </h5>
-                      <p className='text-sm text-gray-500'>
-                        Photo Should be in PNG, JPEG or JPG format
+                    <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                      <p className="text-[13px]">
+                        <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                          Click to upload
+                        </span>{" "}
+                        or drag and drop
                       </p>
+                      <p className="text-[11px]">Max image size is 10 MB</p>
+                      <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
                     </div>
                   </label>
                   {sizeError && (
-                    <p className="text-red-600 text-center">Select image</p>
+                    <p className="text-left text-red-500 font-semibold text-xs">Select product thumbnail image</p>
                   )}
                   {image && (
                     <div className='relative'>

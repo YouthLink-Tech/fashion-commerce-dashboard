@@ -527,7 +527,7 @@ const SecondStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
-          <h3 className='flex-1 font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
+          <h3 className='flex-1 font-semibold text-lg lg:text-2xl text-neutral-600'>INVENTORY VARIANTS</h3>
           <h3 className='flex-1 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
           <Link
             className="flex-1 flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
@@ -548,36 +548,36 @@ const SecondStepOfAddProduct = () => {
               <div key={index} className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div className='flex items-center gap-2 md:gap-4 h-fit'>
                   <div className='w-1/3'>
-                    <label className='font-medium text-[#9F5216]'>Color</label>
+                    <label htmlFor="color" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Color</label>
                     <input
                       type="text"
                       value={variant.color.label}
-                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       disabled
                     />
                   </div>
                   <div className='w-1/3'>
-                    <label className='font-medium text-[#9F5216]'>Size</label>
+                    <label htmlFor="size" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Size</label>
                     <input
                       type="text"
                       value={variant.size}
-                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       disabled
                     />
                   </div>
                   <div className='md:w-1/3'>
-                    <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
+                    <label htmlFor={`sku-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">SKU <span className="text-red-600 pl-1">*</span></label>
                     <input
                       id={`sku-${index}`}
                       autocomplete="off"
                       {...register(`sku-${index}`, { required: true })}
                       value={variant.sku}
                       onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       type="number"
                     />
                     {errors[`sku-${index}`] && (
-                      <p className="text-red-600 text-left">SKU is required</p>
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">SKU is required</p>
                     )}
                   </div>
                 </div>
@@ -603,9 +603,8 @@ const SecondStepOfAddProduct = () => {
                           <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
                             Click to upload
                           </span>{" "}
-                          or
+                          or drag and drop
                         </p>
-                        <p className="text-[10px]">drag and drop</p>
                         <p className="text-[10px]">Max image size : 10 MB</p>
                         <div className='py-1'>
                           <p className="text-[10px] text-gray-500">Required size</p>
@@ -616,7 +615,7 @@ const SecondStepOfAddProduct = () => {
                     </label>
                   )}
                   {sizeError && (
-                    <p className="text-red-600 text-center">Please select at least one image</p>
+                    <p className="text-left text-red-500 font-semibold text-xs pt-2">Please select at least one image</p>
                   )}
 
                   <div>
