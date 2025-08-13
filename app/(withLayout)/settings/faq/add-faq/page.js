@@ -126,7 +126,7 @@ const AddFAQPage = () => {
       <div className='max-w-screen-xl mx-auto py-3 md:py-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between px-8 gap-4'>
 
-          <h3 className='flex-1 font-semibold text-base md:text-xl lg:text-3xl text-neutral-700'>FAQ CONFIGURATION</h3>
+          <h3 className='flex-1 font-semibold text-lg lg:text-2xl text-neutral-600'>FAQ CONFIGURATION</h3>
 
           <div className='flex justify-start'>
             <button type="button" onClick={() => append({ question: "", answer: "" })} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
@@ -150,12 +150,12 @@ const AddFAQPage = () => {
 
         <div className='flex flex-col gap-8 items-center bg-white p-4 lg:p-8 drop-shadow rounded-lg'>
 
-          <div className="relative w-full space-y-3">
-            <label htmlFor="pageTitle" className="text-[#9F5216]">Page Title *</label>
+          <div className="relative w-full">
+            <label htmlFor='pageTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Page Title <span className="text-red-600 pl-1">*</span></label>
             <input
               id="pageTitle"
               type="text"
-              className="h-11 w-full font-semibold rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]"
+              className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               placeholder="Enter page title"
               {...register("pageTitle", {
                 required: {
@@ -173,20 +173,24 @@ const AddFAQPage = () => {
               })}
             />
             {errors.pageTitle && (
-              <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
+              <p className="text-left pt-2 text-red-500 font-semibold text-xs">
                 {errors.pageTitle?.message}
               </p>
             )}
           </div>
 
-          <div className='flex flex-col gap-4 rounded-lg h-fit w-full'>
-            <label htmlFor='faqDescription' className='flex justify-start font-medium text-[#9F5216]'>
-              Details About FAQ *
-            </label>
+          <div className='flex flex-col rounded-lg h-fit w-full'>
+            <label htmlFor='faqDescription' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Details About FAQ <span className="text-red-600 pl-1">*</span></label>
             <Controller
               name="faqDescription"
               defaultValue=""
-              rules={{ required: true }}
+              rules={{
+                required: "FAQ Description is required",
+                validate: (value) => {
+                  const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                  return strippedText.length >= 10 || "FAQ Description must be at least 10 characters.";
+                },
+              }}
               control={control}
               render={({ field }) => <LegalPoliciesEditor
                 value={field.value}
@@ -195,15 +199,15 @@ const AddFAQPage = () => {
                 }}
               />}
             />
-            {errors.faqDescription?.type === "required" && (
-              <p className="text-red-600 text-left pt-1">FAQ Description is required</ p>
+            {errors.faqDescription && (
+              <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.faqDescription.message}</p>
             )}
           </div>
 
         </div>
 
         <div className='grid grid-cols-1 gap-4 w-full'>
-          <h3 className='font-semibold text-[#9F5216] px-8'>Question & Answers</h3>
+          <h3 className='font-semibold text-neutral-600 px-8 text-base lg:text-lg'>Question & Answers</h3>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 w-full'>
             {fields.map((faq, index) => (
               <div key={faq.id} className="bg-white p-4 lg:p-8 drop-shadow rounded-lg h-fit">

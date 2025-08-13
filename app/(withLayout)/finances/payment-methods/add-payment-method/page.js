@@ -9,8 +9,8 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import UploadUi from '@/app/components/upload-image/UploadUi';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -24,18 +24,8 @@ const AddPaymentMethod = () => {
   const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748164462517_default-payment-image.jpg";
 
   const { register, handleSubmit, control, formState: { errors } } = useForm();
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!isValidImageFile(file)) return;
-
-    setImage({
-      src: URL.createObjectURL(file),
-      file
-    });
-  };
+  const [dragging, setDragging] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const handleImageRemove = () => {
     setImage(null);
@@ -44,7 +34,7 @@ const AddPaymentMethod = () => {
   const uploadSingleFileToGCS = async (image) => {
     try {
       const formData = new FormData();
-      formData.append('attachment', image.file);
+      formData.append('attachment', image);
 
       const response = await axiosSecure.post('/upload-single-file', formData, {
         headers: {
@@ -57,7 +47,12 @@ const AddPaymentMethod = () => {
       }
     } catch (error) {
       console.error('Error uploading file:', error);
+      setImageError("Upload failed. Please try again.");
     }
+  };
+
+  const handleUploadSuccess = (url) => {
+    setImage(url);
   };
 
   const onSubmit = async (data) => {
@@ -66,23 +61,11 @@ const AddPaymentMethod = () => {
 
     const { paymentMethodName } = data;
 
-    let imageUrl = '';
-    if (image) {
-      imageUrl = await uploadSingleFileToGCS(image);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        imageUrl = DEFAULT_IMAGE_URL;
-        return;
-      }
-    } else {
-      imageUrl = DEFAULT_IMAGE_URL;
-    }
-
     const paymentData = {
       paymentMethodName,
       paymentDetails,
       status: true,
-      imageUrl,
+      imageUrl: image || DEFAULT_IMAGE_URL, // Using image state (URL) directly
     };
 
     try {
@@ -137,7 +120,7 @@ const AddPaymentMethod = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Payment Configuration</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Payment Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -146,23 +129,26 @@ const AddPaymentMethod = () => {
         <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
             {/* Payment Method name Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Payment Method Name *</label>
+              <label htmlFor='paymentMethodName' className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Payment Method Name <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Payment Method Name"
                 {...register('paymentMethodName', { required: 'Payment Method Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.paymentMethodName && (
-                <p className="text-red-600 text-left">{errors.paymentMethodName.message}</p>
+                <p className="text-left pt-1 text-red-500 font-semibold text-xs">{errors.paymentMethodName.message}</p>
               )}
             </div>
 
             {/* Payment Method Description Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Payment Details</label>
+              <label htmlFor='paymentDetails' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                Payment Details
+              </label>
               <Controller
                 name="paymentDetails"
                 defaultValue=""
@@ -179,31 +165,25 @@ const AddPaymentMethod = () => {
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <input
-              id='imageUpload'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange}
-            />
-            <label
-              htmlFor='imageUpload'
-              className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-            >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
-                </p>
-              </div>
-            </label>
+
+            <div>
+              <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+                Payment Method Thumbnail
+              </label>
+              <UploadUi
+                dragging={dragging}
+                setDragging={setDragging}
+                imageError={imageError}
+                setImageError={setImageError}
+                onUploadSuccess={handleUploadSuccess}
+                uploadFile={uploadSingleFileToGCS}
+              />
+            </div>
 
             {image && (
               <div className='relative'>
                 <Image
-                  src={image.src}
+                  src={image.src || image}
                   alt='Uploaded image'
                   height={100}
                   width={200}

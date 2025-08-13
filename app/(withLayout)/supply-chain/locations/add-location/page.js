@@ -82,7 +82,7 @@ const AddLocation = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Location Configuration</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Location Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/supply-chain/locations"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -94,43 +94,43 @@ const AddLocation = () => {
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             {/* Location name Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Location Name *</label>
+              <label htmlFor='locationName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Location Name <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Location Name"
                 {...register('locationName', { required: 'Location is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.locationName && (
-                <p className="text-red-600 text-left">{errors.locationName.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.locationName.message}</p>
               )}
             </div>
 
             {/* Contact person name of the Location Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Name *</label>
+              <label htmlFor='contactPersonName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Contact Person Name <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Contact Person Name"
                 {...register('contactPersonName', { required: 'Contact Person Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.contactPersonName && (
-                <p className="text-red-600 text-left">{errors.contactPersonName.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonName.message}</p>
               )}
             </div>
 
             {/* Contact person number of the Location Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Number *</label>
+              <label htmlFor='contactPersonNumber' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Contact Person Number <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="number"
                 placeholder="Add Contact Person Number"
                 {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
-                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.contactPersonNumber && (
-                <p className="text-red-600 text-left">{errors.contactPersonNumber.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonNumber.message}</p>
               )}
             </div>
 
@@ -140,41 +140,41 @@ const AddLocation = () => {
 
             {/* Location Address of the Location Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Address *</label>
+              <label htmlFor='locationAddress' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Address <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Location Address"
                 {...register('locationAddress', { required: 'Location Address is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.locationAddress && (
-                <p className="text-red-600 text-left">{errors.locationAddress.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.locationAddress.message}</p>
               )}
             </div>
 
             <div className='flex items-center gap-6'>
               <div className="w-full">
-                <label className="flex justify-start font-medium text-[#9F5216] pb-2">City *</label>
+                <label htmlFor='cityName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">City <span className="text-red-600 pl-1">*</span></label>
                 <input
                   type="text"
                   placeholder="Add City"
                   {...register('cityName', { required: 'City is required' })}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                 />
                 {errors.cityName && (
-                  <p className="text-red-600 text-left">{errors.cityName.message}</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.cityName.message}</p>
                 )}
               </div>
               <div className="w-full">
-                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Postal Code *</label>
+                <label htmlFor='postalCode' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Postal Code <span className="text-red-600 pl-1">*</span></label>
                 <input
                   type="number"
                   placeholder="Add Postal Code"
                   {...register('postalCode', { required: 'Postal Code is required' })}
-                  className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                 />
                 {errors.postalCode && (
-                  <p className="text-red-600 text-left">{errors.postalCode.message}</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.postalCode.message}</p>
                 )}
               </div>
             </div>

@@ -48,6 +48,10 @@ const EditOffer = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { data: session, status } = useSession();
+  const [dragging, setDragging] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -154,19 +158,46 @@ const EditOffer = () => {
     }
   };
 
-  const handleImageChange = async (event) => {
+  const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (file) processFile(file);
+  };
 
-    if (!isValidImageFile(file)) return;
-
-    // Immediately upload the selected image to Imgbb
-    const uploadedImageUrl = await uploadSingleFileToGCS(file);
-
-    if (uploadedImageUrl) {
-      // Update the state with the Imgbb URL instead of the local blob URL
-      setImage(uploadedImageUrl);
+  const processFile = async (file) => {
+    if (!VALID_TYPES.includes(file.type)) {
+      setImageError('Invalid file type. Please upload JPG, PNG, WEBP, or JPEG.');
+      return;
     }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError('Image must be smaller than 10MB.');
+      return;
+    }
+
+    if (file) {
+      // Immediately upload the selected image to GCS
+      const uploadedImageUrl = await uploadSingleFileToGCS(file);
+      if (uploadedImageUrl) {
+        setImage(uploadedImageUrl);
+        setImageError("");
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
   const handleImageRemove = () => {
@@ -507,7 +538,7 @@ const EditOffer = () => {
 
         <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
           <div className='flex items-center justify-between'>
-            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Edit Offer Configuration</h3>
+            <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Edit Offer Configuration</h3>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/marketing"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
         </div>
@@ -516,42 +547,58 @@ const EditOffer = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+
             <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3 h-fit'>
+
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+
                 <div>
-                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
-                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Offer Title <span className="text-red-600 pl-1">*</span></label>
+                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="text" />
                   {errors.offerTitle?.type === "required" && (
-                    <p className="text-red-600 text-left">Offer Title is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Offer Title is required</p>
                   )}
                 </div>
+
                 <div>
-                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Badge Title *</label>
-                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
+                  <label htmlFor='badgeTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Badge Title
+                    <span className="text-red-600 pl-1">*</span>
+                  </label>
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" maxLength="12" type="text" />
                   {errors.badgeTitle?.type === "required" && (
-                    <p className="text-red-600 text-left">Badge Title is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Badge Title is required</p>
                   )}
                 </div>
 
                 <div className="flex w-full flex-col">
+
                   <Tabs
                     aria-label="Select Discount Type"
                     selectedKey={offerDiscountType} // Default select based on fetched data
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-                    <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
+                    <Tab key="Percentage" title="Percentage">
+                      <span className='font-semibold text-neutral-500 text-sm'>
+                        Percentage (%)
+                      </span>
+                      <span className="text-red-600 pl-1">*</span>
+                    </Tab>
+                    <Tab key="Amount" title="Amount">
+                      <span className='font-semibold text-neutral-500 text-sm'>Amount (Taka)</span>
+                      <span className="text-red-600 pl-1">*</span>
+                    </Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('offerDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    className='custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold'
                     placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.offerDiscountValue?.type === "required" && (
-                    <p className="text-red-600 text-left">Discount Value is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Discount Value is required</p>
                   )}
+
                 </div>
 
               </div>
@@ -559,19 +606,24 @@ const EditOffer = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Minimum Order Amount <span className="text-red-600 pl-1">*</span></label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
                 </div>
 
-                {offerDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
-                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                </div>}
+                {offerDiscountType === "Percentage" &&
+                  <div>
+                    <label htmlFor='maxAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Maximum Capped Amount <span className="text-red-600 pl-1">*</span></label>
+                    <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                  </div>
+                }
 
                 <div className="space-y-2">
-                  <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
-                    Expiry Date <span className="text-red-600">*</span>
+
+                  <label htmlFor='expiryDate' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                    Expiry Date
+                    <span className="text-red-600 pl-1">*</span>
                   </label>
+
                   <input
                     type="date"
                     id="expiryDate"
@@ -581,10 +633,12 @@ const EditOffer = () => {
                     className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
                   />
                   {dateError && (
-                    <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Expiry Date is required</p>
                   )}
                 </div>
+
               </div>
+
             </div>
 
             <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3'>
@@ -598,7 +652,9 @@ const EditOffer = () => {
                 >
                   <Tab key="Products" title="Products">
                     <div>
-                      <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
+                      <label htmlFor='Product Selection' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Selection
+                        <span className="text-red-600 pl-1">*</span>
+                      </label>
                       {productList && (
                         <ProductSearchSelect
                           productList={productList}
@@ -607,12 +663,14 @@ const EditOffer = () => {
                           setSelectedProductIds={setSelectedProductIds}
                         />
                       )}
-                      {productIdError && <p className="text-red-600 text-left">Please select at least one product ID</p>}
+                      {productIdError && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one product ID</p>}
                     </div>
                   </Tab>
                   <Tab key="Categories" title="Categories">
                     <div>
-                      <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
+                      <label htmlFor='Category' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Category Selection
+                        <span className="text-red-600 pl-1">*</span>
+                      </label>
                       {categoryList && (
                         <div>
                           <div className="w-full mx-auto" ref={dropdownRef}>
@@ -624,7 +682,7 @@ const EditOffer = () => {
                               onChange={(e) => setSearchTerm(e?.target?.value)}
                               onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
                               placeholder="Search & Select by Categories"
-                              className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                              className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                             />
 
                             {/* Dropdown list for search results */}
@@ -681,7 +739,7 @@ const EditOffer = () => {
                           </div>
                         </div>
                       )}
-                      {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
+                      {categoryError && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Select at least one category</p>}
                     </div>
                   </Tab>
                 </Tabs>
@@ -689,8 +747,9 @@ const EditOffer = () => {
               </div>
 
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
+                  <label htmlFor='offerDescription' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Offer Description</label>
                   <Controller
                     control={control}
                     name="offerDescription"
@@ -705,26 +764,40 @@ const EditOffer = () => {
                 </div>
 
                 <div className='flex flex-col gap-4'>
-                  <input
-                    id='imageUpload'
-                    type='file'
-                    className='hidden'
-                    onChange={handleImageChange}
-                  />
-                  <label
-                    htmlFor='imageUpload'
-                    className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-                  >
-                    <MdOutlineFileUpload size={60} />
-                    <div className='space-y-1.5 text-center'>
-                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                        Upload Thumbnail
-                      </h5>
-                      <p className='text-sm text-gray-500'>
-                        Photo Should be in PNG, JPEG or JPG format
-                      </p>
-                    </div>
-                  </label>
+
+                  <div>
+                    <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+                      Offer Thumbnail
+                    </label>
+                    <input
+                      id='imageUpload'
+                      type='file'
+                      className='hidden'
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor='imageUpload'
+                      className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                        } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                    >
+                      <MdOutlineFileUpload size={60} />
+                      <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                        <p className="text-[13px]">
+                          <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                            Click to upload
+                          </span>{" "}
+                          or drag and drop
+                        </p>
+                        <p className="text-[11px]">Max image size is 10 MB</p>
+                      </div>
+                    </label>
+                    {imageError && (
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{imageError}</p>
+                    )}
+                  </div>
 
                   {image && (
                     <div className='relative'>
@@ -745,9 +818,11 @@ const EditOffer = () => {
                   )}
 
                 </div>
+
               </div>
 
             </div>
+
           </div>
 
           <div className='flex justify-end items-center'>

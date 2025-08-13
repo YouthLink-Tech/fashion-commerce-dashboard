@@ -478,6 +478,7 @@ export default function EditCategory() {
       <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
         <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+
           {/* Category Field */}
           <div className="w-full">
             <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Category <span className="text-red-600 pl-1">*</span></label>
@@ -485,7 +486,7 @@ export default function EditCategory() {
               type="text"
               placeholder="Add Category"
               {...register('category', { required: 'Category is required' })}
-              className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
+              className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
             />
             {errors.category && (
               <p className="text-left pt-1 text-red-500 font-semibold text-xs">{errors.category.message}</p>
@@ -502,7 +503,7 @@ export default function EditCategory() {
                 value={sizeInput}
                 onFocus={handleInputFocus}
                 onChange={(e) => handleSizeInputChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               <Button
                 type="button"
@@ -629,7 +630,7 @@ export default function EditCategory() {
                 value={subCategoryInput}
                 onFocus={handleSubCategoryInputFocus}
                 onChange={(e) => handleSubCategoryInputChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               <Button
                 type="button"

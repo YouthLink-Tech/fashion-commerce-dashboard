@@ -220,6 +220,7 @@ const EditShipmentHandler = () => {
         <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
             {/* Shipment handler name Input */}
             <div className="w-full">
               <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Shipment Handler Name <span className="text-red-600 pl-1">*</span></label>
@@ -227,10 +228,10 @@ const EditShipmentHandler = () => {
                 type="text"
                 placeholder="Add Shipment Handler Name"
                 {...register('shipmentHandlerName', { required: 'Shipment handler Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.shipmentHandlerName && (
-                <p className="text-red-600 text-left">{errors.shipmentHandlerName.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.shipmentHandlerName.message}</p>
               )}
             </div>
 
@@ -241,10 +242,10 @@ const EditShipmentHandler = () => {
                 type="text"
                 placeholder="Add Contact Person Name"
                 {...register('contactPersonName', { required: 'Contact Person Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.contactPersonName && (
-                <p className="text-red-600 text-left">{errors.contactPersonName.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonName.message}</p>
               )}
             </div>
 
@@ -255,10 +256,10 @@ const EditShipmentHandler = () => {
                 type="number"
                 placeholder="Add Contact Person Number"
                 {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
-                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.contactPersonNumber && (
-                <p className="text-red-600 text-left">{errors.contactPersonNumber.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonNumber.message}</p>
               )}
             </div>
 
@@ -269,7 +270,7 @@ const EditShipmentHandler = () => {
                 type="text"
                 placeholder="Add Office Address"
                 {...register('officeAddress')}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
             </div>
 
@@ -280,7 +281,7 @@ const EditShipmentHandler = () => {
                 type="text"
                 placeholder="Add tracking url"
                 {...register('trackingUrl')}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
             </div>
 
@@ -324,7 +325,7 @@ const EditShipmentHandler = () => {
 
             {/* Error Message of delivery type */}
             {errors.deliveryType && (
-              <p className="text-red-500">Please Select at least One Delivery Type.</p>
+              <p className="text-left text-red-500 font-semibold text-xs">Please Select at least One Delivery Type.</p>
             )}
 
             {/* Hidden Input for Validation */}

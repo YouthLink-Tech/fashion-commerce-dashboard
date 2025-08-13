@@ -56,7 +56,7 @@ const ProductSearchSelect = ({
         onChange={(e) => setSearchTerm(e.target.value)}
         onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
         placeholder="Search & Select by Product ID's"
-        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+        className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
       />
 
       {/* Dropdown list for search results */}

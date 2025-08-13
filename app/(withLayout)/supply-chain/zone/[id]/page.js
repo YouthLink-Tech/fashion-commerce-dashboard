@@ -247,7 +247,7 @@ export default function EditShippingZone() {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SHIPPING SETTINGS</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>SHIPPING SETTINGS</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/supply-chain/zone/existing-zones"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -260,50 +260,53 @@ export default function EditShippingZone() {
 
             {/* Shipping Zone Field */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Zone</label>
+              <label htmlFor='shippingZone' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Shipping Zone <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 disabled
                 placeholder="Add Shipping Zone"
                 {...register('shippingZone', { required: 'Shipping Zone is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.shippingZone && (
-                <p className="text-red-600 text-left">{errors.shippingZone.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.shippingZone.message}</p>
               )}
             </div>
 
-            {/* City Selection */}
-            <div className='flex items-center justify-center gap-4'>
+            <div className="w-full">
+              <label htmlFor='city' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select City <span className="text-red-600 pl-1">*</span></label>
+              {/* City Selection */}
+              <div className='flex items-center justify-center gap-4'>
 
-              <input
-                type="text"
-                placeholder="Search or select a city"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
-                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
+                <input
+                  type="text"
+                  placeholder="Search or select a city"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                  className="h-11 flex-1 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
 
-              {/* Select All Button */}
-              {selectedCities?.length > 71 ? "" : <button
-                type="button"
-                onClick={handleSelectAll}
-                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
-              >
-                <MdCheckBox size={18} /> Select All
-              </button>}
+                {/* Select All Button */}
+                {selectedCities?.length > 71 ? "" : <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+                >
+                  <MdCheckBox size={18} /> Select All
+                </button>}
 
-              {/* Unselect All Button */}
-              {selectedCities?.length > 2 && <button
-                type="button"
-                onClick={handleUnselectAll}
-                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
-              >
-                <MdCheckBoxOutlineBlank size={20} /> Unselect All
-              </button>}
+                {/* Unselect All Button */}
+                {selectedCities?.length > 2 && <button
+                  type="button"
+                  onClick={handleUnselectAll}
+                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
+                >
+                  <MdCheckBoxOutlineBlank size={20} /> Unselect All
+                </button>}
 
+              </div>
             </div>
 
             {/* Suggestions Dropdown */}
@@ -328,7 +331,7 @@ export default function EditShippingZone() {
               </div>
             )}
 
-            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+            {cityError && <p className='text-left text-red-500 font-semibold text-xs'>City selection is required.</p>}
 
             {/* Selected Cities */}
             <div>
@@ -357,7 +360,7 @@ export default function EditShippingZone() {
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             {/* Shipment Handlers */}
-            <h1 className='text-[#9F5216]'>Select Shipment Handler</h1>
+            <label htmlFor='shipmentHandler' className="flex justify-start font-semibold text-neutral-500 text-sm">Manage Shipment Handler <span className="text-red-600 pl-1">*</span></label>
             <div className="flex flex-wrap items-center justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
@@ -370,7 +373,7 @@ export default function EditShippingZone() {
                 </div>
               ))}
               {/* Display error message if no shipment handler is selected */}
-              {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
+              {sizeError && <p className='text-left text-red-500 font-semibold text-xs'>Please select at least one shipment handler.</p>}
             </div>
 
             {Object.keys(shippingCharges || {}).length > 0 && (
@@ -383,8 +386,9 @@ export default function EditShippingZone() {
                     >
                       {/* Charge input */}
                       <div className="w-full">
-                        <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                        <label htmlFor={`${type}Charge`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
                           {type} Charge
+                          <span className="text-red-600 pl-1">*</span>
                         </label>
                         <input
                           type="number"
@@ -394,10 +398,10 @@ export default function EditShippingZone() {
                           {...register(`shippingCharge${type}`, {
                             required: `${type} Shipping Charge is required`,
                           })}
-                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         />
                         {errors[`shippingCharge${type}`] && (
-                          <p className="text-red-600 text-left">
+                          <p className="text-left text-red-500 font-semibold text-xs">
                             {errors[`shippingCharge${type}`]?.message}
                           </p>
                         )}
@@ -405,9 +409,14 @@ export default function EditShippingZone() {
 
                       {/* Duration input */}
                       <div className="w-full">
-                        <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+
+                        <label htmlFor={`${type} ${type === "EXPRESS" ? "Hours" : "Days"}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
                           {type} {type === "EXPRESS" ? "Hours" : "Days"}
+                          <span className="text-red-600 pl-1">
+                            *
+                          </span>
                         </label>
+
                         <input
                           type="text"
                           disabled
@@ -416,14 +425,15 @@ export default function EditShippingZone() {
                           {...register(`shippingTime${type}`, {
                             required: `${type} Shipping ${type === "EXPRESS" ? "Hour" : "Days"} is required`,
                           })}
-                          className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         />
                         {errors[`shippingTime${type}`] && (
-                          <p className="text-red-600 text-left">
+                          <p className="text-left text-red-500 font-semibold text-xs">
                             {errors[`shippingTime${type}`]?.message}
                           </p>
                         )}
                       </div>
+
                     </div>
                   ))}
                 </div>

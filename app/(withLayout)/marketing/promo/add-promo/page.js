@@ -1,5 +1,4 @@
 "use client";
-import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { Checkbox, DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
@@ -25,6 +24,10 @@ const AddPromo = () => {
   const [promoDescription, setPromoDescription] = useState("");
   const [image, setImage] = useState(null);
   const [isSelected, setIsSelected] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -66,19 +69,46 @@ const AddPromo = () => {
     }
   };
 
-  const handleImageChange = async (event) => {
+  const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (file) processFile(file);
+  };
 
-    if (!isValidImageFile(file)) return;
+  const processFile = async (file) => {
+    if (!VALID_TYPES.includes(file.type)) {
+      setImageError('Invalid file type. Please upload JPG, PNG, WEBP, or JPEG.');
+      return;
+    }
 
-    // Immediately upload the selected image to Imgbb
-    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError('Image must be smaller than 10MB.');
+      return;
+    }
 
-    if (uploadedImageUrl) {
-      // Update the state with the Imgbb URL instead of the local blob URL
-      setImage(uploadedImageUrl);
-    };
+    if (file) {
+      // Immediately upload the selected image to GCS
+      const uploadedImageUrl = await uploadSingleFileToGCS(file);
+      if (uploadedImageUrl) {
+        setImage(uploadedImageUrl);
+        setImageError("");
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
   const handleImageRemove = () => {
@@ -183,7 +213,7 @@ const AddPromo = () => {
 
         <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
           <div className='flex items-center justify-between'>
-            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Promo Configuration</h3>
+            <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Promo Configuration</h3>
             <button className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' onClick={() => handleGoBack()}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</button>
           </div>
         </div>
@@ -191,85 +221,109 @@ const AddPromo = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+
             <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+
                 <div>
-                  <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Code *</label>
-                  <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md uppercase" type="text" />
+                  <label htmlFor='promoCode' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Promo Code <span className="text-red-600 pl-1">*</span></label>
+                  <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="text" />
                   {errors.promoCode?.type === "required" && (
-                    <p className="text-red-600 text-left">Promo Code is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Promo Code is required</p>
                   )}
                 </div>
 
                 <div className="flex w-full flex-col">
+
                   <Tabs
                     aria-label="Discount Type"
                     selectedKey={promoDiscountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
-                    <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
+                    <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">
+                      <span className='font-semibold text-neutral-500 text-sm'>
+                        Percentage (%)
+                      </span>
+                      <span className="text-red-600 pl-1">*</span>
+                    </Tab>
+                    <Tab className='text-[#9F5216]' key="Amount" title="Amount">
+                      <span className='font-semibold text-neutral-500 text-sm'>Amount (Taka)</span>
+                      <span className="text-red-600 pl-1">*</span>
+                    </Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('promoDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    className='custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold'
                     placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.promoDiscountValue?.type === "required" && (
-                    <p className="text-red-600 text-left">Discount Value is required</p>
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Discount Value is required</p>
                   )}
+
                 </div>
+
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+              <div>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
-                <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount *</label>
-                  <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                  {errors.minAmount?.type === "required" && (
-                    <p className="text-red-600 text-left">Min Amount is required</p>
-                  )}
+                  <div>
+                    <label htmlFor='minAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Minimum Order Amount <span className="text-red-600 pl-1">*</span></label>
+                    <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                    {errors.minAmount?.type === "required" && (
+                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">Min Amount is required</p>
+                    )}
+                  </div>
+
+                  {promoDiscountType === "Percentage" &&
+                    <div>
+                      <label htmlFor='maxAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Maximum Capped Amount <span className="text-red-600 pl-1">*</span></label>
+                      <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                      {errors.maxAmount?.type === "required" && (
+                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">Max Amount is required</p>
+                      )}
+                    </div>
+                  }
+
+                  <div>
+                    <label htmlFor='expiryDate' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Promo Expire On <span className="text-red-600 pl-1">*</span></label>
+                    <DatePicker
+                      id='expiryDate'
+                      placeholder="Select date"
+                      aria-label="Select expiry date"
+                      onChange={(date) => {
+                        handleShowDateError(date);
+                        if (date instanceof Date && !isNaN(date)) {
+                          setValue('expiryDate', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
+                        } else {
+                          setValue('expiryDate', date); // If DatePicker returns something else, handle it here
+                        }
+                      }}
+                      className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    />
+
+                    {dateError && (
+                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select Promo Expire Date.</p>
+                    )}
+                  </div>
+
                 </div>
 
-                {promoDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount *</label>
-                  <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                  {errors.maxAmount?.type === "required" && (
-                    <p className="text-red-600 text-left">Max Amount is required</p>
-                  )}
-                </div>}
+                <Checkbox isSelected={isSelected} color='success' className={`mt-1 ${isSelected ? "font-semibold" : ""}`} onValueChange={setIsSelected}>
+                  Set as Welcome Email Promo Code
+                </Checkbox>
 
-                <div>
-                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Expire On *</label>
-                  <DatePicker
-                    id='expiryDate'
-                    placeholder="Select date"
-                    aria-label="Select expiry date"
-                    onChange={(date) => {
-                      handleShowDateError(date);
-                      if (date instanceof Date && !isNaN(date)) {
-                        setValue('expiryDate', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
-                      } else {
-                        setValue('expiryDate', date); // If DatePicker returns something else, handle it here
-                      }
-                    }}
-                    className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                  />
-
-                  {dateError && (
-                    <p className="text-red-600 text-left">Please select Promo Expire Date.</p>
-                  )}
-                </div>
               </div>
+
             </div>
 
-            <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3'>
+            <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3 h-fit'>
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-                <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='promoDescription' className='flex justify-start font-medium text-[#9F5216]'>Promo Description</label>
+                <div className='flex w-full flex-col'>
+                  <label htmlFor='promoDescription' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Promo Description</label>
                   <Controller
                     name="promoDescription"
                     defaultValue=""
@@ -284,26 +338,41 @@ const AddPromo = () => {
                 </div>
 
                 <div className='flex flex-col gap-4'>
-                  <input
-                    id='imageUpload'
-                    type='file'
-                    className='hidden'
-                    onChange={handleImageChange}
-                  />
-                  <label
-                    htmlFor='imageUpload'
-                    className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-                  >
-                    <MdOutlineFileUpload size={60} />
-                    <div className='space-y-1.5 text-center'>
-                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                        Upload Thumbnail
-                      </h5>
-                      <p className='text-sm text-gray-500'>
-                        Photo Should be in PNG, JPEG or JPG format
-                      </p>
-                    </div>
-                  </label>
+
+                  <div>
+                    <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+                      Promo Thumbnail
+                    </label>
+                    <input
+                      id='imageUpload'
+                      type='file'
+                      className='hidden'
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor='imageUpload'
+                      className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                        } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                    >
+                      <MdOutlineFileUpload size={60} />
+                      <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                        <p className="text-[13px]">
+                          <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                            Click to upload
+                          </span>{" "}
+                          or drag and drop
+                        </p>
+                        <p className="text-[11px]">Max image size is 10 MB</p>
+                      </div>
+                    </label>
+
+                    {imageError && (
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{imageError}</p>
+                    )}
+                  </div>
 
                   {image && (
                     <div className='relative'>
@@ -325,11 +394,8 @@ const AddPromo = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          <Checkbox isSelected={isSelected} color='success' className={`mt-1 ${isSelected ? "font-semibold" : ""}`} onValueChange={setIsSelected}>
-            Set as Welcome Email Promo Code
-          </Checkbox>
+          </div>
 
           <div className='flex justify-end items-center'>
 
@@ -340,6 +406,7 @@ const AddPromo = () => {
           </div>
 
         </form>
+
       </div>
 
     </div>

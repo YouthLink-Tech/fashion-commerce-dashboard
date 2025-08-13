@@ -22,6 +22,7 @@ import { useSession } from 'next-auth/react';
 const currentModule = "Supply Chain";
 
 const AddShippingZone = () => {
+  const hasLoaded = useRef(false);
   const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -42,7 +43,8 @@ const AddShippingZone = () => {
   const isOwner = role === "Owner";
   const { data: session, status } = useSession();
 
-  const { register, handleSubmit, resetField, formState: { errors } } = useForm();
+  const { register, handleSubmit, resetField, watch, setValue, formState: { errors } } = useForm();
+  const shippingZone = watch("shippingZone");
 
   useEffect(() => {
     if (!selectedShipmentHandlerId || typeof window === "undefined") return; // Avoid fetching without an ID
@@ -60,6 +62,42 @@ const AddShippingZone = () => {
 
     fetchShipmentHandlerData();
   }, [selectedShipmentHandlerId, session?.user?.accessToken, status, axiosSecure]); // Re-fetch when selectedId changes
+
+  // Save & remove instantly when shippingZone changes
+  useEffect(() => {
+    if (!hasLoaded.current) return;
+
+    if (shippingZone && shippingZone.trim() !== "") {
+      localStorage.setItem("shippingZone", shippingZone);
+    } else {
+      localStorage.removeItem("shippingZone");
+    }
+  }, [shippingZone]);
+
+  // Save instantly when selectedCities changes
+  useEffect(() => {
+    if (!hasLoaded.current) return; // skip first render
+    if (selectedCities.length > 0) {
+      localStorage.setItem("selectedCities", JSON.stringify(selectedCities));
+    } else {
+      localStorage.removeItem("selectedCities");
+    }
+  }, [selectedCities]);
+
+  // Load from localStorage once
+  useEffect(() => {
+    const storedZone = localStorage.getItem("shippingZone");
+    const storedCities = localStorage.getItem("selectedCities");
+
+    if (storedZone) {
+      setValue("shippingZone", storedZone);
+    }
+    if (storedCities) {
+      setSelectedCities(JSON.parse(storedCities));
+    }
+
+    hasLoaded.current = true; // allow save effects to run after first load
+  }, [setValue]);
 
   // Filter cities based on the search term and exclude selected cities
   const filteredCities = cities.filter(
@@ -245,6 +283,11 @@ const AddShippingZone = () => {
     try {
       const response = await axiosSecure.post('/addShippingZone', shippingData);
       if (response?.data?.insertedId) {
+
+        // Remove saved values after success
+        localStorage.removeItem("shippingZone");
+        localStorage.removeItem("selectedCities");
+
         toast.custom((t) => (
           <div
             className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -298,7 +341,7 @@ const AddShippingZone = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Shipping Configuration</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Shipping Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/supply-chain/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -308,51 +351,54 @@ const AddShippingZone = () => {
         <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
             {/* Shipping Zone Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Zone</label>
+              <label htmlFor='shippingZone' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Shipping Zone <span className="text-red-600 pl-1">*</span></label>
               <input
                 type="text"
                 placeholder="Add Shipping Zone"
                 {...register('shippingZone', { required: 'Shipping Zone is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
               />
               {errors.shippingZone && (
-                <p className="text-red-600 text-left">{errors.shippingZone.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.shippingZone.message}</p>
               )}
             </div>
 
-            {/* City Selection */}
-            <div className='flex items-center justify-center gap-4'>
+            <div className="w-full">
+              {/* City Label */}
+              <label htmlFor='city' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select City <span className="text-red-600 pl-1">*</span></label>
+              <div className='flex items-center justify-center gap-4'>
+                <input
+                  type="text"
+                  placeholder="Search or select a city"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                  className="h-11 flex-1 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
 
-              <input
-                type="text"
-                placeholder="Search or select a city"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
-                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
+                {/* Select All Button */}
+                {selectedCities?.length > 71 ? "" : <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+                >
+                  <MdCheckBox size={18} /> Select All
+                </button>}
 
-              {/* Select All Button */}
-              {selectedCities?.length > 71 ? "" : <button
-                type="button"
-                onClick={handleSelectAll}
-                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
-              >
-                <MdCheckBox size={18} /> Select All
-              </button>}
+                {/* Unselect All Button */}
+                {selectedCities?.length > 2 && <button
+                  type="button"
+                  onClick={handleUnselectAll}
+                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
+                >
+                  <MdCheckBoxOutlineBlank size={20} />  Unselect All
+                </button>}
 
-              {/* Unselect All Button */}
-              {selectedCities?.length > 2 && <button
-                type="button"
-                onClick={handleUnselectAll}
-                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
-              >
-                <MdCheckBoxOutlineBlank size={20} />  Unselect All
-              </button>}
-
+              </div>
             </div>
 
             {/* Suggestions Dropdown */}
@@ -377,7 +423,7 @@ const AddShippingZone = () => {
               </div>
             )}
 
-            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+            {cityError && <p className='text-left text-red-500 font-semibold text-xs'>City selection is required.</p>}
 
             {/* Selected Cities */}
             <div>
@@ -406,7 +452,7 @@ const AddShippingZone = () => {
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             {/* Shipping Handler Selection */}
-            <h1 className='text-[#9F5216]'>Manage Shipment Handler</h1>
+            <label htmlFor='shipmentHandler' className="flex justify-start font-semibold text-neutral-500 text-sm">Manage Shipment Handler <span className="text-red-600 pl-1">*</span></label>
             <div className="flex overflow-x-auto custom-scrollbar pb-4 items-start justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
@@ -475,35 +521,34 @@ const AddShippingZone = () => {
 
             </div>
 
-            {sizeError && <p className='text-red-600 text-left'>Please select at least one shipment handler.</p>}
+            {sizeError && <p className='text-left text-red-500 font-semibold text-xs'>Please select at least one shipment handler.</p>}
 
             {selectedShipmentHandler?.deliveryType.length === 1 && <div className="w-full mt-4">
+
               {/* Conditionally render shipping charge input fields based on deliveryType */}
               <div className='flex flex-col md:flex-row gap-6 items-center justify-between w-full'>
+
                 <div className='w-full'>
-                  <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Charge
-                  </label>
+                  <label htmlFor='shippingCharge' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">{selectedShipmentHandler?.deliveryType[0]} Shipping Charge <span className="text-red-600 pl-1">*</span></label>
                   <input
                     type="number"
                     placeholder={`Enter Shipping Charge for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingCharge', { required: 'Shipping Charge is required' })}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
                   {errors.shippingCharge && (
-                    <p className="text-red-600 text-left">{errors?.shippingCharge?.message}</p>
+                    <p className="text-left text-red-500 font-semibold text-xs">{errors?.shippingCharge?.message}</p>
                   )}
                 </div>
 
                 <div className='w-full'>
-                  <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
+                  <label htmlFor='shippingDays' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">{selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"} <span className="text-red-600 pl-1">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     onKeyDown={(e) => {
                       const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
                       if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -512,10 +557,12 @@ const AddShippingZone = () => {
                     }}
                   />
                   {errors.shippingTime && (
-                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
+                    <p className="text-left text-red-500 font-semibold text-xs">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
+
               </div>
+
             </div>}
 
             {/* Shipping Charge Input */}
