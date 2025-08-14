@@ -528,7 +528,7 @@ const CreatePurchaseOrder = () => {
 
 			<div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
 				<div className='flex items-center justify-between w-full'>
-					<h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Create purchase order</h3>
+					<h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Create purchase order</h3>
 					<Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/product-hub/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
 				</div>
 			</div>
@@ -547,7 +547,7 @@ const CreatePurchaseOrder = () => {
 						<div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
 
 							<div className='flex-1'>
-								<label htmlFor='paymentTerms' className='flex justify-start font-medium text-neutral-800 pb-2'>Payment Terms</label>
+								<label htmlFor='paymentTerms' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Payment Terms <span className="text-red-600 pl-1">*</span></label>
 								<select id="paymentTerms" value={paymentTerms}
 									{...register('paymentTerms', { required: 'Please select payment terms.' })} className='lg:w-1/2 font-semibold' style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
 									onChange={(e) => {
@@ -566,12 +566,12 @@ const CreatePurchaseOrder = () => {
 									</option>
 								</select>
 								{errors.paymentTerms && (
-									<p className="text-red-600 text-left">{errors.paymentTerms.message}</p>
+									<p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.paymentTerms.message}</p>
 								)}
 							</div>
 
 							<div className='flex-1'>
-								<label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
+								<label htmlFor='estimatedArrival' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Estimated Arrival <span className="text-red-600 pl-1">*</span></label>
 								<DatePicker
 									id='estimatedArrival'
 									placeholder="Select date"
@@ -587,7 +587,7 @@ const CreatePurchaseOrder = () => {
 									className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
 								/>
 								{dateError && (
-									<p className="text-red-600 text-left">Please select estimated arrival date.</p>
+									<p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select estimated arrival date.</p>
 								)}
 							</div>
 
@@ -596,7 +596,7 @@ const CreatePurchaseOrder = () => {
 					</div>
 
 					<div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-						<h1 className='font-bold text-lg'>Add products</h1>
+						<h1 className='font-semibold text-lg'>Add products</h1>
 						<div className='w-full pt-2'>
 							<li className="flex items-center relative group border-2 rounded-lg">
 								<svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -668,7 +668,7 @@ const CreatePurchaseOrder = () => {
 															{...register(`quantity-${index}`, { required: true })}
 															value={purchaseOrderVariants[index]?.quantity || ''}
 															onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-															className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+															className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 															type="number"
 															min="0" // Prevents negative values in the input
 														/>
@@ -684,7 +684,7 @@ const CreatePurchaseOrder = () => {
 																{...register(`cost-${index}`, { required: true })}
 																value={purchaseOrderVariants[index]?.cost || ''}
 																onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-																className="pl-7 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+																className="pl-7 custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 																type="number"
 																min="0" // Prevents negative values in the input
 															/>
@@ -700,7 +700,7 @@ const CreatePurchaseOrder = () => {
 																{...register(`tax-${index}`)} // No required validation here
 																value={purchaseOrderVariants[index]?.tax || ''}
 																onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-																className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+																className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 																type="number"
 															/>
 															<span className="input-suffix">%</span>
@@ -734,27 +734,26 @@ const CreatePurchaseOrder = () => {
 						<div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 							<h1 className='font-semibold'>Additional Details</h1>
 							<div>
-								<label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
+								<label htmlFor='referenceNumber' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Reference Number</label>
 								<input
 									id={`referenceNumber`}
 									{...register(`referenceNumber`)}
-									className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+									className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 									type="text"
 								/>
 							</div>
 							<div>
-								<label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2 pt-[4px]'>Note to supplier</label>
-								<input
-									id={`supplierNote`}
-									{...register(`supplierNote`)}
-									className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-									type="text"
+								<label htmlFor='supplierNote' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2 pt-[4px]">Note to supplier</label>
+								<textarea
+									id="supplierNote"
+									{...register("supplierNote")}
+									className="w-full p-3 border-2 border-[#ededed] outline-none focus:border-[#F4D3BA] focus:bg-white transition-colors duration-1000 rounded-md"
+									rows={5} // Set the number of rows for height adjustment
 								/>
 							</div>
 
 							<div>
-								<label className='flex justify-start font-medium text-neutral-500 pb-2 pt-[6px]'>Attachment</label>
-
+								<label htmlFor='attachment' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2 pt-[6px]">Attachment</label>
 								<div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef.current?.click()}>
 									<label
 										htmlFor="attachment"
@@ -800,7 +799,7 @@ const CreatePurchaseOrder = () => {
 									<input
 										id='shipping'
 										{...register('shipping')}
-										className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+										className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 										type="number"
 										onChange={handleShippingChange}  // Step 3: Update shipping state on change
 									/>
@@ -810,7 +809,7 @@ const CreatePurchaseOrder = () => {
 									<input
 										id='discount'
 										{...register('discount')}
-										className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+										className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 										type="number"
 										onChange={handleDiscountChange}  // Step 3: Update discount state on change
 									/>
@@ -826,13 +825,14 @@ const CreatePurchaseOrder = () => {
 
 					{/* Submit Button */}
 					<div className='flex justify-end items-center'>
-						<Button
+						<button
 							type='submit'
-							className={`mt-4 mb-8 bg-neutral-800 hover:bg-neutral-700 text-white cursor-pointer font-bold`}
+							className={`mt-4 mb-8 relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}
 						>
 							Create order
-						</Button>
+						</button>
 					</div>
+
 				</div>
 
 			</form>

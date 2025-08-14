@@ -266,48 +266,75 @@ const CreateTransfer = () => {
   // Function to toggle selection for all sizes of a product including originSku
   const toggleAllSizesAndColorsForProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const allSelected = product?.skuBySizeAndColor.every((entry) =>
+      // Only consider entries that are NOT disabled
+      const validEntries = product?.skuBySizeAndColor.filter(entry => entry.originSku !== 0);
+
+      const allSelected = validEntries.every((entry) =>
         prevSelectedProducts.some(
           (item) =>
             item?.productTitle === product?.productTitle &&
             item?.size === entry?.size &&
             item?.color === entry?.color?.code &&
             item?.name === entry?.color?.name &&
-            item?.originSku === entry?.originSku && // Check originSku
-            item?.destinationSku === entry?.destinationSku // Check destinationSku
+            item?.originSku === entry?.originSku &&
+            item?.destinationSku === entry?.destinationSku
         )
       );
 
       if (allSelected) {
-        // Deselect all sizes and colors for this product
+        // Deselect only valid entries for this product
         setTransferOrderVariants((prevVariants) =>
-          prevVariants.filter((variant) => variant.productTitle !== product.productTitle)
+          prevVariants.filter(
+            (variant) =>
+              !(
+                variant.productTitle === product.productTitle &&
+                validEntries.some(
+                  (entry) =>
+                    entry.size === variant.size &&
+                    entry.color?.code === variant.color?.code &&
+                    entry.originSku === variant.originSku &&
+                    entry.destinationSku === variant.destinationSku
+                )
+              )
+          )
         );
 
-        return prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle);
+        return prevSelectedProducts.filter(
+          (item) =>
+            !(
+              item.productTitle === product.productTitle &&
+              validEntries.some(
+                (entry) =>
+                  entry.size === item.size &&
+                  entry.color?.code === item.color &&
+                  entry.originSku === item.originSku &&
+                  entry.destinationSku === item.destinationSku
+              )
+            )
+        );
       } else {
-        // Select all sizes and colors for this product
-        const newSelections = product.skuBySizeAndColor.map((entry) => ({
+        // Select only valid entries
+        const newSelections = validEntries.map((entry) => ({
           productTitle: product?.productTitle,
           imageUrl: product?.imageUrl,
           size: entry?.size,
           color: entry?.color?.code,
           name: entry?.color?.name,
-          originSku: entry?.originSku, // Store originSku
-          destinationSku: entry?.destinationSku, // Store destinationSku
+          originSku: entry?.originSku,
+          destinationSku: entry?.destinationSku,
         }));
 
         setTransferOrderVariants((prevVariants) => [
           ...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
-          ...product.skuBySizeAndColor.map((entry) => ({
+          ...validEntries.map((entry) => ({
             productTitle: product?.productTitle,
             size: entry?.size,
             color: { code: entry?.color?.code, name: entry?.color?.name },
-            originSku: entry?.originSku, // Store originSku
-            destinationSku: entry?.destinationSku, // Store destinationSku
-            quantity: 0, // Initialize quantity to 0
-            cost: 0, // Initialize cost to 0
-            tax: 0, // Initialize tax to 0
+            originSku: entry?.originSku,
+            destinationSku: entry?.destinationSku,
+            quantity: 0,
+            cost: 0,
+            tax: 0,
           })),
         ]);
 

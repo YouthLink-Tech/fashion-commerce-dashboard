@@ -817,9 +817,10 @@ const EditPurchaseOrderPage = () => {
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
+
               {/* Payment Terms */}
               <div className='flex-1'>
-                <label htmlFor='paymentTerms' className='flex justify-start font-medium text-neutral-800 pb-2'>Payment Terms</label>
+                <label htmlFor='paymentTerms' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Payment Terms <span className="text-red-600 pl-1">*</span></label>
 
                 {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? (
                   <p className='font-semibold'>{paymentTerms}</p> // Display the value instead of select
@@ -840,13 +841,13 @@ const EditPurchaseOrderPage = () => {
                 )}
 
                 {errors.paymentTerms && (
-                  <p className="text-red-600 text-left">{errors.paymentTerms.message}</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.paymentTerms.message}</p>
                 )}
               </div>
 
               {/* Estimated Arrival */}
               <div className='flex-1'>
-                <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
+                <label htmlFor='estimatedArrival' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Estimated Arrival <span className="text-red-600 pl-1">*</span></label>
 
                 {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? (
                   <p className='font-semibold'>{estimatedArrival}</p> // Display the value instead of input
@@ -857,14 +858,15 @@ const EditPurchaseOrderPage = () => {
                     {...register("estimatedArrival", { required: purchaseOrderStatus === "pending" })}
                     value={estimatedArrival}
                     onChange={(e) => setEstimatedArrival(e.target.value)} // Update state with the input value
-                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
+                    className="w-full p-2 border rounded-md border-gray-300 outline-none focus:border-[#F4D3BA] focus:bg-white transition-colors duration-1000"
                   />
                 )}
 
                 {dateError && (
-                  <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Expiry Date is required</p>
                 )}
               </div>
+
             </div>
 
           </div>
@@ -962,13 +964,13 @@ const EditPurchaseOrderPage = () => {
                               {...register(`quantity-${index}`, { required: purchaseOrderStatus === "pending" })}
                               value={purchaseOrderVariants[index]?.quantity || ''}
                               onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                              className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                              className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                               type="number"
                               min="0" // Prevents negative values in the input
                               disabled={["ordered", "received", "canceled"].includes(purchaseOrderStatus)}
                             />
                             {errors[`quantity-${index}`] && (
-                              <p className="text-red-600 text-left">Quantity is required.</p>
+                              <p className="text-left pt-2 text-red-500 font-semibold text-xs">Quantity is required.</p>
                             )}
                           </td>
                           <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
@@ -979,14 +981,14 @@ const EditPurchaseOrderPage = () => {
                                 {...register(`cost-${index}`, { required: purchaseOrderStatus === "pending" })}
                                 value={purchaseOrderVariants[index]?.cost || ''}
                                 onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                                className="pl-7 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                                className="pl-7 custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                                 type="number"
                                 min="0" // Prevents negative values in the input
                                 disabled={["ordered", "received", "canceled"].includes(purchaseOrderStatus)}
                               />
                             </div>
                             {errors[`cost-${index}`] && (
-                              <p className="text-red-600 text-left">Cost is required.</p>
+                              <p className="text-left pt-2 text-red-500 font-semibold text-xs">Cost is required.</p>
                             )}
                           </td>
                           <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
@@ -996,7 +998,7 @@ const EditPurchaseOrderPage = () => {
                                 {...register(`tax-${index}`)} // No required validation here
                                 value={purchaseOrderVariants[index]?.tax || ''}
                                 onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                                className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                                 type="number"
                                 disabled={["ordered", "received", "canceled"].includes(purchaseOrderStatus)}
                               />
@@ -1046,20 +1048,20 @@ const EditPurchaseOrderPage = () => {
                 <>
                   <h1 className='font-semibold'>Additional Details</h1>
                   <div>
-                    <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
+                    <label htmlFor='referenceNumber' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Reference Number</label>
                     <input
                       id={`referenceNumber`}
                       {...register(`referenceNumber`)}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       type="text"
                     />
                   </div>
                   <div>
-                    <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2 pt-[2px]'>Note to supplier</label>
+                    <label htmlFor='supplierNote' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2 pt-[4px]">Note to supplier</label>
                     <textarea
                       id="supplierNote"
                       {...register("supplierNote")}
-                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="w-full p-3 border-2 border-[#ededed] outline-none focus:border-[#F4D3BA] focus:bg-white transition-colors duration-1000 rounded-md"
                       rows={5} // Set the number of rows for height adjustment
                     />
                   </div>
@@ -1120,7 +1122,7 @@ const EditPurchaseOrderPage = () => {
                       <input
                         id='shipping'
                         {...register('shipping')}
-                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         type="number"
                         onChange={handleShippingChange}  // Step 3: Update shipping state on change
                       />
@@ -1130,7 +1132,7 @@ const EditPurchaseOrderPage = () => {
                       <input
                         id='discount'
                         {...register('discount')}
-                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         type="number"
                         onChange={handleDiscountChange}  // Step 3: Update discount state on change
                       />
@@ -1153,7 +1155,7 @@ const EditPurchaseOrderPage = () => {
               <button
                 type='button'
                 onClick={handleCancelClick}
-                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
               >
                 Cancel Order
               </button>
@@ -1161,7 +1163,7 @@ const EditPurchaseOrderPage = () => {
               <button
                 type='button'
                 onClick={handleConfirmClick}
-                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+                className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}
               >
                 Confirm Order
               </button>
@@ -1171,7 +1173,7 @@ const EditPurchaseOrderPage = () => {
           {purchaseOrderStatus === "ordered" && isAuthorized === true && (
             <div className='w-full flex justify-end my-4'>
               <Link href={`/product-hub/purchase-orders/receive-inventory/${id}`}
-                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
               >
                 Receive inventory
               </Link>

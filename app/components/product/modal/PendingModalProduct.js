@@ -20,7 +20,7 @@ const PendingModalProduct = ({ isOpen, onClose, onConfirm }) => {
               <Button color="danger" variant="light" onPress={onCloseModal}>
                 Cancel
               </Button>
-              <Button className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold" onPress={() => { onConfirm(); onCloseModal(); }}>
+              <Button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700" onPress={() => { onConfirm(); onCloseModal(); }}>
                 Mark as pending
               </Button>
             </ModalFooter>

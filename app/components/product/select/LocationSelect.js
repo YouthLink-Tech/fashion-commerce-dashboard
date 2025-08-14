@@ -21,12 +21,12 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
   }
 
   return (
-    <div className='flex-1 space-y-3'>
-      <h1 className='font-medium'>Destination</h1>
+    <div className='flex-1 space-y-2'>
+      <label htmlFor='selectedLocation' className="flex justify-start font-semibold text-neutral-500 text-sm">Destination <span className="text-red-600 pl-1">*</span></label>
       <select
         id="selectedLocation"
         {...register('selectedLocation', { required: 'Please select a destination.' })}
-        className='font-semibold text-lg'
+        className='font-semibold'
         value={selectedLocation?.locationName || "" || selectedLocation} // Set selected value here
         onChange={handleSelectChangeLocation}
         style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
@@ -39,15 +39,16 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
         ))}
       </select>
 
-      {errors.selectedLocation && (
-        <p className="text-red-600 text-left">{errors.selectedLocation.message}</p>
-      )}
-
       {selectedLocation && (
         <div>
-          <p className='text-neutral-500 font-medium'>{selectedLocation?.locationName}, {selectedLocation?.cityName}, {selectedLocation?.postalCode}</p>
+          <p className='text-neutral-500 font-medium text-sm'>{selectedLocation?.locationName}, {selectedLocation?.cityName}, {selectedLocation?.postalCode}</p>
         </div>
       )}
+
+      {errors.selectedLocation && (
+        <p className="text-left text-red-500 font-semibold text-xs">{errors.selectedLocation.message}</p>
+      )}
+
     </div>
   );
 };

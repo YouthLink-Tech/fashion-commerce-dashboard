@@ -91,7 +91,7 @@ const TagsPage = () => {
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6 max-w-screen-2xl mx-auto'>
 
-        <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>TAG MANAGEMENT</h1>
+        <h1 className='font-semibold text-lg lg:text-2xl text-neutral-600'>TAG MANAGEMENT</h1>
 
         {isAuthorized &&
           <button onClick={() => router.push('/product-hub/tags/add-tag')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">

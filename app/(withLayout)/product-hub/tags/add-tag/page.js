@@ -83,14 +83,17 @@ const AddTag = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Tags</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Create New Tags</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/product-hub/tags"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
         <div className="mt-8 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
-          <label className="flex justify-start font-medium text-[#9F5216]">Enter Tag</label>
+          <label htmlFor='tagName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+            Enter Tag
+            <span className="text-red-600 pl-1">*</span>
+          </label>
           {tagFields?.map((item, index) => (
             <div key={item.id} className="flex flex-col">
               <div className='w-full flex items-center gap-2'>
@@ -98,14 +101,14 @@ const AddTag = () => {
                   type="text"
                   placeholder="Add Tag"
                   {...register(`tag.${index}.tag`, { required: 'Tag is required' })}
-                  className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                 />
                 <Button type='button' color="danger" onPress={() => removeTag(index)} variant="light">
                   Remove
                 </Button>
               </div>
               {errors.tag?.[index]?.tag && (
-                <p className="text-red-600 text-left">{errors.tag[index].tag.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.tag[index].tag.message}</p>
               )}
             </div>
           ))}

@@ -1,6 +1,6 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
+import UploadUi from '@/app/components/upload-image/UploadUi';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -11,7 +11,6 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { FiSave } from 'react-icons/fi';
-import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 export default function EditSeason() {
@@ -20,6 +19,8 @@ export default function EditSeason() {
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const { data: session, status } = useSession();
+  const [dragging, setDragging] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
 
@@ -62,19 +63,8 @@ export default function EditSeason() {
     }
   };
 
-  const handleImageChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!isValidImageFile(file)) return;
-
-    // Immediately upload the selected image to Imgbb
-    const uploadedImageUrl = await uploadSingleFileToGCS(file);
-
-    if (uploadedImageUrl) {
-      // Update the state with the Imgbb URL instead of the local blob URL
-      setImage(uploadedImageUrl);
-    }
+  const handleUploadSuccess = (url) => {
+    setImage(url);
   };
 
   const handleImageRemove = () => {
@@ -144,7 +134,7 @@ export default function EditSeason() {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>EDIT SEASON DETAILS</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>EDIT SEASON DETAILS</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/product-hub/seasons"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -152,17 +142,18 @@ export default function EditSeason() {
       <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
         <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+
           {/* Season Name Field */}
           <div>
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Season *</label>
+            <label htmlFor='seasonName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Season <span className="text-red-600 pl-1">*</span></label>
             <input
               type="text"
               placeholder="Add Season Name"
               {...register('seasonName', { required: 'Season is required' })}
-              className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
             />
             {errors.seasonName && (
-              <p className="text-red-600 text-left">{errors.seasonName.message}</p>
+              <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.seasonName.message}</p>
             )}
           </div>
 
@@ -171,26 +162,19 @@ export default function EditSeason() {
         <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
 
           <div>
-            <input
-              id='imageUpload'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange}
-            />
-            <label
-              htmlFor='imageUpload'
-              className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-            >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
-                </p>
-              </div>
-            </label>
+            <div>
+              <label htmlFor={`imageUpload`} className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
+                Season Thumbnail
+              </label>
+              <UploadUi
+                dragging={dragging}
+                setDragging={setDragging}
+                imageError={imageError}
+                setImageError={setImageError}
+                onUploadSuccess={handleUploadSuccess}
+                uploadFile={uploadSingleFileToGCS}
+              />
+            </div>
 
             {image && (
               <div className='relative'>

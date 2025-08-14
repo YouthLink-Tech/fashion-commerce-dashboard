@@ -329,7 +329,7 @@ const EditReceiveInventory = () => {
                         min="0"
                         max={purchaseOrderVariants[index]?.quantity}
                         step="1"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         value={purchaseOrderVariants[index]?.accept || ''} // Set value to empty string when 0
                         onChange={(e) => handleAcceptChange(index, e.target.value)}
                       />
@@ -350,7 +350,7 @@ const EditReceiveInventory = () => {
                         min="0"
                         max={purchaseOrderVariants[index]?.quantity}
                         step="1"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         value={purchaseOrderVariants[index]?.reject || ''} // Set value to empty string when 0
                         onChange={(e) => handleRejectChange(index, e.target.value)}
                       />
@@ -384,7 +384,7 @@ const EditReceiveInventory = () => {
 
           <button
             type='submit'
-            className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}>
+            className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}>
             Accept
           </button>
 

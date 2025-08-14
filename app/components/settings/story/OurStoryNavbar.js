@@ -301,7 +301,7 @@ const OurStoryNavbar = () => {
   return (
     <>
       <div className='flex justify-between items-center sticky top-0 z-10'>
-        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3">STORY</h1>
+        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-600 py-1 2xl:py-3">STORY</h1>
 
         <button onClick={() => onOpen()} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <FaPlus size={15} className='text-neutral-700' /> Add
@@ -319,15 +319,15 @@ const OurStoryNavbar = () => {
                 <div className="space-y-6 px-3 py-6">
 
                   <div className='flex flex-col gap-2 font-semibold'>
-                    <label htmlFor='departmentName' className='font-semibold text-[#9F5216] text-sm'>Department Name <span className='text-red-600'>*</span></label>
+                    <label htmlFor='departmentName' className="flex justify-start font-semibold text-neutral-500 text-sm">Department Name <span className="text-red-600 pl-1">*</span></label>
                     <input id='departmentName' {...register("departmentName", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]" placeholder='Enter Department Name' type="text" />
                     {errors.departmentName?.type === "required" && (
                       <p className="text-red-600 text-left text-xs">Department Name is required</p>
                     )}
                   </div>
 
-                  <div className='flex flex-col gap-3'>
-                    <label className='font-semibold text-[#9F5216]' htmlFor="description">Upload Cover Image <span className='text-red-600'>*</span></label>
+                  <div className='flex flex-col gap-2'>
+                    <label htmlFor='uploadCoverImg' className="flex justify-start font-semibold text-neutral-500 text-sm">Upload Cover Image <span className="text-red-600 pl-1">*</span></label>
                     <FileUploadZone
                       inputId="image-upload-1"
                       description={
@@ -354,8 +354,8 @@ const OurStoryNavbar = () => {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-3 font-semibold pt-4">
-                    <label htmlFor='workSummary' className='font-semibold text-[#9F5216] text-sm'>Work Summary <span className='text-red-600'>*</span></label>
+                  <div className="flex flex-col gap-2 font-semibold pt-4">
+                    <label htmlFor='workSummary' className="flex justify-start font-semibold text-neutral-500 text-sm">Work Summary <span className="text-red-600 pl-1">*</span></label>
                     <textarea
                       {...register("workSummary", {
                         required: "Work Summary is required.",
@@ -376,15 +376,15 @@ const OurStoryNavbar = () => {
                   </div>
 
                   <div className='flex flex-col gap-2 font-semibold'>
-                    <label htmlFor='staffName' className='font-semibold text-[#9F5216] text-sm'>Staff Name <span className='text-red-600'>*</span></label>
+                    <label htmlFor='staffName' className="flex justify-start font-semibold text-neutral-500 text-sm">Staff Name <span className="text-red-600 pl-1">*</span></label>
                     <input id='staffName' {...register("staffName", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]" placeholder='Enter Staff Name' type="text" />
                     {errors.staffName?.type === "required" && (
                       <p className="text-red-600 text-left text-xs">Staff Name is required</p>
                     )}
                   </div>
 
-                  <div className='flex flex-col gap-3'>
-                    <label className='font-semibold text-[#9F5216]' htmlFor="description">Upload Staff Image <span className='text-red-600'>*</span></label>
+                  <div className='flex flex-col gap-2'>
+                    <label htmlFor='image-upload-2' className="flex justify-start font-semibold text-neutral-500 text-sm">Upload Staff Image <span className="text-red-600 pl-1">*</span></label>
                     <FileUploadZone
                       inputId="image-upload-2"
                       description={
@@ -412,8 +412,8 @@ const OurStoryNavbar = () => {
                     />
                   </div>
 
-                  <div className='flex flex-col gap-3'>
-                    <label htmlFor='storyPublishDate' className='font-semibold text-[#9F5216]'>Story Publish Date</label>
+                  <div className='flex flex-col gap-2'>
+                    <label htmlFor='storyPublishDate' className="flex justify-start font-semibold text-neutral-500 text-sm">Story Publish Date <span className="text-red-600 pl-1">*</span></label>
                     <DatePicker
                       id='storyPublishDate'
                       placeholder="Select date"
@@ -429,12 +429,12 @@ const OurStoryNavbar = () => {
                       className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
                     />
                     {dateError && (
-                      <p className="text-red-600 text-left text-xs font-semibold pt-2">Please select story publish date.</p>
+                      <p className="text-red-600 text-left text-xs font-semibold">Please select story publish date.</p>
                     )}
                   </div>
 
                   <div className="flex flex-col gap-3 py-2">
-                    <label className='font-semibold text-[#9F5216]'>Status:</label>
+                    <label htmlFor='status' className="flex justify-start font-semibold text-neutral-500 text-sm">Status:</label>
                     <div className='flex items-center gap-3'>
                       <CustomSwitch checked={status} onChange={handleStatusChange} />
                       <span className="text-sm text-gray-500">{status ? 'Active' : 'Inactive'}</span>
@@ -459,8 +459,9 @@ const OurStoryNavbar = () => {
 
                       {/* Upload Media Content */}
                       <div className="flex flex-col gap-3">
-                        <label htmlFor={`media-upload-${index}`} className="font-semibold text-[#9F5216]">
-                          Upload Media Content <span className="text-red-600">*</span>
+                        <label htmlFor={`media-upload-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm">
+                          Upload Media Content
+                          <span className="text-red-600 pl-1">*</span>
                         </label>
                         <FileUploadZone
                           inputId={`media-upload-${index}`}
@@ -484,8 +485,9 @@ const OurStoryNavbar = () => {
 
                       {/* Hashtag Input */}
                       <div className="flex flex-col gap-2 font-semibold">
-                        <label htmlFor={`items.${index}.hashtag`} className="font-semibold text-[#9F5216] text-sm">
-                          Hashtag *
+                        <label htmlFor={`items.${index}.hashtag`} className="flex justify-start font-semibold text-neutral-500 text-sm">
+                          Hashtag
+                          <span className="text-red-600 pl-1">*</span>
                         </label>
                         <input
                           id={`items.${index}.hashtag`}
@@ -495,14 +497,15 @@ const OurStoryNavbar = () => {
                           type="text"
                         />
                         {errors?.items?.[index]?.hashtag?.type === 'required' && (
-                          <p className="text-red-600 text-left pt-1 text-xs font-semibold">Hashtag is required</p>
+                          <p className="text-red-600 text-left text-xs font-semibold">Hashtag is required</p>
                         )}
                       </div>
 
                       {/* Quote Input */}
                       <div className="flex flex-col gap-2">
-                        <label htmlFor={`items.${index}.quote`} className="font-semibold text-[#9F5216] text-sm">
-                          Quote *
+                        <label htmlFor={`items.${index}.quote`} className="flex justify-start font-semibold text-neutral-500 text-sm">
+                          Quote
+                          <span className="text-red-600 pl-1">*</span>
                         </label>
                         <Controller
                           name={`items.${index}.quote`}
@@ -526,7 +529,7 @@ const OurStoryNavbar = () => {
                           )}
                         />
                         {errors?.items?.[index]?.quote && (
-                          <p className="text-red-600 text-left pt-1 text-xs font-semibold">
+                          <p className="text-red-600 text-left text-xs font-semibold">
                             {errors.items[index].quote.message}
                           </p>
                         )}

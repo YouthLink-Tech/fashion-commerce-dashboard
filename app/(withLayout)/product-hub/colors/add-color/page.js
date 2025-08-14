@@ -86,14 +86,14 @@ const AddColor = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>CREATE NEW COLORS</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>CREATE NEW COLORS</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/product-hub/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
         <div className="mt-8 w-full bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
-          <label className="flex justify-start font-medium text-[#9F5216] pb-2">Select Color</label>
+          <label htmlFor='colors' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Select Color <span className="text-red-600 pl-1">*</span></label>
           {colorFields.map((item, index) => (
             <div key={item.id} className="flex flex-col mb-4">
               <div className="flex flex-col md:flex-row items-center gap-4 w-full">
@@ -104,13 +104,13 @@ const AddColor = () => {
                       required: 'Color code is required',
                       validate: value => value !== '#FFFFFF' || 'Please select a color other than the default white'
                     })}
-                    className="w-16 h-16 p-0 border border-gray-300 rounded-md"
+                    className="w-12 h-12 p-0 border border-gray-300 rounded-md"
                   />
                   <input
                     type="text"
                     placeholder="Enter color name"
                     {...register(`colors.${index}.colorName`, { required: 'Color name is required' })}
-                    className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
+                    className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
                 </div>
                 <Button type="button" color="danger" onPress={() => removeColor(index)} variant="light">
@@ -118,10 +118,10 @@ const AddColor = () => {
                 </Button>
               </div>
               {errors.colors?.[index]?.colorCode && (
-                <p className="text-red-600 text-left">{errors.colors[index].colorCode.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.colors[index].colorCode.message}</p>
               )}
               {errors.colors?.[index]?.colorName && (
-                <p className="text-red-600 text-left">{errors.colors[index].colorName.message}</p>
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.colors[index].colorName.message}</p>
               )}
             </div>
           ))}

@@ -17,12 +17,12 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor, register, errors }) =
   }
 
   return (
-    <div className='flex-1 space-y-3'>
-      <h1 className='font-medium'>Supplier</h1>
+    <div className='flex-1 space-y-2'>
+      <label htmlFor='selectedVendor' className="flex justify-start font-semibold text-neutral-500 text-sm">Supplier <span className="text-red-600 pl-1">*</span></label>
       <select
         id="selectedVendor"
         {...register('selectedVendor', { required: 'Please select a supplier.' })}
-        className='font-semibold text-lg'
+        className='font-semibold'
         value={selectedVendor?.value || "" || selectedVendor}
         onChange={handleSelectChange}
         style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
@@ -35,19 +35,20 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor, register, errors }) =
         ))}
       </select>
 
-      {errors.selectedVendor && (
-        <p className="text-red-600 text-left">{errors.selectedVendor.message}</p>
-      )}
-
       {selectedVendor && (
         <div>
-          <p className="text-neutral-500 font-medium">
+          <p className="text-neutral-500 font-medium text-sm">
             {selectedVendor?.value
               ? vendorList.find(ven => ven.value === selectedVendor.value)?.vendorAddress
               : vendorList.find(ven => ven.value === selectedVendor)?.vendorAddress}
           </p>
         </div>
       )}
+
+      {errors.selectedVendor && (
+        <p className="text-left text-red-500 font-semibold text-xs">{errors.selectedVendor.message}</p>
+      )}
+
     </div>
   );
 };
