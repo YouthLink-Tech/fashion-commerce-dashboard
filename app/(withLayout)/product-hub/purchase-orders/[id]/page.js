@@ -23,6 +23,7 @@ import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitCon
 import PendingModalProduct from '@/app/components/product/modal/PendingModalProduct';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
+import HeadingText from '@/app/components/product/headingText/HeadingText';
 
 const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/PurchaseOrderPDFButton"), { ssr: false });
 
@@ -873,7 +874,9 @@ const EditPurchaseOrderPage = () => {
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             <div className='flex justify-between items-center gap-6'>
-              <h1 className='font-bold text-lg flex-1'>{["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "Ordered products" : "Edit products"}</h1>
+              <h1 className='font-bold text-lg flex-1'>
+                <HeadingText orderStatus={purchaseOrderStatus} />
+              </h1>
               <div className='flex-1'>
                 {purchaseOrderStatus === "received" ? <div className=''>
                   <div className='flex flex-col'>
@@ -918,6 +921,11 @@ const EditPurchaseOrderPage = () => {
                       <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
                         Products
                       </th>
+                      {purchaseOrderStatus === "received" && (
+                        <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                          Received
+                        </th>
+                      )}
                       <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
                         Quantity
                       </th>
@@ -958,6 +966,23 @@ const EditPurchaseOrderPage = () => {
                               </span>
                             </div>
                           </td>
+
+                          {/* Progress Bar Column - Only for Received */}
+                          {purchaseOrderStatus === "received" && (
+                            <td className="text-sm p-3 text-neutral-500 font-semibold">
+                              <div className="flex flex-col justify-center items-center">
+                                <Progressbar
+                                  accepted={purchaseOrderVariants[index]?.accept || 0}
+                                  rejected={purchaseOrderVariants[index]?.reject || 0}
+                                  total={purchaseOrderVariants[index]?.quantity}
+                                />
+                                <div className="mt-1 text-xs">
+                                  {purchaseOrderVariants[index]?.accept || 0} of {purchaseOrderVariants[index]?.quantity}
+                                </div>
+                              </div>
+                            </td>
+                          )}
+
                           <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                             <input
                               id={`quantity-${index}`}

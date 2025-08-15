@@ -15,6 +15,7 @@ import Progressbar from '@/app/components/product/progress/Progressbar';
 import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitConfirmationModalProduct';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
+import HeadingText from '@/app/components/product/headingText/HeadingText';
 
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/TransferOrderPDFButton"), { ssr: false });
 
@@ -350,7 +351,9 @@ const EditTransferOrder = () => {
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             <div className='flex justify-between items-center gap-6'>
-              <h1 className='flex-1 font-bold text-lg'>Ordered products</h1>
+              <h1 className='flex-1 font-bold text-lg'>
+                <HeadingText orderStatus={transferOrderStatus} />
+              </h1>
               <div className='flex flex-col flex-1'>
                 <Progressbar
                   accepted={totalAcceptRejectValues.totalAccept}
@@ -424,7 +427,7 @@ const EditTransferOrder = () => {
 
           <div className='flex flex-col lg:flex-row w-full justify-between items-start gap-6'>
 
-            <div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[270px]'>
+            <div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
               <h1 className='font-semibold'>Shipment Details</h1>
 
               <div className='flex-1'>
@@ -442,7 +445,7 @@ const EditTransferOrder = () => {
 
             </div>
 
-            <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[295px]'>
+            <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
               <h1 className='font-semibold'>Additional Details</h1>
               <div>
                 <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
@@ -462,7 +465,7 @@ const EditTransferOrder = () => {
               <button
                 type='button'
                 onClick={handleCancelClick}
-                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+                className="mt-4 mb-8 relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
               >
                 Cancel transfer
               </button>
@@ -471,7 +474,7 @@ const EditTransferOrder = () => {
             <button
               type='button'
               onClick={handleReceiveTransferClick}
-              className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+              className={`mt-4 mb-8 relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}
             >
               Receive transfer
             </button>

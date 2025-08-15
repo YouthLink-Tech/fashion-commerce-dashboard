@@ -606,7 +606,7 @@ const CreatePurchaseOrder = () => {
 								</svg>
 								<input
 									type="search"
-									placeholder="Search products"
+									placeholder="Search products..."
 									value={searchQuery}
 									onChange={handleSearchChange}
 									className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:bg-white  text-[12px] md:text-base"

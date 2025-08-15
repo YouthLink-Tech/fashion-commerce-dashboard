@@ -279,7 +279,7 @@ const ReceiveTransferOrder = () => {
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
           <div className='flex flex-col w-full'>
-            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Receive items</h3>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-600'>Receive items</h3>
             <span className='text-neutral-500 text-sm'>#{transferOrderNumber}</span>
           </div>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/product-hub/transfers/${id}`}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
@@ -332,7 +332,7 @@ const ReceiveTransferOrder = () => {
                     <div className='flex items-center gap-3'>
                       <input
                         type="number"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         value={transferOrderVariants[index]?.accept || ''} // Set value to empty string when 0
                         onChange={(e) => handleAcceptChange(index, e.target.value)}
                         max={transferOrderVariants[index]?.quantity}
@@ -342,12 +342,12 @@ const ReceiveTransferOrder = () => {
                       <button
                         type="button" // Prevent form submission
                         onClick={() => handleAddAllAccept(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        className="bg-white drop-shadow px-4 py-2 rounded hover:bg-[#bdf6b4] text-neutral-700"
                       >
                         All
                       </button>
                     </div>
-                    {acceptError && <p className='text-red-600 text-left'>This field is required</p>}
+                    {acceptError && <p className='text-left pt-2 text-red-500 font-semibold text-xs'>This field is required</p>}
                   </td>
                   <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                     <div className='flex items-center gap-3'>
@@ -356,14 +356,14 @@ const ReceiveTransferOrder = () => {
                         max={transferOrderVariants[index]?.quantity}
                         min={0}
                         step="1"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                         value={transferOrderVariants[index]?.reject || ''} // Set value to empty string when 0
                         onChange={(e) => handleRejectChange(index, e.target.value)}
                       />
                       <button
                         type="button" // Prevent form submission
                         onClick={() => handleAddAllReject(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        className="bg-white drop-shadow text-neutral-700 px-4 py-2 rounded hover:bg-red-600 hover:text-white"
                       >
                         All
                       </button>
@@ -390,7 +390,7 @@ const ReceiveTransferOrder = () => {
 
           <button
             type='submit'
-            className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}>
+            className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}>
             Accept
           </button>
 

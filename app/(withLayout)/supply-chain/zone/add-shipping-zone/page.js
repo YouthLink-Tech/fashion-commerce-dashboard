@@ -537,7 +537,7 @@ const AddShippingZone = () => {
                     className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
                   {errors.shippingCharge && (
-                    <p className="text-left text-red-500 font-semibold text-xs">{errors?.shippingCharge?.message}</p>
+                    <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingCharge?.message}</p>
                   )}
                 </div>
 
@@ -557,7 +557,7 @@ const AddShippingZone = () => {
                     }}
                   />
                   {errors.shippingTime && (
-                    <p className="text-left text-red-500 font-semibold text-xs">{errors?.shippingTime?.message}</p>
+                    <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
 
@@ -573,29 +573,25 @@ const AddShippingZone = () => {
                 <div className='flex items-center w-full gap-4'>
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Charge
-                    </label>
+                    <label htmlFor='shippingChargeStandard' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2"> STANDARD Charge <span className="text-red-600 pl-1">*</span></label>
                     <input
                       type="number"
                       placeholder="Enter Shipping Charge for STANDARD"
                       {...register('shippingChargeStandard', { required: 'STANDARD Shipping Charge is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     />
                     {errors.shippingChargeStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingChargeStandard?.message}</p>
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingChargeStandard?.message}</p>
                     )}
                   </div>
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Days
-                    </label>
+                    <label htmlFor='shippingDaysStandard' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2"> STANDARD Days <span className="text-red-600 pl-1">*</span></label>
                     <input
                       type="text"
                       placeholder="Enter Shipping days for STANDARD"
                       {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       onKeyDown={(e) => {
                         const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
                         if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -604,7 +600,7 @@ const AddShippingZone = () => {
                       }}
                     />
                     {errors.shippingDaysStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingDaysStandard?.message}</p>
                     )}
                   </div>
                 </div>
@@ -612,29 +608,25 @@ const AddShippingZone = () => {
                 <div className='flex items-center w-full gap-4'>
                   <div className='w-full'>
                     {/* Input for EXPRESS shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      EXPRESS Charge
-                    </label>
+                    <label htmlFor='shippingChargeExpress' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2"> EXPRESS Charge <span className="text-red-600 pl-1">*</span></label>
                     <input
                       type="number"
                       placeholder="Add Shipping Charge for EXPRESS"
                       {...register('shippingChargeExpress', { required: 'EXPRESS Shipping Charge is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     />
                     {errors.shippingChargeExpress && (
-                      <p className="text-red-600 text-left">{errors?.shippingChargeExpress?.message}</p>
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingChargeExpress?.message}</p>
                     )}
                   </div>
                   <div className='w-full'>
                     {/* Input for EXPRESS shipping charge */}
-                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      EXPRESS Hours
-                    </label>
+                    <label htmlFor='shippingHourExpress' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2"> EXPRESS Hours <span className="text-red-600 pl-1">*</span></label>
                     <input
                       type="text"
                       placeholder="Add Shipping hour for EXPRESS"
                       {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                       onKeyDown={(e) => {
                         const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
                         if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -643,7 +635,7 @@ const AddShippingZone = () => {
                       }}
                     />
                     {errors.shippingHourExpress && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourExpress?.message}</p>
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">{errors?.shippingHourExpress?.message}</p>
                     )}
                   </div>
                 </div>

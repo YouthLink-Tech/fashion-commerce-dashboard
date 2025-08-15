@@ -29,14 +29,16 @@ const DestinationSelect = ({
   }
 
   return (
-    <div className="flex-1 space-y-3">
-      <h1 className="font-medium">Destination</h1>
+    <div className="flex-1 space-y-2">
+
+      <label htmlFor='selectedDestination' className="flex justify-start font-semibold text-neutral-500 text-sm">Destination <span className="text-red-600 pl-1">*</span></label>
+
       <select
         id="selectedDestination"
         {...register("selectedDestination", {
           required: "Please select a destination.",
         })}
-        className="font-semibold text-lg"
+        className="font-semibold"
         value={selectedDestination?.locationName || ""}
         onChange={handleSelectChangeLocation}
         style={{
@@ -60,20 +62,21 @@ const DestinationSelect = ({
         ))}
       </select>
 
-      {errors.selectedDestination && (
-        <p className="text-red-600 text-left">
-          {errors.selectedDestination.message}
-        </p>
-      )}
-
       {selectedDestination && (
         <div>
-          <p className="text-neutral-500 font-medium">
+          <p className="text-neutral-500 font-medium text-sm">
             {selectedDestination?.locationName}, {selectedDestination?.cityName},{" "}
             {selectedDestination?.postalCode}
           </p>
         </div>
       )}
+
+      {errors.selectedDestination && (
+        <p className="text-left text-red-500 font-semibold text-xs">
+          {errors.selectedDestination.message}
+        </p>
+      )}
+
     </div>
   );
 };

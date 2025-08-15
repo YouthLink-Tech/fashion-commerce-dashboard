@@ -29,14 +29,14 @@ const OriginSelect = ({
   }
 
   return (
-    <div className="flex-1 space-y-3">
-      <h1 className="font-medium">Origin</h1>
+    <div className="flex-1 space-y-2">
+      <label htmlFor='selectedOrigin' className="flex justify-start font-semibold text-neutral-500 text-sm">Origin <span className="text-red-600 pl-1">*</span></label>
       <select
         id="selectedOrigin"
         {...register("selectedOrigin", {
           required: "Please select an origin.",
         })}
-        className="font-semibold text-lg"
+        className="font-semibold"
         value={selectedOrigin?.locationName || ""}
         onChange={handleSelectChangeLocation}
         style={{
@@ -62,20 +62,21 @@ const OriginSelect = ({
         ))}
       </select>
 
-      {errors.selectedOrigin && (
-        <p className="text-red-600 text-left">
-          {errors.selectedOrigin.message}
-        </p>
-      )}
-
       {selectedOrigin && (
         <div>
-          <p className="text-neutral-500 font-medium">
+          <p className="text-neutral-500 font-medium text-sm">
             {selectedOrigin?.locationName}, {selectedOrigin?.cityName},{" "}
             {selectedOrigin?.postalCode}
           </p>
         </div>
       )}
+
+      {errors.selectedOrigin && (
+        <p className="text-left text-red-500 font-semibold text-xs">
+          {errors.selectedOrigin.message}
+        </p>
+      )}
+
     </div>
   );
 };

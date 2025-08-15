@@ -273,7 +273,7 @@ const EditReceiveInventory = () => {
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
           <div className='flex flex-col w-full'>
-            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Receive items</h3>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-600'>Receive items</h3>
             <span className='text-neutral-500 text-sm'>#{purchaseOrderNumber}</span>
           </div>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/product-hub/purchase-orders/${id}`}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
@@ -336,12 +336,12 @@ const EditReceiveInventory = () => {
                       <button
                         type="button" // Prevent form submission
                         onClick={() => handleAddAllAccept(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        className="bg-white drop-shadow px-4 py-2 rounded hover:bg-[#bdf6b4] text-neutral-700"
                       >
                         All
                       </button>
                     </div>
-                    {acceptError && <p className='text-red-600 text-left'>This field is required</p>}
+                    {acceptError && <p className='text-left pt-2 text-red-500 font-semibold text-xs'>This field is required</p>}
                   </td>
                   <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                     <div className='flex items-center gap-3'>
@@ -357,7 +357,7 @@ const EditReceiveInventory = () => {
                       <button
                         type="button" // Prevent form submission
                         onClick={() => handleAddAllReject(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        className="bg-white drop-shadow text-neutral-700 px-4 py-2 rounded hover:bg-red-600 hover:text-white"
                       >
                         All
                       </button>

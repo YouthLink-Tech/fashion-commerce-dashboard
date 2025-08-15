@@ -152,7 +152,7 @@ const PaymentMethods = () => {
   return (
     <div className='bg-gray-50 relative'>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl mx-auto my-6 relative">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl my-6 relative">
         {
           paymentMethodList?.map((payment, index) => (
             <div key={index} className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col bg-white">

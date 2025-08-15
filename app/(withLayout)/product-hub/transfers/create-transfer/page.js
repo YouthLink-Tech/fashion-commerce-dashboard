@@ -526,7 +526,7 @@ const CreateTransfer = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Create transfer</h3>
+          <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Create transfer</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/product-hub/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -551,7 +551,7 @@ const CreateTransfer = () => {
                 </svg>
                 <input
                   type="search"
-                  placeholder="Search products"
+                  placeholder="Search products..."
                   value={searchQuery}
                   onChange={handleSearchChange}
                   className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:bg-white  text-[12px] md:text-base"
@@ -647,7 +647,7 @@ const CreateTransfer = () => {
               <h1 className='font-semibold'>Shipment Details</h1>
 
               <div className='flex-1'>
-                <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
+                <label htmlFor='estimatedArrival' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Estimated Arrival <span className="text-red-600 pl-1">*</span></label>
                 <DatePicker
                   id='estimatedArrival'
                   placeholder="Select date"
@@ -663,24 +663,28 @@ const CreateTransfer = () => {
                   className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
                 />
                 {dateError && (
-                  <p className="text-red-600 text-left">Please select estimated arrival date.</p>
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select estimated arrival date.</p>
                 )}
               </div>
               <div>
-                <label htmlFor='shippingCarrier' className='flex justify-start font-medium text-neutral-500 pb-2'>Shipping carrier</label>
+                <label htmlFor='shippingCarrier' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                  Shipping carrier
+                </label>
                 <input
                   id={`shippingCarrier`}
                   {...register(`shippingCarrier`)}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   type="text"
                 />
               </div>
               <div>
-                <label htmlFor='trackingNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Tracking Number</label>
+                <label htmlFor='trackingNumber' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                  Tracking Number
+                </label>
                 <input
                   id={`trackingNumber`}
                   {...register(`trackingNumber`)}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-[14px]"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   type="text"
                 />
               </div>
@@ -690,20 +694,24 @@ const CreateTransfer = () => {
             <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <h1 className='font-semibold'>Additional Details</h1>
               <div>
-                <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
+                <label htmlFor='referenceNumber' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                  Reference Number
+                </label>
                 <input
                   id={`referenceNumber`}
                   {...register(`referenceNumber`)}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   type="text"
                 />
               </div>
               <div>
-                <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2'>Note to supplier</label>
+                <label htmlFor='supplierNote' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">
+                  Note to supplier
+                </label>
                 <textarea
                   id="supplierNote"
                   {...register("supplierNote")}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  className="w-full p-3 border-2 border-[#ededed] outline-none focus:border-[#F4D3BA] focus:bg-white transition-colors duration-1000 rounded-md"
                   rows={5} // Set the number of rows for height adjustment
                 />
 
@@ -716,7 +724,7 @@ const CreateTransfer = () => {
           <div className='flex justify-end items-center'>
             <Button
               type='submit'
-              className={`mt-4 mb-8 bg-neutral-800 hover:bg-neutral-700 text-white cursor-pointer font-bold`}
+              className={`mt-4 mb-8 relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700`}
             >
               Create transfer
             </Button>
