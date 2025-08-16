@@ -146,6 +146,12 @@ const Inventory = () => {
   const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
   const toggleDropdown2 = () => setIsOpenDropdown2(!isOpenDropdown2);
 
+  // Find the primary location
+  const primaryLocation = locationList?.find(location => location.isPrimaryLocation)?.locationName;
+
+  // Check if the primary location matches the selected location
+  const isMatchingLocation = primaryLocation === locationNameForMessage;
+
   // Export to CSV
   const exportToCSV = () => {
     const filteredData = paginatedProducts?.map(product => {
@@ -156,7 +162,6 @@ const Inventory = () => {
       orderList?.forEach(order => {
         order?.productInformation.forEach(orderProduct => {
           const isMatchingProduct =
-            product?.productTitle === orderProduct?.productTitle &&
             product?.productId === orderProduct?.productId &&
             product?.size === orderProduct?.size &&
             product?.colorCode === orderProduct.color?.color;
@@ -175,8 +180,8 @@ const Inventory = () => {
         productName: product.productTitle,
         size: product.size,
         color: product.color,
-        pending: onPending,
-        onProcess: onProcess,
+        pending: isMatchingLocation ? onPending : 0,
+        onProcess: isMatchingLocation ? onProcess : 0,
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
@@ -221,7 +226,6 @@ const Inventory = () => {
       orderList?.forEach(order => {
         order?.productInformation.forEach(orderProduct => {
           const isMatchingProduct =
-            product?.productTitle === orderProduct?.productTitle &&
             product?.productId === orderProduct?.productId &&
             product?.size === orderProduct?.size &&
             product?.colorCode === orderProduct.color?.color;
@@ -240,8 +244,8 @@ const Inventory = () => {
         productName: product.productTitle,
         size: product.size,
         color: product.color,
-        pending: onPending,
-        onProcess: onProcess,
+        pending: isMatchingLocation ? onPending : 0,
+        onProcess: isMatchingLocation ? onProcess : 0,
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
@@ -270,7 +274,6 @@ const Inventory = () => {
       orderList?.forEach(order => {
         order?.productInformation.forEach(orderProduct => {
           const isMatchingProduct =
-            product?.productTitle === orderProduct?.productTitle &&
             product?.productId === orderProduct?.productId &&
             product?.size === orderProduct?.size &&
             product?.colorCode === orderProduct.color?.color;
@@ -289,8 +292,8 @@ const Inventory = () => {
         productName: product.productTitle,
         size: product.size,
         color: product.color,
-        pending: onPending,
-        onProcess: onProcess,
+        pending: isMatchingLocation ? onPending : 0,
+        onProcess: isMatchingLocation ? onProcess : 0,
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
@@ -570,7 +573,6 @@ const Inventory = () => {
                   orderList?.forEach(order => {
                     order?.productInformation.forEach(orderProduct => {
                       const isMatchingProduct =
-                        product?.productTitle === orderProduct?.productTitle &&
                         product?.productId === orderProduct?.productId &&
                         product?.size === orderProduct?.size &&
                         product?.colorCode === orderProduct.color?.color;
@@ -586,12 +588,6 @@ const Inventory = () => {
                       }
                     });
                   });
-
-                  // Find the primary location
-                  const primaryLocation = locationList?.find(location => location.isPrimaryLocation)?.locationName;
-
-                  // Check if the primary location matches the selected location
-                  const isMatchingLocation = primaryLocation === locationNameForMessage;
 
                   return (
                     <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">

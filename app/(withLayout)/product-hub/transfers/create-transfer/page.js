@@ -1,4 +1,5 @@
 "use client";
+import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
 import DestinationSelect from '@/app/components/product/select/DestinationSelect';
 import OriginSelect from '@/app/components/product/select/OriginSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
@@ -39,7 +40,7 @@ const CreateTransfer = () => {
   }, [selectedOrigin, selectedDestination]);
 
   // Update handleVariantChange to initialize values if not set
-  const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
+  const handleVariantChange = (index, field, value, productId, size, colorName, colorCode) => {
     setTransferOrderVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
 
@@ -48,10 +49,10 @@ const CreateTransfer = () => {
         updatedVariants[index] = {};
       };
 
-      // Check if the productTitle, size, and color match with the purchaseOrderList
+      // Check if the productId, size, and color match with the purchaseOrderList
       const matchedItem = purchaseOrderList.filter(po => po.status === "received").flatMap(po => po.purchaseOrderVariants).filter(
         (variant) =>
-          variant.productTitle === productTitle &&
+          variant.productId === productId &&
           variant.size === size &&
           variant.colorCode === colorCode &&
           variant.colorName === colorName
@@ -64,14 +65,14 @@ const CreateTransfer = () => {
       const originSku = selectedProducts[index]?.originSku; // Get originSku for the product
 
       if (enteredQuantity > originSku) {
-        toast.error(`Entered quantity for ${productTitle} (${colorName}) exceeds available stock ${originSku}`
+        toast.error(`Entered quantity for ${productId} (${colorName}) exceeds available stock ${originSku}`
         );
         return prevVariants; // Prevent updating state if validation fails
       }
 
       // Set product title, size, and color properties
-      if (!updatedVariants[index].productTitle) {
-        updatedVariants[index].productTitle = productTitle;
+      if (!updatedVariants[index].productId) {
+        updatedVariants[index].productId = productId;
         updatedVariants[index].size = size;
 
         // Assuming color is an object with code and name properties
@@ -161,7 +162,7 @@ const CreateTransfer = () => {
 
       // Push the completed SKU data for each product, including title and image
       skuByProduct.push({
-        productTitle: product.productTitle,
+        productId: product.productId,
         imageUrl: product?.thumbnailImageUrl,
         skuBySizeAndColor: skuEntries,
       });
@@ -175,7 +176,7 @@ const CreateTransfer = () => {
     setSelectedProducts((prevSelectedProducts) => {
       const isSelected = prevSelectedProducts.some(
         (item) =>
-          item?.productTitle === product?.productTitle &&
+          item?.productId === product?.productId &&
           item?.size === size &&
           item?.color === colorCode &&
           item?.name === colorName &&
@@ -189,7 +190,7 @@ const CreateTransfer = () => {
           prevVariants.filter(
             (variant) =>
               !(
-                variant?.productTitle === product?.productTitle &&
+                variant?.productId === product?.productId &&
                 variant?.size === size &&
                 variant?.color?.code === colorCode &&
                 variant?.color?.name === colorName &&
@@ -205,7 +206,7 @@ const CreateTransfer = () => {
 
           const variantIndex = updatedVariants.findIndex(
             (variant) =>
-              variant.productTitle === product.productTitle &&
+              variant.productId === product.productId &&
               variant.size === size &&
               variant.color.code === colorCode &&
               variant.color.name === colorName &&
@@ -223,7 +224,7 @@ const CreateTransfer = () => {
         return prevSelectedProducts.filter(
           (item) =>
             !(
-              item?.productTitle === product?.productTitle &&
+              item?.productId === product?.productId &&
               item?.size === size &&
               item?.color === colorCode &&
               item?.name === colorName &&
@@ -236,7 +237,7 @@ const CreateTransfer = () => {
         setTransferOrderVariants((prevVariants) => [
           ...prevVariants,
           {
-            productTitle: product?.productTitle,
+            productId: product?.productId,
             size,
             color: { code: colorCode, name: colorName },
             originSku, // Store originSku
@@ -250,7 +251,7 @@ const CreateTransfer = () => {
         return [
           ...prevSelectedProducts,
           {
-            productTitle: product?.productTitle,
+            productId: product?.productId,
             imageUrl: product?.imageUrl,
             size,
             color: colorCode,
@@ -272,7 +273,7 @@ const CreateTransfer = () => {
       const allSelected = validEntries.every((entry) =>
         prevSelectedProducts.some(
           (item) =>
-            item?.productTitle === product?.productTitle &&
+            item?.productId === product?.productId &&
             item?.size === entry?.size &&
             item?.color === entry?.color?.code &&
             item?.name === entry?.color?.name &&
@@ -287,7 +288,7 @@ const CreateTransfer = () => {
           prevVariants.filter(
             (variant) =>
               !(
-                variant.productTitle === product.productTitle &&
+                variant.productId === product.productId &&
                 validEntries.some(
                   (entry) =>
                     entry.size === variant.size &&
@@ -302,7 +303,7 @@ const CreateTransfer = () => {
         return prevSelectedProducts.filter(
           (item) =>
             !(
-              item.productTitle === product.productTitle &&
+              item.productId === product.productId &&
               validEntries.some(
                 (entry) =>
                   entry.size === item.size &&
@@ -315,7 +316,7 @@ const CreateTransfer = () => {
       } else {
         // Select only valid entries
         const newSelections = validEntries.map((entry) => ({
-          productTitle: product?.productTitle,
+          productId: product?.productId,
           imageUrl: product?.imageUrl,
           size: entry?.size,
           color: entry?.color?.code,
@@ -325,9 +326,9 @@ const CreateTransfer = () => {
         }));
 
         setTransferOrderVariants((prevVariants) => [
-          ...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
+          ...prevVariants.filter((variant) => variant.productId !== product.productId),
           ...validEntries.map((entry) => ({
-            productTitle: product?.productTitle,
+            productId: product?.productId,
             size: entry?.size,
             color: { code: entry?.color?.code, name: entry?.color?.name },
             originSku: entry?.originSku,
@@ -339,7 +340,7 @@ const CreateTransfer = () => {
         ]);
 
         return [
-          ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
+          ...prevSelectedProducts.filter((item) => item.productId !== product.productId),
           ...newSelections,
         ];
       }
@@ -352,7 +353,7 @@ const CreateTransfer = () => {
     setSelectedProducts((prevSelectedProducts) => {
       const updatedSelectedProducts = prevSelectedProducts.filter(
         (item) => !(
-          item.productTitle === product.productTitle &&
+          item.productId === product.productId &&
           item.size === size &&
           item.color === color
         )
@@ -362,11 +363,11 @@ const CreateTransfer = () => {
 
     setTransferOrderVariants((prevVariants) => {
       const updatedVariants = prevVariants.filter((variant) => {
-        const titleMatches = variant.productTitle === product.productTitle;
+        const idMatches = variant.productId === product.productId;
         const sizeMatches = variant.size === size;
         const colorMatches = variant.color?.code === color;
 
-        return !(titleMatches && sizeMatches && colorMatches);
+        return !(idMatches && sizeMatches && colorMatches);
       });
       return updatedVariants;
     });
@@ -377,8 +378,11 @@ const CreateTransfer = () => {
     const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedOrigin, selectedDestination);
 
     const filtered = totalSku.filter((product) => {
+
       // Check if productTitle matches the search query
-      const titleMatches = product.productTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      const productTitle = getProductTitleById(product.productId, productList);
+      const titleMatches = productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
+      const productIdMatches = product.productId?.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Check if sizes, colors, originSku, or destinationSku match the search query
       const sizeOrColorMatches = product.skuBySizeAndColor.some((entry) => {
@@ -402,7 +406,7 @@ const CreateTransfer = () => {
       });
 
       // Return true if title, size/color, originSku, or destinationSku matches the search query
-      return titleMatches || sizeOrColorMatches || originSkuMatches || destinationSkuMatches;
+      return titleMatches || productIdMatches || sizeOrColorMatches || originSkuMatches || destinationSkuMatches;
     });
 
     setFilteredProducts(filtered);
@@ -455,7 +459,7 @@ const CreateTransfer = () => {
       origin: selectedOrigin,
       destination: selectedDestination,
       transferOrderVariants: transferOrderVariants?.map(variant => ({
-        productTitle: variant.productTitle,
+        productId: variant.productId,
         quantity: parseFloat(variant.quantity),
         size: variant?.size,
         colorCode: variant.color?.code,  // Include the color code
@@ -588,10 +592,10 @@ const CreateTransfer = () => {
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
+                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productId} height={600} width={600} />
                             </div>
                             <div className='flex flex-col items-start justify-start gap-1'>
-                              <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                              <p className='font-bold text-blue-700 text-start'>{getProductTitleById(product.productId, productList)}</p>
                               <p className='font-medium'>{product?.size}</p>
                               <span className='flex items-center gap-2'>
                                 {product.name}
@@ -610,7 +614,7 @@ const CreateTransfer = () => {
                                 id={`quantity-${index}`}
                                 {...register(`quantity-${index}`, { required: true })}
                                 value={transferOrderVariants[index]?.quantity || ''}
-                                onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+                                onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productId, product?.size, product?.name, product.color)}
                                 className="custom-number-input p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                                 type="number"
                                 min="0" // Prevents negative values in the input
@@ -780,10 +784,10 @@ const CreateTransfer = () => {
                             <td className="text-xs p-3 cursor-pointer flex items-center gap-3">
                               <Checkbox
                                 isSelected={
-                                  selectedProducts.some((p) => p.productTitle === product.productTitle) &&
+                                  selectedProducts.some((p) => p.productId === product.productId) &&
                                   product.skuBySizeAndColor.every((entry) =>
                                     selectedProducts.some(
-                                      (p) => p.productTitle === product.productTitle &&
+                                      (p) => p.productId === product.productId &&
                                         p.size === entry.size &&
                                         p.color === entry.color?.code && // Ensure color is correctly accessed 
                                         p.name === entry.color?.name &&
@@ -798,13 +802,13 @@ const CreateTransfer = () => {
                                 <Image
                                   className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
                                   src={product.imageUrl}
-                                  alt={product?.productTitle}
+                                  alt={product?.productId}
                                   height={600}
                                   width={600}
                                 />
                               </div>
                               <div className="flex flex-col">
-                                <p className="font-bold text-sm">{product.productTitle}</p>
+                                <p className="font-bold text-sm">{getProductTitleById(product.productId, productList)}</p>
                               </div>
                             </td>
                             <td colSpan="2"></td>
@@ -815,9 +819,9 @@ const CreateTransfer = () => {
                             <tr key={`${index}-${entry.size}-${entry.color.code}`} className="hover:bg-gray-50 transition-colors">
                               <td className="pl-12 text-xs p-3 text-gray-600 flex items-center">
                                 <Checkbox
-                                  key={`${product.productTitle}-${entry.size}-${entry.color?.code}`} // Unique key for each checkbox
+                                  key={`${product.productId}-${entry.size}-${entry.color?.code}`} // Unique key for each checkbox
                                   isSelected={selectedProducts.some(
-                                    (p) => p.productTitle === product.productTitle &&
+                                    (p) => p.productId === product.productId &&
                                       p.size === entry.size &&
                                       p.color === entry.color?.code && // Ensure color is correctly accessed
                                       p.name === entry.color?.name &&

@@ -20,7 +20,7 @@ const ExitConfirmationModalProduct = ({ isOpen, onClose, onConfirm, message, hea
               <Button color="danger" variant="light" onPress={onCloseModal}>
                 Cancel
               </Button>
-              <Button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700" onPress={() => { onConfirm(); onCloseModal(); }}>
+              <Button className={`relative z-[1] flex items-center gap-x-3 rounded-lg ${heading === "canceled" ? "bg-[#d4ffce] hover:bg-[#bdf6b4]" : "bg-[#ffddc2] hover:bg-[#fbcfb0]"} px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`} onPress={() => { onConfirm(); onCloseModal(); }}>
                 Mark as {heading}
               </Button>
             </ModalFooter>

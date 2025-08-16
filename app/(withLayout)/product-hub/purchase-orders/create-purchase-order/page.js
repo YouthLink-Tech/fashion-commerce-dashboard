@@ -1,4 +1,5 @@
 "use client";
+import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
 import LocationSelect from '@/app/components/product/select/LocationSelect';
 import VendorSelect from '@/app/components/product/select/VendorSelect';
 import { formatDate } from '@/app/components/shared/date-format/DateFormat';
@@ -47,7 +48,7 @@ const CreatePurchaseOrder = () => {
 	const isOwner = role === "Owner";
 
 	// Update handleVariantChange to initialize values if not set
-	const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
+	const handleVariantChange = (index, field, value, productId, size, colorName, colorCode) => {
 		setPurchaseOrderVariants((prevVariants) => {
 			const updatedVariants = [...prevVariants];
 
@@ -57,8 +58,8 @@ const CreatePurchaseOrder = () => {
 			}
 
 			// Set product title, size, and color properties
-			if (!updatedVariants[index].productTitle) {
-				updatedVariants[index].productTitle = productTitle;
+			if (!updatedVariants[index].productId) {
+				updatedVariants[index].productId = productId;
 				updatedVariants[index].size = size;
 
 				// Assuming color is an object with code and name properties
@@ -145,10 +146,10 @@ const CreatePurchaseOrder = () => {
 			// const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
 
 			skuByProduct.push({
-				productTitle: product?.productTitle,
+				// productTitle: product?.productTitle,
+				productId: product?.productId,
 				skuBySizeAndColor: skuEntries,
 				imageUrl: product?.thumbnailImageUrl,
-				// imageUrl,
 			});
 		});
 
@@ -160,7 +161,7 @@ const CreatePurchaseOrder = () => {
 		setSelectedProducts((prevSelectedProducts) => {
 			const isSelected = prevSelectedProducts.some(
 				(item) =>
-					item?.productTitle === product?.productTitle &&
+					item?.productId === product?.productId &&
 					item?.size === size &&
 					item?.color === colorCode &&
 					item?.name === colorName
@@ -172,7 +173,7 @@ const CreatePurchaseOrder = () => {
 					prevVariants.filter(
 						(variant) =>
 							!(
-								variant?.productTitle === product?.productTitle &&
+								variant?.productId === product?.productId &&
 								variant?.size === size &&
 								variant?.color?.code === colorCode &&
 								variant?.color?.name === colorName
@@ -182,7 +183,7 @@ const CreatePurchaseOrder = () => {
 				return prevSelectedProducts.filter(
 					(item) =>
 						!(
-							item?.productTitle === product?.productTitle &&
+							item?.productId === product?.productId &&
 							item?.size === size &&
 							item?.color === colorCode &&
 							item?.name === colorName
@@ -193,7 +194,7 @@ const CreatePurchaseOrder = () => {
 				setPurchaseOrderVariants((prevVariants) => [
 					...prevVariants,
 					{
-						productTitle: product?.productTitle,
+						productId: product?.productId,
 						size,
 						color: {
 							code: colorCode,
@@ -207,7 +208,7 @@ const CreatePurchaseOrder = () => {
 				return [
 					...prevSelectedProducts,
 					{
-						productTitle: product?.productTitle,
+						productId: product?.productId,
 						imageUrl: product?.imageUrl,
 						size,
 						color: colorCode,
@@ -224,7 +225,7 @@ const CreatePurchaseOrder = () => {
 			const allSelected = product?.skuBySizeAndColor.every((entry) =>
 				prevSelectedProducts.some(
 					(item) =>
-						item?.productTitle === product?.productTitle &&
+						item?.productId === product?.productId &&
 						item?.size === entry?.size &&
 						item?.color === entry?.color?.code &&
 						item?.name === entry?.color?.name
@@ -234,13 +235,13 @@ const CreatePurchaseOrder = () => {
 			if (allSelected) {
 				// Deselect all sizes and colors for this product
 				setPurchaseOrderVariants((prevVariants) =>
-					prevVariants.filter((variant) => variant.productTitle !== product.productTitle)
+					prevVariants.filter((variant) => variant.productId !== product.productId)
 				);
-				return prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle);
+				return prevSelectedProducts.filter((item) => item.productId !== product.productId);
 			} else {
 				// Select all sizes and colors for this product
 				const newSelections = product.skuBySizeAndColor.map((entry) => ({
-					productTitle: product?.productTitle,
+					productId: product?.productId,
 					imageUrl: product?.imageUrl,
 					size: entry?.size,
 					color: entry?.color?.code,
@@ -248,9 +249,9 @@ const CreatePurchaseOrder = () => {
 				}));
 
 				setPurchaseOrderVariants((prevVariants) => [
-					...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
+					...prevVariants.filter((variant) => variant.productId !== product.productId),
 					...product.skuBySizeAndColor.map((entry) => ({
-						productTitle: product?.productTitle,
+						productId: product?.productId,
 						size: entry?.size,
 						color: {
 							code: entry?.color?.code,
@@ -263,7 +264,7 @@ const CreatePurchaseOrder = () => {
 				]);
 
 				return [
-					...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
+					...prevSelectedProducts.filter((item) => item.productId !== product.productId),
 					...newSelections,
 				];
 			}
@@ -276,7 +277,7 @@ const CreatePurchaseOrder = () => {
 		setSelectedProducts((prevSelectedProducts) => {
 			const updatedSelectedProducts = prevSelectedProducts.filter(
 				(item) => !(
-					item?.productTitle === product?.productTitle &&
+					item?.productId === product?.productId &&
 					item?.size === size &&
 					item?.color === color
 				)
@@ -286,7 +287,7 @@ const CreatePurchaseOrder = () => {
 
 		setPurchaseOrderVariants((prevVariants) => {
 			const updatedVariants = prevVariants.filter((variant) => {
-				const titleMatches = variant?.productTitle === product?.productTitle;
+				const titleMatches = variant?.productId === product?.productId;
 				const sizeMatches = variant?.size === size;
 				const colorMatches = variant?.color?.code === color;
 
@@ -302,7 +303,9 @@ const CreatePurchaseOrder = () => {
 
 		const filtered = totalSku?.filter(product => {
 			// Check if productTitle matches the search query
-			const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
+			const productTitle = getProductTitleById(product.productId, productList);
+			const titleMatches = productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
+			const productIdMatches = product.productId?.toLowerCase().includes(searchQuery.toLowerCase());
 
 			// Check if sizes, colors, locationSku, or totalSku match the search query
 			const sizeOrColorMatches = product.skuBySizeAndColor.some(entry => {
@@ -326,7 +329,7 @@ const CreatePurchaseOrder = () => {
 			});
 
 			// Return true if title, size/color, locationSku, or totalSku matches the search query
-			return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches;
+			return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches || productIdMatches;
 		});
 
 		setFilteredProducts(filtered);
@@ -456,7 +459,7 @@ const CreatePurchaseOrder = () => {
 			supplier: selectedVendor,
 			destination: selectedLocation,
 			purchaseOrderVariants: purchaseOrderVariants?.map(variant => ({
-				productTitle: variant.productTitle,
+				productId: variant.productId,
 				quantity: parseFloat(variant.quantity),
 				cost: parseFloat(variant.cost),
 				tax: parseFloat(variant.tax) || 0,
@@ -652,10 +655,10 @@ const CreatePurchaseOrder = () => {
 												<tr key={index} className="hover:bg-gray-50">
 													<td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
 														<div>
-															<Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
+															<Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productId} height={600} width={600} />
 														</div>
 														<div className='flex flex-col items-start justify-start gap-1'>
-															<p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+															<p className='font-bold text-blue-700 text-start'>{getProductTitleById(product.productId, productList)}</p>
 															<p className='font-medium'>{product?.size}</p>
 															<span className='flex items-center gap-2'>
 																{product.name}
@@ -667,7 +670,7 @@ const CreatePurchaseOrder = () => {
 															id={`quantity-${index}`}
 															{...register(`quantity-${index}`, { required: true })}
 															value={purchaseOrderVariants[index]?.quantity || ''}
-															onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+															onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productId, product?.size, product?.name, product.color)}
 															className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 															type="number"
 															min="0" // Prevents negative values in the input
@@ -683,7 +686,7 @@ const CreatePurchaseOrder = () => {
 																id={`cost-${index}`}
 																{...register(`cost-${index}`, { required: true })}
 																value={purchaseOrderVariants[index]?.cost || ''}
-																onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+																onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productId, product?.size, product?.name, product.color)}
 																className="pl-7 custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 																type="number"
 																min="0" // Prevents negative values in the input
@@ -699,7 +702,7 @@ const CreatePurchaseOrder = () => {
 																id={`tax-${index}`}
 																{...register(`tax-${index}`)} // No required validation here
 																value={purchaseOrderVariants[index]?.tax || ''}
-																onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+																onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productId, product?.size, product?.name, product.color)}
 																className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
 																type="number"
 															/>
@@ -884,10 +887,10 @@ const CreatePurchaseOrder = () => {
 														<td className="text-xs p-3 cursor-pointer flex items-center gap-3">
 															<Checkbox
 																isSelected={
-																	selectedProducts.some((p) => p.productTitle === product.productTitle) &&
+																	selectedProducts.some((p) => p.productId === product.productId) &&
 																	product.skuBySizeAndColor.every((entry) =>
 																		selectedProducts.some(
-																			(p) => p.productTitle === product.productTitle &&
+																			(p) => p.productId === product.productId &&
 																				p.size === entry.size &&
 																				p.color === entry.color?.code && // Ensure color is correctly accessed 
 																				p.name === entry.color?.name
@@ -901,13 +904,15 @@ const CreatePurchaseOrder = () => {
 																<Image
 																	className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
 																	src={product.imageUrl}
-																	alt={product?.productTitle}
+																	alt={product?.productId}
 																	height={600}
 																	width={600}
 																/>
 															</div>
 															<div className="flex flex-col">
-																<p className="font-bold text-sm">{product.productTitle}</p>
+																<p className="font-bold text-sm">
+																	{getProductTitleById(product.productId, productList)}
+																</p>
 															</div>
 														</td>
 														<td colSpan="2"></td>
@@ -918,9 +923,9 @@ const CreatePurchaseOrder = () => {
 														<tr key={`${index}-${entry.size}-${entry.color.code}`} className="hover:bg-gray-50 transition-colors">
 															<td className="pl-12 text-xs p-3 text-gray-600 flex items-center">
 																<Checkbox
-																	key={`${product.productTitle}-${entry.size}-${entry.color?.code}`} // Unique key for each checkbox
+																	key={`${product.productId}-${entry.size}-${entry.color?.code}`} // Unique key for each checkbox
 																	isSelected={selectedProducts.some(
-																		(p) => p.productTitle === product.productTitle &&
+																		(p) => p.productId === product.productId &&
 																			p.size === entry.size &&
 																			p.color === entry.color?.code && // Ensure color is correctly accessed
 																			p.name === entry.color?.name

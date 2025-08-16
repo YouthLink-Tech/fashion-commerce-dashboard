@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
-// import useProductsInformation from '@/app/hooks/useProductsInformation';
+import useProductsInformation from '@/app/hooks/useProductsInformation';
 import Image from 'next/image';
 // import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Swal from 'sweetalert2';
@@ -24,6 +24,7 @@ import PendingModalProduct from '@/app/components/product/modal/PendingModalProd
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import HeadingText from '@/app/components/product/headingText/HeadingText';
+import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
 
 const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/PurchaseOrderPDFButton"), { ssr: false });
 
@@ -36,17 +37,14 @@ const EditPurchaseOrderPage = () => {
   const router = useRouter();
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
-  // const [searchQuery, setSearchQuery] = useState("");
   const [estimatedArrival, setEstimatedArrival] = useState(''); // Initial state set to an empty string
-  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [dateError, setDateError] = useState(false)
-  // const [productList, isProductPending] = useProductsInformation();
+  const [productList, isProductPending] = useProductsInformation();
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [shipping, setShipping] = useState(0);  // Initial value for shipping
   const [discount, setDiscount] = useState(0);  // Initial value for discount
-  // const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [purchaseOrderVariants, setPurchaseOrderVariants] = useState([]);
   const [purchaseOrderStatus, setPurchaseOrderStatus] = useState("");
@@ -78,7 +76,7 @@ const EditPurchaseOrderPage = () => {
   };
 
   // Update handleVariantChange to initialize values if not set
-  const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
+  const handleVariantChange = (index, field, value, productId, size, colorName, colorCode) => {
     setPurchaseOrderVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
 
@@ -88,8 +86,8 @@ const EditPurchaseOrderPage = () => {
       }
 
       // Set product title, size, and color properties
-      if (!updatedVariants[index].productTitle) {
-        updatedVariants[index].productTitle = productTitle;
+      if (!updatedVariants[index].productId) {
+        updatedVariants[index].productId = productId;
         updatedVariants[index].size = size;
 
         // Assuming color is an object with code and name properties
@@ -114,13 +112,6 @@ const EditPurchaseOrderPage = () => {
   const handleDiscountChange = (e) => {
     setDiscount(parseFloat(e.target.value) || 0);  // Update state with parsed value
   };
-
-  // const handleSearchChange = (e) => {
-  //   setSearchQuery(e.target.value);
-  //   if (e.target.value) {
-  //     onOpen(); // Open modal when there's input
-  //   }
-  // };
 
   // Memoized function to fetch purchase order data
   const fetchPurchaseOrderData = useCallback(async () => {
@@ -175,234 +166,6 @@ const EditPurchaseOrderPage = () => {
   useEffect(() => {
     fetchPurchaseOrderData();
   }, [fetchPurchaseOrderData]);
-
-  // Function to calculate total SKU per size and SKU for selected location
-  // const calculateSkuBySizeAndColorAndLocation = (productList, selectedLocation) => {
-  //   if (!productList || !selectedLocation) return [];
-
-  //   const skuByProduct = [];
-
-  //   productList?.forEach((product) => {
-  //     const skuEntries = [];
-
-  //     product?.productVariants?.forEach((variant) => {
-  //       const size = variant?.size;
-  //       const colorCode = variant?.color?.color; // Hex code for the color
-  //       const colorName = variant?.color?.value; // Name of the color
-  //       const sku = variant?.sku || 0;
-
-  //       // Find an existing entry for this size and color
-  //       let entry = skuEntries?.find(
-  //         (e) => e?.size === size && e?.color?.code === colorCode
-  //       );
-
-  //       if (!entry) {
-  //         // If not found, initialize a new entry for this size and color
-  //         entry = { size, color: { code: colorCode, name: colorName }, locationSku: 0, totalSku: 0 };
-  //         skuEntries.push(entry);
-  //       }
-
-  //       // Add to total SKU for this size and color
-  //       entry.totalSku += sku;
-
-  //       // If the variant matches the selected location, add its SKU to locationSku
-  //       if (variant?.location === selectedLocation) {
-  //         entry.locationSku += sku;
-  //       }
-  //     });
-
-  //     // Find the first image URL from a variant matching the selected location
-  //     // const variantWithLocation = product.productVariants.find(
-  //     //   (variant) => variant.location === selectedLocation
-  //     // );
-  //     // const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
-
-  //     skuByProduct?.push({
-  //       productTitle: product?.productTitle,
-  //       skuBySizeAndColor: skuEntries,
-  //       imageUrl: product?.thumbnailImageUrl,
-  //     });
-  //   });
-
-  //   return skuByProduct;
-  // };
-
-  // Function to toggle selection for a specific product size
-  // const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
-  //   setSelectedProducts((prevSelectedProducts) => {
-  //     const isSelected = prevSelectedProducts?.some(
-  //       (item) =>
-  //         item?.productTitle === product?.productTitle &&
-  //         item?.size === size &&
-  //         item?.color === colorCode &&
-  //         item?.name === colorName
-  //     );
-
-  //     if (isSelected) {
-  //       // Deselect the specific entry
-  //       setPurchaseOrderVariants((prevVariants) =>
-  //         prevVariants.filter(
-  //           (variant) =>
-  //             !(
-  //               variant?.productTitle === product?.productTitle &&
-  //               variant?.size === size &&
-  //               variant?.color?.code === colorCode &&
-  //               variant?.color?.name === colorName
-  //             )
-  //         )
-  //       );
-  //       return prevSelectedProducts?.filter(
-  //         (item) =>
-  //           !(
-  //             item?.productTitle === product?.productTitle &&
-  //             item?.size === size &&
-  //             item?.color === colorCode &&
-  //             item?.name === colorName
-  //           )
-  //       );
-  //     } else {
-  //       // Select the specific entry
-  //       setPurchaseOrderVariants((prevVariants) => [
-  //         ...prevVariants,
-  //         {
-  //           productTitle: product?.productTitle,
-  //           size,
-  //           color: {
-  //             code: colorCode,
-  //             name: colorName,
-  //           },
-  //           quantity: 0, // Initialize quantity to 0 or any default value
-  //           cost: 0, // Initialize cost to 0
-  //           tax: 0, // Initialize tax to 0
-  //         },
-  //       ]);
-  //       return [
-  //         ...prevSelectedProducts,
-  //         {
-  //           productTitle: product?.productTitle,
-  //           imageUrl: product?.imageUrl,
-  //           size,
-  //           color: colorCode,
-  //           name: colorName,
-  //         },
-  //       ];
-  //     }
-  //   });
-  // };
-
-  // Function to toggle selection for all sizes of a product
-  // const toggleAllSizesAndColorsForProduct = (product) => {
-  //   setSelectedProducts((prevSelectedProducts) => {
-  //     const allSelected = product?.skuBySizeAndColor?.every((entry) =>
-  //       prevSelectedProducts?.some(
-  //         (item) =>
-  //           item?.productTitle === product?.productTitle &&
-  //           item?.size === entry?.size &&
-  //           item?.color === entry?.color?.code &&
-  //           item?.name === entry?.color?.name
-  //       )
-  //     );
-
-  //     if (allSelected) {
-  //       // Deselect all sizes and colors for this product
-  //       setPurchaseOrderVariants((prevVariants) =>
-  //         prevVariants?.filter((variant) => variant?.productTitle !== product?.productTitle)
-  //       );
-  //       return prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle);
-  //     } else {
-  //       // Select all sizes and colors for this product
-  //       const newSelections = product?.skuBySizeAndColor?.map((entry) => ({
-  //         productTitle: product?.productTitle,
-  //         imageUrl: product?.imageUrl,
-  //         size: entry?.size,
-  //         color: entry?.color?.code,
-  //         name: entry?.color?.name,
-  //       }));
-
-  //       setPurchaseOrderVariants((prevVariants) => [
-  //         ...prevVariants?.filter((variant) => variant.productTitle !== product.productTitle),
-  //         ...product?.skuBySizeAndColor?.map((entry) => ({
-  //           productTitle: product?.productTitle,
-  //           size: entry?.size,
-  //           color: {
-  //             code: entry?.color?.code,
-  //             name: entry?.color?.name,
-  //           },
-  //           quantity: 0, // Initialize quantity to 0
-  //           cost: 0, // Initialize cost to 0
-  //           tax: 0, // Initialize tax to 0
-  //         })),
-  //       ]);
-
-  //       return [
-  //         ...prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle),
-  //         ...newSelections,
-  //       ];
-  //     }
-  //   });
-  // };
-
-  // Function to remove a selected product
-  // const removeSelectedProduct = (product, size, color) => {
-
-  //   setSelectedProducts((prevSelectedProducts) => {
-  //     const updatedSelectedProducts = prevSelectedProducts?.filter(
-  //       (item) => !(
-  //         item?.productTitle === product?.productTitle &&
-  //         item?.size === size &&
-  //         item?.color === color
-  //       )
-  //     );
-  //     return updatedSelectedProducts;
-  //   });
-
-  //   setPurchaseOrderVariants((prevVariants) => {
-  //     const updatedVariants = prevVariants?.filter((variant) => {
-  //       const titleMatches = variant?.productTitle === product?.productTitle;
-  //       const sizeMatches = variant?.size === size;
-  //       const colorMatches = variant?.color?.code === color;
-
-  //       return !(titleMatches && sizeMatches && colorMatches);
-  //     });
-  //     return updatedVariants;
-  //   });
-  // };
-
-  // Update filtered products whenever productList or searchQuery changes
-  // useEffect(() => {
-  //   const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedLocation?.locationName);
-
-  //   const filtered = totalSku?.filter(product => {
-  //     // Check if productTitle matches the search query
-  //     const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
-
-  //     // Check if sizes, colors, locationSku, or totalSku match the search query
-  //     const sizeOrColorMatches = product?.skuBySizeAndColor?.some(entry => {
-  //       // Check if entry.size matches the search query
-  //       const sizeMatches = entry?.size?.toString().toLowerCase().includes(searchQuery.toLowerCase());
-
-  //       // Assuming entry.color is an object with a 'name' property
-  //       const colorNameMatches = entry?.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-  //       return sizeMatches || colorNameMatches;
-  //     });
-
-  //     // Check if locationSku matches the search query
-  //     const locationSkuMatches = product.skuBySizeAndColor.some(entry => {
-  //       return entry.locationSku.toString().includes(searchQuery);
-  //     });
-
-  //     // Check if totalSku matches the search query
-  //     const totalSkuMatches = product.skuBySizeAndColor.some(entry => {
-  //       return entry.totalSku.toString().includes(searchQuery);
-  //     });
-
-  //     // Return true if title, size/color, locationSku, or totalSku matches the search query
-  //     return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches;
-  //   });
-
-  //   setFilteredProducts(filtered);
-  // }, [productList, searchQuery, selectedLocation]);
 
   const handlePaymentTerms = (value) => {
     setPaymentTerms(value);
@@ -638,7 +401,7 @@ const EditPurchaseOrderPage = () => {
         supplier: selectedVendor,
         destination: selectedLocation,
         purchaseOrderVariants: purchaseOrderVariants?.map(variant => ({
-          productTitle: variant.productTitle,
+          productId: variant.productId,
           quantity: parseFloat(variant.quantity),
           cost: parseFloat(variant.cost),
           tax: parseFloat(variant.tax) || 0,
@@ -717,7 +480,7 @@ const EditPurchaseOrderPage = () => {
       });
   };
 
-  if (isLoading || isUserLoading || status === "loading") {
+  if (isLoading || isUserLoading || status === "loading" || isProductPending) {
     return <Loading />;
   }
 
@@ -745,7 +508,23 @@ const EditPurchaseOrderPage = () => {
           <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/product-hub/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
             <div className="flex gap-4 items-center">
-              <PurchaseOrderPDFButton selectedVendor={selectedVendor} selectedLocation={selectedLocation} paymentTerms={paymentTerms} estimatedArrival={estimatedArrival} referenceNumber={referenceNumber} supplierNote={supplierNote} shipping={shipping} discount={discount} selectedProducts={selectedProducts} purchaseOrderVariants={purchaseOrderVariants} purchaseOrderNumber={purchaseOrderNumber} purchaseOrderStatus={purchaseOrderStatus} />
+              <PurchaseOrderPDFButton
+                selectedVendor={selectedVendor}
+                selectedLocation={selectedLocation}
+                paymentTerms={paymentTerms}
+                estimatedArrival={estimatedArrival}
+                referenceNumber={referenceNumber}
+                supplierNote={supplierNote}
+                shipping={shipping}
+                discount={discount}
+                purchaseOrderVariants={purchaseOrderVariants}
+                purchaseOrderNumber={purchaseOrderNumber}
+                purchaseOrderStatus={purchaseOrderStatus}
+                selectedProducts={selectedProducts.map((product) => ({
+                  ...product,
+                  productTitle: getProductTitleById(product?.productId, productList),
+                }))}
+              />
               {["ordered", "canceled"].includes(purchaseOrderStatus) && isOwner === true && <button type='button' onClick={handleReverseStatusPending}
                 class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >
@@ -956,10 +735,10 @@ const EditPurchaseOrderPage = () => {
                         <tr key={index} className={`${["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : "hover:bg-gray-50"}`}>
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
+                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productId} height={600} width={600} />
                             </div>
                             <div className='flex flex-col items-start justify-start gap-1'>
-                              <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                              <p className='font-bold text-blue-700 text-start'>{getProductTitleById(product?.productId, productList)}</p>
                               <p className='font-medium'>{product?.size}</p>
                               <span className='flex items-center gap-2'>
                                 {product.name}
@@ -988,7 +767,7 @@ const EditPurchaseOrderPage = () => {
                               id={`quantity-${index}`}
                               {...register(`quantity-${index}`, { required: purchaseOrderStatus === "pending" })}
                               value={purchaseOrderVariants[index]?.quantity || ''}
-                              onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+                              onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productId, product?.size, product?.name, product.color)}
                               className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                               type="number"
                               min="0" // Prevents negative values in the input
@@ -1005,7 +784,7 @@ const EditPurchaseOrderPage = () => {
                                 id={`cost-${index}`}
                                 {...register(`cost-${index}`, { required: purchaseOrderStatus === "pending" })}
                                 value={purchaseOrderVariants[index]?.cost || ''}
-                                onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+                                onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productId, product?.size, product?.name, product.color)}
                                 className="pl-7 custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                                 type="number"
                                 min="0" // Prevents negative values in the input
@@ -1022,7 +801,7 @@ const EditPurchaseOrderPage = () => {
                                 id={`tax-${index}`}
                                 {...register(`tax-${index}`)} // No required validation here
                                 value={purchaseOrderVariants[index]?.tax || ''}
-                                onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+                                onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productId, product?.size, product?.name, product.color)}
                                 className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                                 type="number"
                                 disabled={["ordered", "received", "canceled"].includes(purchaseOrderStatus)}
@@ -1208,131 +987,6 @@ const EditPurchaseOrderPage = () => {
         </div>
 
       </form>
-
-      {/* <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col">
-                <p>All products</p>
-                <div className='w-full pt-1'>
-                  <li className="flex items-center relative group border-1.5 rounded-lg">
-                    <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-                      <g>
-                        <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                      </g>
-                    </svg>
-                    <input
-                      type="search"
-                      placeholder="Search products"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      autoFocus
-                      className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:bg-white  text-[12px] md:text-base"
-                    />
-                  </li>
-                </div>
-              </ModalHeader>
-              <ModalBody className="modal-body-scroll">
-                <table className="w-full text-left border-collapse">
-                  <thead className="sticky top-0 z-[1] bg-white">
-                    <tr>
-                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Products</th>
-                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available at destination</th>
-                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Total available</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredProducts.length === 0 ? (
-                      <tr>
-                        <td colSpan="3" className="text-center p-4 text-gray-500 py-32">
-                          <h1 className="text-xl font-semibold text-neutral-800">No Products Available!</h1>
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredProducts.map((product, index) => (
-                        <React.Fragment key={index}>
-                          <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="text-xs p-3 cursor-pointer flex items-center gap-3">
-                              <Checkbox
-                                isSelected={
-                                  selectedProducts.some((p) => p.productTitle === product.productTitle) &&
-                                  product.skuBySizeAndColor.every((entry) =>
-                                    selectedProducts.some(
-                                      (p) => p.productTitle === product.productTitle &&
-                                        p.size === entry.size &&
-                                        p.color === entry.color?.code && // Ensure color is correctly accessed 
-                                        p.name === entry.color?.name
-                                    )
-                                  )
-                                }
-                                onValueChange={() => toggleAllSizesAndColorsForProduct(product)}
-                              />
-
-                              <div>
-                                <Image
-                                  className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
-                                  src={product.imageUrl}
-                                  alt={product.productTitle}
-                                  height={600}
-                                  width={600}
-                                />
-                              </div>
-                              <div className="flex flex-col">
-                                <p className="font-bold text-sm">{product.productTitle}</p>
-                              </div>
-                            </td>
-                            <td colSpan="2"></td>
-                          </tr>
-
-                          
-                          {product?.skuBySizeAndColor?.map((entry) => (
-                            <tr key={`${index}-${entry.size}-${entry.color.code}`} className="hover:bg-gray-50 transition-colors">
-                              <td className="pl-12 text-xs p-3 text-gray-600 flex items-center">
-                                <Checkbox
-                                  key={`${product.productTitle}-${entry.size}-${entry.color?.code}`} // Unique key for each checkbox
-                                  isSelected={selectedProducts.some(
-                                    (p) => p.productTitle === product.productTitle &&
-                                      p.size === entry.size &&
-                                      p.color === entry.color?.code && // Ensure color is correctly accessed
-                                      p.name === entry.color?.name
-                                  )}
-                                  onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name)}
-                                />
-                                <span className="font-semibold ml-2">
-                                  {entry.size}
-                                  <span className='flex items-center gap-2'>
-                                    {entry.color.name}
-                                  </span>
-                                </span>
-                              </td>
-                              <td className="text-center">{entry.locationSku}</td>
-                              <td className="text-center">{entry.totalSku}</td>
-                            </tr>
-                          ))}
-                        </React.Fragment>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </ModalBody>
-              <ModalFooter className='flex justify-between items-center'>
-                <div>
-                  {selectedProducts?.length > 0 && <p className='border px-4 rounded-lg shadow py-1'>{selectedProducts?.length} variants selected</p>}
-                </div>
-                <div className='flex gap-4 items-center'>
-                  <Button size='sm' variant="bordered" onPress={onClose}>
-                    Cancel
-                  </Button>
-                  <Button size='sm' className='bg-neutral-700 text-white font-bold' onPress={onClose}>
-                    Done
-                  </Button>
-                </div>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal> */}
 
       <ExitConfirmationModalProduct
         isOpen={isModalOpen}

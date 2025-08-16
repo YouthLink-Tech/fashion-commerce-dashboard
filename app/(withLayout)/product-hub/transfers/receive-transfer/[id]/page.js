@@ -1,4 +1,5 @@
 "use client";
+import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
@@ -122,7 +123,7 @@ const ReceiveTransferOrder = () => {
 
     transferOrderVariants.forEach(variant => {
       updatedProductList.forEach(product => {
-        if (product.productTitle === variant.productTitle && product.productVariants) {
+        if (product.productId === variant.productId && product.productVariants) {
           let originMatchFound = false;
           let destinationMatchFound = false;
 
@@ -186,7 +187,7 @@ const ReceiveTransferOrder = () => {
     // Prepare data for the API call
     const receivedOrderData = {
       transferOrderVariants: transferOrderVariants.map(variant => ({
-        productTitle: variant.productTitle,
+        productId: variant.productId,
         quantity: variant.quantity,
         size: variant.size,
         colorCode: variant.colorCode,
@@ -315,10 +316,12 @@ const ReceiveTransferOrder = () => {
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                     <div>
-                      <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
+                      <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productId} height={600} width={600} />
                     </div>
                     <div className='flex flex-col items-start justify-start gap-1'>
-                      <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                      <p className='font-bold text-blue-700 text-start'>
+                        {getProductTitleById(product?.productId, productList)}
+                      </p>
                       <p className='font-medium'>{product?.size}</p>
                       <span className='flex items-center gap-2'>
                         {product.name}

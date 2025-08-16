@@ -16,6 +16,8 @@ import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitCon
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import HeadingText from '@/app/components/product/headingText/HeadingText';
+import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
+import useProductsInformation from '@/app/hooks/useProductsInformation';
 
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/TransferOrderPDFButton"), { ssr: false });
 
@@ -32,6 +34,7 @@ const EditTransferOrder = () => {
   const [selectedDestination, setSelectedDestination] = useState("");
   const [estimatedArrival, setEstimatedArrival] = useState('');
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [productList, isProductPending] = useProductsInformation();
   const [transferOrderVariants, setTransferOrderVariants] = useState([]);
   const [transferOrderStatus, setTransferOrderStatus] = useState("");
   const [transferOrderNumber, setTransferOrderNumber] = useState("");
@@ -255,7 +258,7 @@ const EditTransferOrder = () => {
       });
   };
 
-  if (isLoading || isUserLoading || status === "loading") {
+  if (isLoading || isUserLoading || status === "loading" || isProductPending) {
     return <Loading />;
   };
 
@@ -302,17 +305,22 @@ const EditTransferOrder = () => {
                 </button>
               }
 
-              <TransferOrderPDFButton transferOrderNumber={transferOrderNumber}
+              <TransferOrderPDFButton
+                transferOrderNumber={transferOrderNumber}
                 transferOrderStatus={transferOrderStatus}
                 selectedOrigin={selectedOrigin}
                 selectedDestination={selectedDestination}
                 estimatedArrival={estimatedArrival}
-                selectedProducts={selectedProducts}
                 transferOrderVariants={transferOrderVariants}
                 referenceNumber={referenceNumber}
                 supplierNote={supplierNote}
                 trackingNumber={trackingNumber}
-                shippingCarrier={shippingCarrier} />
+                shippingCarrier={shippingCarrier}
+                selectedProducts={selectedProducts.map((product) => ({
+                  ...product,
+                  productTitle: getProductTitleById(product?.productId, productList),
+                }))}
+              />
             </div>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/product-hub/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
@@ -390,10 +398,10 @@ const EditTransferOrder = () => {
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={6000} width={6000} />
+                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productId} height={6000} width={6000} />
                             </div>
                             <div className='flex flex-col items-start justify-start gap-1'>
-                              <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                              <p className='font-bold text-blue-700 text-start'>{getProductTitleById(product?.productId, productList)}</p>
                               <p className='font-medium'>{product?.size}</p>
                               <span className='flex items-center gap-2'>
                                 {product.name}
