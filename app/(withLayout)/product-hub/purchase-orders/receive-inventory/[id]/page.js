@@ -139,18 +139,18 @@ const EditReceiveInventory = () => {
             colorCode: variant.colorCode,
             size: variant.size,
             location: locationName,
-            accept: variant.accept,
+            accept: parseFloat(variant.accept),
           })),
       });
 
-      const results = updateResponses.data.results;
+      const { results, message } = updateResponses.data;
 
       // 5️⃣ Process the responses
-      const successfulUpdates = results.filter(update => update.success);
-      const failedUpdates = results.filter(update => !update.success);
+      const successfulUpdates = results?.filter(update => update.success);
+      const failedUpdates = results?.filter(update => !update.success);
 
       if (failedUpdates.length > 0) {
-        const errorMessages = failedUpdates.map(u => `${u.productId}: ${u.error}`).join("\n");
+        const errorMessages = failedUpdates.map(u => `${u?.productId}: ${u?.error}`).join("\n");
         toast.error(`Some variants failed to update:\n${errorMessages}`);
         return; // Stop here, don't update purchase order
       }
@@ -212,12 +212,23 @@ const EditReceiveInventory = () => {
         // Redirect after toast
         router.push('/product-hub/purchase-orders');
       } else {
-        toast.error("Purchase order update failed or no changes detected.");
+        toast.error("Purchase order update failed or no changes detected.", {
+          position: "bottom-right",
+          duration: 5000,
+        });
       }
 
     } catch (err) {
       console.error("Error in submitting purchase order:", err);
-      toast.error(err.response?.data?.error || "Failed to receive purchase order");
+      toast.error(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to receive purchase order",
+        {
+          position: "bottom-right",
+          duration: 5000,
+        }
+      );
     }
 
   };

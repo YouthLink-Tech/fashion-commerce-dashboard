@@ -101,171 +101,133 @@ const ReceiveTransferOrder = () => {
   };
 
   const onSubmit = async () => {
-    // Validate transferOrderVariants
-    const invalidVariantsForZero = transferOrderVariants.filter(variant => variant.accept <= 0);
-    const invalidVariants = transferOrderVariants.filter(variant => variant.accept === undefined);
+    try {
 
-    if (invalidVariantsForZero.length > 0) {
-      toast.error('Accept value must be greater than 0');
-      return; // Stop the submission
-    }
+      // Validate transferOrderVariants
+      const invalidVariantsForZero = transferOrderVariants.filter(variant => variant.accept <= 0);
+      const invalidVariants = transferOrderVariants.filter(variant => variant.accept === undefined);
 
-    if (invalidVariants.length > 0) {
-      setAcceptError(true);
-      return; // Stop the submission
-    }
+      if (invalidVariantsForZero.length > 0) {
+        toast.error('Accept value must be greater than 0', {
+          position: "bottom-right",
+          duration: 5000,
+        });
+        return; // Stop the submission
+      }
 
-    setAcceptError(false);
+      if (invalidVariants.length > 0) {
+        setAcceptError(true);
+        return; // Stop the submission
+      }
+      setAcceptError(false);
 
-    const updatedProductList = [...productList]; // Clone productList to modify
-
-    const modifiedProducts = new Set();
-
-    transferOrderVariants.forEach(variant => {
-      updatedProductList.forEach(product => {
-        if (product.productId === variant.productId && product.productVariants) {
-          let originMatchFound = false;
-          let destinationMatchFound = false;
-
-          product.productVariants.forEach(prodVariant => {
-            // Check for origin location
-            if (prodVariant.location === originName &&
-              prodVariant.color.color === variant.colorCode &&
-              prodVariant.color.value === variant.colorName &&
-              prodVariant.size === variant.size) {
-              originMatchFound = true;
-
-              // Prevent negative SKU values
-              if (prodVariant.sku >= variant.accept) {
-                // Subtract accept value from SKU
-                prodVariant.sku -= variant.accept;
-                // Update onHandSku
-                prodVariant.onHandSku = (prodVariant.onHandSku || 0) - variant.accept;
-                modifiedProducts.add(product._id); // Track modified product
-              }
-            }
-
-            // Check for destination location
-            if (prodVariant.location === destinationName &&
-              prodVariant.color.color === variant.colorCode &&
-              prodVariant.color.value === variant.colorName &&
-              prodVariant.size === variant.size) {
-              destinationMatchFound = true;
-
-              // Add accept value to SKU
-              prodVariant.sku += variant.accept;
-              // Update onHandSku
-              prodVariant.onHandSku = (prodVariant.onHandSku || 0) + variant.accept;
-              modifiedProducts.add(product._id); // Track modified product
-            }
-          });
-
-          // If no destination match was found, create a new product variant
-          if (originMatchFound && !destinationMatchFound) {
-            const matchingVariant = product.productVariants.find(
-              prodVariant =>
-                prodVariant.color.color === variant.colorCode &&
-                prodVariant.color.value === variant.colorName &&
-                prodVariant.size === variant.size
-            );
-
-            // Create a new variant based on the matching variant
-            const newVariant = {
-              ...matchingVariant,
-              sku: variant.accept,
-              onHandSku: variant.accept, // Initialize onHandSku
-              location: destinationName, // New location
-            };
-
-            product.productVariants.push(newVariant);
-            modifiedProducts.add(product._id); // Track modified product
-          }
-        }
+      // Send transfer request to /transferStock
+      const updateResponses = await axiosSecure.patch("/transferStock", {
+        variants: transferOrderVariants.map((variant) => ({
+          productId: variant.productId,
+          colorCode: variant.colorCode,
+          size: variant.size,
+          originName: originName,
+          destinationName: destinationName,
+          accept: parseFloat(variant.accept),
+        })),
       });
-    });
 
-    // Prepare data for the API call
-    const receivedOrderData = {
-      transferOrderVariants: transferOrderVariants.map(variant => ({
-        productId: variant.productId,
-        quantity: variant.quantity,
-        size: variant.size,
-        colorCode: variant.colorCode,
-        colorName: variant.colorName,
-        accept: parseFloat(variant.accept) || 0,
-        reject: parseFloat(variant.reject) || 0,
-        tax: variant.tax || 0, // Include tax
-        cost: variant.cost || 0, // Include cost
-      })),
-      status: 'received'
-    };
+      const { results, message } = updateResponses.data;
 
-    // Update product details in the database
-    const response1 = await axiosSecure.put(`/editTransferOrder/${id}`, receivedOrderData);
+      // Process the responses
+      const successfulUpdates = results.filter((update) => update.success);
+      const failedUpdates = results.filter((update) => !update.success);
 
-    const updateResponses = await Promise.all(
-      Array.from(modifiedProducts).map(async (productId) => {
-        const updatedProduct = updatedProductList?.find((product) => product._id === productId);
-        if (updatedProduct) {
-          try {
-            // Send the update request for each modified product
-            const response = await axiosSecure.put(`/editProductDetails/${productId}`, updatedProduct);
-            return { productId, success: true, response: response.data };
-          } catch (error) {
-            console.error(`Failed to update product ${productId}:`, error.response?.data || error.message);
-            return { productId, success: false, error: error.message };
-          }
-        } else {
-          console.warn(`Product with ID ${productId} not found in updatedProductList`);
-          return { productId, success: false, error: 'Product not found' };
-        }
-      })
-    );
+      if (failedUpdates.length > 0) {
+        const errorMessages = failedUpdates
+          .map(
+            (u) =>
+              `${u.productId} (${u.size}, ${u.colorCode}, ${u.originName} → ${u.destinationName}): ${u.error}`
+          )
+          .join("\n");
+        toast.error(`Failed to transfer variants:\n${errorMessages}`, {
+          position: "bottom-right",
+          duration: 7000,
+        });
+        return;
+      }
 
-    // Process the responses
-    const successfulUpdates = updateResponses.filter((update) => update.success);
-    const failedUpdates = updateResponses.filter((update) => !update.success);
+      // Prepare data for the API call
+      const receivedOrderData = {
+        transferOrderVariants: transferOrderVariants.map(variant => ({
+          productId: variant.productId,
+          quantity: variant.quantity,
+          size: variant.size,
+          colorCode: variant.colorCode,
+          colorName: variant.colorName,
+          accept: parseFloat(variant.accept) || 0,
+          reject: parseFloat(variant.reject) || 0,
+          tax: parseFloat(variant.tax) || 0, // Include tax
+          cost: parseFloat(variant.cost) || 0, // Include cost
+        })),
+        status: 'received'
+      };
 
-    // Show single toast message based on the update results
-    if (successfulUpdates.length > 0 && response1.data.modifiedCount > 0) {
-      toast.custom((t) => (
-        <div
-          className={`${t.visible ? 'animate-enter' : 'animate-leave'
-            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-        >
-          <div className="pl-6">
-            <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-          </div>
-          <div className="flex-1 w-0 p-4">
-            <div className="flex items-start">
-              <div className="ml-3 flex-1">
-                <p className="text-base font-bold text-gray-900">
-                  Transfer order received!
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                  {successfulUpdates.length} product(s) successfully updated!
-                </p>
+      // Update product details in the database
+      const response1 = await axiosSecure.put(`/editTransferOrder/${id}`, receivedOrderData);
+
+      // Show single toast message based on the update results
+      if (response1.data.modifiedCount > 0) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Transfer order received!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {successfulUpdates.length} product(s) successfully updated!
+                  </p>
+                </div>
               </div>
             </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
           </div>
-          <div className="flex border-l border-gray-200">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-            >
-              <RxCross2 />
-            </button>
-          </div>
-        </div>
-      ), {
-        position: "bottom-right",
-        duration: 5000
-      });
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        });
 
-      // Redirect after toast
-      router.push('/product-hub/transfers');
-    } else if (successfulUpdates.length === 0 && failedUpdates.length > 0) {
-      toast.error('No changes detected or updates failed.');
+        // Redirect after toast
+        router.push('/product-hub/transfers');
+      } else {
+        toast.error('Transfer order update failed or no changes detected.', {
+          position: "bottom-right",
+          duration: 5000,
+        });
+      }
+
+    } catch (err) {
+      console.error("Error in submitting transfer order:", err);
+      toast.error(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to receive transfer order",
+        {
+          position: "bottom-right",
+          duration: 5000,
+        }
+      );
     }
 
   };

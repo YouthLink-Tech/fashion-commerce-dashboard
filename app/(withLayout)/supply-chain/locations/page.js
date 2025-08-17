@@ -46,7 +46,7 @@ const LocationsPage = () => {
       if (result.isConfirmed) {
         try {
           const res = await axiosSecure.delete(`/deleteLocation/${locationId}`);
-          if (res?.data?.deletedCount) {
+          if (res?.data?.deleteResult?.deletedCount > 0) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (
               <div
@@ -81,9 +81,18 @@ const LocationsPage = () => {
               position: "bottom-right",
               duration: 5000
             })
+          } else {
+            throw new Error("Location deletion failed: No location was deleted.");
           }
         } catch (error) {
-          toast.error('Failed to delete Location. Please try again.');
+          console.error("Error deleting location:", error);
+          toast.error(
+            error.response?.data?.message || "Failed to delete location. Please try again.",
+            {
+              position: "bottom-right",
+              duration: 5000,
+            }
+          );
         }
       }
     });

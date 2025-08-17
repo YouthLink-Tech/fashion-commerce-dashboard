@@ -73,7 +73,14 @@ const AddLocation = () => {
       }
     } catch (error) {
       setIsSubmitting(false);
-      toast.error('Failed to add location. Please try again!');
+      console.error("Error deleting location:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to delete location. Please try again.",
+        {
+          position: "bottom-right",
+          duration: 5000,
+        }
+      );
     }
   };
 
