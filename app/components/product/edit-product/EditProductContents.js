@@ -19,7 +19,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LuImagePlus } from "react-icons/lu";
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
+import { MdCancel, MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import ReactSelect from 'react-select';
 import toast from 'react-hot-toast';
@@ -72,7 +72,6 @@ const EditProductContents = () => {
   const [sizeError, setSizeError] = useState(false);
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
-  const [sizeError4, setSizeError4] = useState(false);
   const [sizeError5, setSizeError5] = useState(false);
   const [colorError, setColorError] = useState(false);
   const [tagError, setTagError] = useState(false);
@@ -361,12 +360,6 @@ const EditProductContents = () => {
 
   const handleSubCategoryArray = (keys) => {
     const selectedArray = [...keys];
-    if (selectedArray.length > 0) {
-      setSizeError4(false);
-    }
-    else {
-      setSizeError4(true);
-    }
     setSelectedSubCategories(selectedArray);
   };
 
@@ -380,13 +373,14 @@ const EditProductContents = () => {
     }
 
     // Generate sizes based on the selected size range
-    const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
+    // const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
+    // setGroupSelected2(newRelatedSizes); // Directly set new sizes
 
     setGroupSelected(sizes);
 
     setUnselectedGroupSelected2([]); // Reset previously unselected sizes
+    setGroupSelected2([]);
 
-    setGroupSelected2(newRelatedSizes); // Directly set new sizes
   };
 
   const handleGroupSelected2Change = (sizes) => {
@@ -405,11 +399,9 @@ const EditProductContents = () => {
       });
     };
 
-    setGroupSelected2((prevSizes) => {
-      const updatedSizes = [...sizes]; // Create a new array with the latest sizes
-      const sortedSizes = sortSizes(updatedSizes); // Ensure correct sorting
-      return sortedSizes;
-    });
+    const sortedSizes = sortSizes([...sizes]);
+
+    setGroupSelected2(sortedSizes);
 
     if (sizes.length > 0) {
       setSizeError3(false);
@@ -421,6 +413,23 @@ const EditProductContents = () => {
       return [...prevUnselected, ...newlyUnselected];
     });
   };
+
+  const handleSelectAll = () => {
+    const availableSizes = generateSizes(groupSelected[0] || '');
+    setGroupSelected2(availableSizes);
+    setSizeError3(false);
+  };
+
+  const handleUnselectAll = () => {
+    setGroupSelected2([]);
+    setSizeError3(false);
+  };
+
+  // Ensure groupSelected is an array, default to empty array if undefined
+  const safeGroupSelected = Array.isArray(groupSelected) ? groupSelected : [];
+  const availableSizes = safeGroupSelected?.length > 0 ? generateSizes(safeGroupSelected[0]) : [];
+  const allSelected = availableSizes?.length > 0 && groupSelected2?.length === availableSizes?.length;
+  const noneSelected = groupSelected2?.length === 0;
 
   const uploadSingleFileToGCS = async (file) => {
     try {
@@ -752,19 +761,19 @@ const EditProductContents = () => {
     }
   }, [selectedAvailableColors, groupSelected2, initializeVariants, productVariants]);
 
-  const handleVariantChange = (index, field, value) => {
-    const updatedVariants = [...productVariants];
+  // const handleVariantChange = (index, field, value) => {
+  //   const updatedVariants = [...productVariants];
 
-    // Update the field value
-    updatedVariants[index][field] = value;
+  //   // Update the field value
+  //   updatedVariants[index][field] = value;
 
-    // If the field is 'sku', update 'onHandSku' with the same value
-    if (field === "sku") {
-      updatedVariants[index]["onHandSku"] = value;
-    }
+  //   // If the field is 'sku', update 'onHandSku' with the same value
+  //   if (field === "sku") {
+  //     updatedVariants[index]["onHandSku"] = value;
+  //   }
 
-    setProductVariants(updatedVariants);
-  };
+  //   setProductVariants(updatedVariants);
+  // };
 
   const handleColorChange = (newValue) => {
     setSelectedAvailableColors(newValue);
@@ -903,12 +912,6 @@ const EditProductContents = () => {
         return;
       }
       setSizeError3(false);
-      if (selectedSubCategories.length === 0) {
-        setSizeError4(true);
-        toast.error("Sub-Category is required");
-        return;
-      }
-      setSizeError4(false);
 
       if (selectedAvailableColors.length === 0) {
         setColorError(true);
@@ -947,11 +950,11 @@ const EditProductContents = () => {
 
       // Check if any variant is missing an image URL
       const invalidVariants = productVariants?.filter(
-        (variant) => variant.imageUrls.length < 3
+        (variant) => variant.imageUrls.length < 2
       );
 
       if (invalidVariants?.length > 0) {
-        toast.error("Each variant must have at least 3 images.");
+        toast.error("Each variant must have at least 2 images.");
         return;
       }
 
@@ -978,7 +981,7 @@ const EditProductContents = () => {
       // Initialize an array to hold final data
       const finalData = [];
 
-      let isSkuUpdated = false;
+      // let isSkuUpdated = false;
 
       // Iterate over productVariants
       productVariants?.forEach((variant, index) => {
@@ -998,20 +1001,8 @@ const EditProductContents = () => {
           let sku = 0; // Default SKU for new active locations
           let onHandSku = 0; // Default SKU for new active locations
 
-          // If location is primary, update SKU based on user input
-          if (location.isPrimaryLocation) {
-
-            sku = parseFloat(data[`sku-${index}`]) || 0; // Update SKU for primary location
-
-            onHandSku = parseFloat(data[`sku-${index}`]) || 0; // Update SKU for primary location
-
-            // Check if SKU is changed
-            if (existingVariant && existingVariant.sku !== sku) {
-              isSkuUpdated = true;
-            }
-
-          } else if (existingVariant) {
-            // If the variant exists for this active location, keep existing SKU
+          // Preserve whatever SKU exists already
+          if (existingVariant) {
             sku = existingVariant.sku;
             onHandSku = existingVariant.sku;
           }
@@ -1020,8 +1011,8 @@ const EditProductContents = () => {
           finalData.push({
             color: variant.color,
             size: variant.size,
-            sku: sku, // Assign SKU based on above conditions
-            onHandSku: onHandSku, // Assign SKU based on above conditions
+            sku,
+            onHandSku,
             imageUrls: primaryImageUrls, // Use the same imageUrls for all locations
             location: location.locationName,
           });
@@ -1091,11 +1082,12 @@ const EditProductContents = () => {
                     Product Updated!
                   </p>
                   <p className="mt-1 text-sm text-gray-500">
-                    {
+                    {/* {
                       isSkuUpdated ?
                         `SKU updated in ${primaryLocationName}.` :
                         "Product Details updated successfully!"
-                    }
+                    } */}
+                    Product Details updated successfully!
                   </p>
                 </div>
               </div>
@@ -1268,6 +1260,7 @@ const EditProductContents = () => {
                         onChange={(e) => {
                           handleCategoryChange(e.target.value);
                         }}
+                        disabled
                       >
                         <option value="" disabled className='bg-white'>Select a category</option>
                         {categoryList?.map((category) => (
@@ -1282,32 +1275,59 @@ const EditProductContents = () => {
                     </div>
 
                     {selectedCategory && sizeRangeList[selectedCategory] && (
-                      <div className="flex flex-col gap-1 w-full">
-                        <CheckboxGroup
-                          className="gap-1"
-                          label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
-                          orientation="horizontal"
-                          value={groupSelected}
-                          onChange={handleGroupSelectedChange}
-                        >
-                          {sizeRangeList[selectedCategory]?.map((size) => (
-                            <CustomCheckbox
-                              key={size}
-                              value={size}
-                              isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
-                            >
-                              {size}
-                            </CustomCheckbox>
-                          ))}
-                        </CheckboxGroup>
+                      <div className="flex flex-col w-full">
+
+                        <div className='flex justify-between items-center'>
+                          <CheckboxGroup
+                            className="gap-1"
+                            label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
+                            orientation="horizontal"
+                            value={groupSelected}
+                            onChange={handleGroupSelectedChange}
+                          >
+                            {sizeRangeList[selectedCategory]?.map((size) => (
+                              <CustomCheckbox
+                                key={size}
+                                value={size}
+                                isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
+                              >
+                                {size}
+                              </CustomCheckbox>
+                            ))}
+                          </CheckboxGroup>
+                          {groupSelected?.length > 0 && (
+                            <div className="flex gap-2 mt-6">
+                              {!allSelected && (
+                                <button
+                                  type="button"
+                                  className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#ffddc2] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-sm text-neutral-700"
+                                  onClick={handleSelectAll}
+                                >
+                                  <MdCheckBox size={16} /> Select All
+                                </button>
+                              )}
+                              {!noneSelected && (
+                                <button
+                                  type="button"
+                                  className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#d4ffce] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-sm text-neutral-700"
+                                  onClick={handleUnselectAll}
+                                >
+                                  <MdCheckBoxOutlineBlank size={16} /> Unselect All
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
                         {sizeError2 && (
                           <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
                         )}
+
                       </div>
                     )}
 
                     {groupSelected?.length > 0 && (
-                      <div className="flex flex-col gap-1 w-full">
+                      <div className="flex flex-col w-full">
                         <CheckboxGroup
                           className="gap-1"
                           label={<p className="font-semibold text-neutral-500 text-sm pb-1">Deselect sizes <span className="text-red-600 pl-1">*</span></p>}
@@ -1323,7 +1343,7 @@ const EditProductContents = () => {
                           Selected: <span>{groupSelected2?.join(", ")}</span>
                         </p>
                         {sizeError3 && (
-                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
+                          <p className="text-left text-red-500 font-semibold text-xs">Please select at least one size.</p>
                         )}
                       </div>
                     )}
@@ -1334,11 +1354,10 @@ const EditProductContents = () => {
                           name="subCategories"
                           control={control}
                           defaultValue={selectedSubCategories}
-                          rules={{ required: 'Sub-Category is required' }}
                           render={({ field }) => (
                             <div>
                               <Select
-                                label={<p className="font-semibold text-neutral-500 text-sm">Sub Category <span className="text-red-600 pl-1">*</span></p>}
+                                label={<p className="font-semibold text-neutral-500 text-sm">Sub Category</p>}
                                 selectionMode="multiple"
                                 value={selectedSubCategories}
                                 placeholder="Select Sub Categories"
@@ -1354,13 +1373,6 @@ const EditProductContents = () => {
                                   </SelectItem>
                                 ))}
                               </Select>
-
-                              {/* Conditional Error Display */}
-                              {errors.subCategories ? (
-                                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.subCategories.message}</p>
-                              ) : (
-                                sizeError4 && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Sub-Category is required.</p>
-                              )}
                             </div>
                           )}
                         />
@@ -1387,7 +1399,7 @@ const EditProductContents = () => {
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
                       <RadioGroup
                         label={<p className="font-semibold text-neutral-500 text-sm">Is New Arrival? <span className="text-red-600 pl-1">*</span></p>}
                         value={selectedNewArrival}
@@ -1399,11 +1411,11 @@ const EditProductContents = () => {
                       </RadioGroup>
                       <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
                       {newArrivalError && (
-                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
+                        <p className="text-left text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
                       <RadioGroup
                         label={<p className="font-semibold text-neutral-500 text-sm">Is Trending? <span className="text-red-600 pl-1">*</span></p>}
                         value={isTrending}
@@ -1415,7 +1427,7 @@ const EditProductContents = () => {
                       </RadioGroup>
                       <p className="text-default-500 text-small">Selected: {isTrending}</p>
                       {trendingError && (
-                        <p className="text-left pt-2 text-red-500 font-semibold text-xs">Trending Selection is required</p>
+                        <p className="text-left text-red-500 font-semibold text-xs">Trending Selection is required</p>
                       )}
                     </div>
 
@@ -1664,35 +1676,40 @@ const EditProductContents = () => {
                     <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                       <div className='flex flex-col gap-4'>
-                        <input
-                          id='imageUpload'
-                          type='file'
-                          className='hidden'
-                          onChange={handleImageChange}
-                        />
-                        <label
-                          htmlFor='imageUpload'
-                          className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
-                            } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
-                        >
-                          <MdOutlineFileUpload size={60} />
-                          <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
-                            <p className="text-[13px]">
-                              <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
-                                Click to upload
-                              </span>{" "}
-                              or drag and drop
-                            </p>
-                            <p className="text-[11px]">Max image size is 10 MB</p>
-                            <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
-                          </div>
-                        </label>
-                        {sizeError && (
-                          <p className="text-left text-red-500 font-semibold text-xs">Select product thumbnail image</p>
-                        )}
+
+                        <div>
+                          <label htmlFor="imageUpload" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Thumbnail <span className="text-red-600 pl-1">*</span></label>
+                          <input
+                            id='imageUpload'
+                            type='file'
+                            className='hidden'
+                            onChange={handleImageChange}
+                          />
+                          <label
+                            htmlFor='imageUpload'
+                            className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                              } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                          >
+                            <MdOutlineFileUpload size={60} />
+                            <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                              <p className="text-[13px]">
+                                <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                                  Click to upload
+                                </span>{" "}
+                                or drag and drop
+                              </p>
+                              <p className="text-[11px]">Max image size is 10 MB</p>
+                              <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
+                            </div>
+                          </label>
+                          {sizeError && (
+                            <p className="text-left text-red-500 font-semibold text-xs">Select product thumbnail image</p>
+                          )}
+                        </div>
+
                         {image && (
                           <div className='relative'>
                             <Image
@@ -1761,18 +1778,14 @@ const EditProductContents = () => {
                         />
                       </div>
                       <div className='md:w-1/3'>
-                        <label htmlFor={`sku-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">SKU <span className="text-red-600 pl-1">*</span></label>
+                        <label htmlFor={`sku-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">SKU</label>
                         <input
                           id={`sku-${index}`}
-                          {...register(`sku-${index}`, { required: true })}
                           value={variant.sku}
-                          onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
+                          disabled
                           className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                           type="number"
                         />
-                        {errors[`sku-${index}`] && (
-                          <p className="text-left text-red-500 font-semibold text-xs pt-2">SKU is required</p>
-                        )}
                       </div>
                     </div>
                     <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
@@ -1798,6 +1811,12 @@ const EditProductContents = () => {
                                 Click to upload
                               </span>{" "}
                               or drag and drop
+                            </p>
+                            <p className="text-[10px] text-neutral-500">
+                              Upload at least{" "}
+                              <span className="text-blue-300 font-semibold">2 images</span>{" "}
+                              (up to{" "}
+                              <span className="text-amber-600 font-semibold">6 allowed</span>)
                             </p>
                             <p className="text-[10px]">Max image size : 10 MB</p>
                             <div className='py-1'>

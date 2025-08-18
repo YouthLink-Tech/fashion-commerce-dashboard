@@ -102,7 +102,7 @@ const SecondStepOfAddProduct = () => {
           if (existingVariant) {
             allVariants.push(existingVariant);
           } else {
-            allVariants.push({ color, size, sku: "", onHandSku: "", imageUrls: [], location: primaryLocationName });
+            allVariants.push({ color, size, sku: 0, onHandSku: 0, imageUrls: [], location: primaryLocationName });
           }
         }
       }
@@ -110,28 +110,28 @@ const SecondStepOfAddProduct = () => {
       setProductVariants(allVariants);
 
       // Set form values for the variants
-      allVariants?.forEach((variant, index) => {
-        setValue(`sku-${index}`, variant?.sku || 0);
-      });
+      // allVariants?.forEach((variant, index) => {
+      //   setValue(`sku-${index}`, variant?.sku || 0);
+      // });
 
     } catch (e) {
       console.error(e);
     }
   }, [router, setValue, locationList]);
 
-  const handleVariantChange = (index, field, value) => {
-    const updatedVariants = [...productVariants];
+  // const handleVariantChange = (index, field, value) => {
+  //   const updatedVariants = [...productVariants];
 
-    // Update the field value
-    updatedVariants[index][field] = value;
+  //   // Update the field value
+  //   updatedVariants[index][field] = value;
 
-    // If the field is 'sku', update 'onHandSku' with the same value
-    if (field === "sku") {
-      updatedVariants[index]["onHandSku"] = value;
-    }
+  //   // If the field is 'sku', update 'onHandSku' with the same value
+  //   if (field === "sku") {
+  //     updatedVariants[index]["onHandSku"] = value;
+  //   }
 
-    setProductVariants(updatedVariants);
-  };
+  //   setProductVariants(updatedVariants);
+  // };
 
   // Memoize the primary location name based on locationList changes
   const primaryLocationName = useMemo(() => {
@@ -301,11 +301,11 @@ const SecondStepOfAddProduct = () => {
     try {
 
       const invalidVariants = productVariants.filter(
-        (variant) => variant.imageUrls.length < 3
+        (variant) => variant.imageUrls.length < 2
       );
 
       if (invalidVariants.length > 0) {
-        toast.error("Each variant must have at least 3 images.");
+        toast.error("Each variant must have at least 2 images.");
         return;
       }
 
@@ -315,12 +315,8 @@ const SecondStepOfAddProduct = () => {
       const formattedData = productVariants.map((variant, index) => {
         return activeLocations?.map(location => ({
           ...variant,
-          sku: location.isPrimaryLocation
-            ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
-            : 0, // Set SKU to 0 for others
-          onHandSku: location.isPrimaryLocation
-            ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
-            : 0, // Set SKU to 0 for others
+          sku: 0, // Set SKU 0
+          onHandSku: 0, // Set SKU 0
           location: location.locationName,
         }));
       });
@@ -370,12 +366,8 @@ const SecondStepOfAddProduct = () => {
     const formattedData = productVariants?.map((variant, index) => {
       return activeLocations?.map(location => ({
         ...variant,
-        sku: location.isPrimaryLocation
-          ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
-          : 0, // Set SKU to 0 for others
-        onHandSku: location.isPrimaryLocation
-          ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
-          : 0, // Set SKU to 0 for others
+        sku: 0, // Set SKU to 0
+        onHandSku: 0, // Set SKU to 0
         location: location.locationName,
       }));
     });
@@ -385,11 +377,11 @@ const SecondStepOfAddProduct = () => {
 
     // Check if any variant is missing an image URL
     const invalidVariants = productVariants?.filter(
-      (variant) => variant.imageUrls.length < 3
+      (variant) => variant.imageUrls.length < 2
     );
 
     if (invalidVariants?.length > 0) {
-      toast.error("Each variant must have at least 3 images.");
+      toast.error("Each variant must have at least 2 images.");
       return;
     }
 
@@ -479,6 +471,7 @@ const SecondStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('allSizes') || '[]');
         JSON.parse(localStorage.removeItem('availableColors') || '[]');
         localStorage.removeItem('newArrival');
+        localStorage.removeItem('trending');
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
         JSON.parse(localStorage.removeItem('productVariants') || '[]');
@@ -565,21 +558,6 @@ const SecondStepOfAddProduct = () => {
                       disabled
                     />
                   </div>
-                  <div className='md:w-1/3'>
-                    <label htmlFor={`sku-${index}`} className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">SKU <span className="text-red-600 pl-1">*</span></label>
-                    <input
-                      id={`sku-${index}`}
-                      autocomplete="off"
-                      {...register(`sku-${index}`, { required: true })}
-                      value={variant.sku}
-                      onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                      className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-                      type="number"
-                    />
-                    {errors[`sku-${index}`] && (
-                      <p className="text-left text-red-500 font-semibold text-xs pt-2">SKU is required</p>
-                    )}
-                  </div>
                 </div>
 
                 <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
@@ -604,6 +582,12 @@ const SecondStepOfAddProduct = () => {
                             Click to upload
                           </span>{" "}
                           or drag and drop
+                        </p>
+                        <p className="text-[10px] text-neutral-500">
+                          Upload at least{" "}
+                          <span className="text-blue-300 font-semibold">2 images</span>{" "}
+                          (up to{" "}
+                          <span className="text-amber-600 font-semibold">6 allowed</span>)
                         </p>
                         <p className="text-[10px]">Max image size : 10 MB</p>
                         <div className='py-1'>

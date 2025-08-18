@@ -531,7 +531,7 @@ const RecentPromotions = () => {
     return (
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => {
-          const isExpired = new Date(item?.expiryDate) < currentDate;
+          // const isExpired = new Date(item?.expiryDate) < currentDate;
           // const isExpandedItem = isExpanded === item._id;
 
           const totalPromoApplied = item?.promoCode
@@ -622,7 +622,6 @@ const RecentPromotions = () => {
                           ৳ {item?.maxAmount || '0'}
                         </td>
                       )}
-
                       {column === 'Actions' && isAuthorized && (
                         <td key="actions" className="text-xs p-3 text-gray-700">
                           <div className="flex items-center gap-3 cursor-pointer">
@@ -630,7 +629,7 @@ const RecentPromotions = () => {
                             {isAuthorized &&
                               <div className="group relative">
                                 <button
-                                  disabled={isExpired || !isAuthorized}>
+                                  disabled={!isAuthorized}>
                                   <MdOutlineModeEdit
                                     onClick={() =>
                                       item?.promoCode
@@ -638,15 +637,14 @@ const RecentPromotions = () => {
                                         : router.push(`/marketing/offer/${item._id}`)
                                     }
                                     size={22}
-                                    className={`text-blue-500 ${isExpired || !isAuthorized ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                    className={`text-blue-500 ${!isAuthorized ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                   />
                                 </button>
-                                {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                                {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
 
-                                  {isExpired ? "Expired"
-                                    : !isAuthorized
-                                      ? "N/A"
-                                      : "Edit"}
+                                  {!isAuthorized
+                                    ? "N/A"
+                                    : "Edit"}
                                 </span>}
                               </div>
                             }
@@ -654,7 +652,7 @@ const RecentPromotions = () => {
                             {isOwner &&
                               <div className="group relative">
 
-                                <button disabled={isExpired || !isOwner}>
+                                <button disabled={!isOwner}>
                                   <RiDeleteBinLine
                                     onClick={() =>
                                       item?.promoCode
@@ -662,15 +660,13 @@ const RecentPromotions = () => {
                                         : handleDeleteOffer(item._id)
                                     }
                                     size={22}
-                                    className={`text-red-500 ${isExpired || !isOwner ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                    className={`text-red-500 ${!isOwner ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                   />
                                 </button>
-                                {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                                  {isExpired
-                                    ? "Expired"
-                                    : !isOwner
-                                      ? "N/A"
-                                      : "Delete"
+                                {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                                  {!isOwner
+                                    ? "N/A"
+                                    : "Delete"
                                   }
                                 </span>}
                               </div>
@@ -679,7 +675,6 @@ const RecentPromotions = () => {
                           </div>
                         </td>
                       )}
-
                       {column === 'Status' && isOwner && (
                         <td key="status" className="text-xs p-3 text-gray-700">
                           {isOwner &&
@@ -688,8 +683,6 @@ const RecentPromotions = () => {
                               onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
                               size="md"
                               color="primary"
-                              // disabled={isExpired || (item?.promoCode ? !isTogglePromoButtonAllowed : !isToggleOfferButtonAllowed)}
-                              disabled={isExpired}
                             />
                           }
                         </td>

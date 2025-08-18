@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
-import { MdOutlineFileUpload } from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-icons/md';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useSizeRanges from '@/app/hooks/useSizeRanges';
@@ -52,7 +52,6 @@ const FirstStepOfAddProduct = () => {
   const [sizeError, setSizeError] = useState(false);
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
-  const [sizeError4, setSizeError4] = useState(false);
   const [menuPortalTarget, setMenuPortalTarget] = useState(null);
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [selectedNewArrival, setSelectedNewArrival] = useState("");
@@ -281,12 +280,6 @@ const FirstStepOfAddProduct = () => {
 
   const handleSubCategoryArray = (keys) => {
     const selectedArray = [...keys];
-    if (selectedArray.length > 0) {
-      setSizeError4(false);
-    }
-    else {
-      setSizeError4(true);
-    }
     setSelectedSubCategories(selectedArray);
 
     localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
@@ -304,15 +297,15 @@ const FirstStepOfAddProduct = () => {
     localStorage.setItem('groupOfSizes', JSON.stringify(sizes));
 
     // Generate sizes based on the selected size range
-    const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
+    // const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
 
     setGroupSelected(sizes);
 
     setUnselectedGroupSelected2([]); // Reset previously unselected sizes
+    setGroupSelected2([]);
+    // setGroupSelected2(newRelatedSizes); // Directly set new sizes
 
-    setGroupSelected2(newRelatedSizes); // Directly set new sizes
-
-    localStorage.setItem('allSizes', JSON.stringify(newRelatedSizes));
+    // localStorage.setItem('allSizes', JSON.stringify(newRelatedSizes));
   };
 
   const handleGroupSelected2Change = (sizes) => {
@@ -331,15 +324,22 @@ const FirstStepOfAddProduct = () => {
       });
     };
 
-    // Save to local storage
-    localStorage.setItem("allSizes", JSON.stringify(sizes));
+    const sortedSizes = sortSizes([...sizes]);
 
-    setGroupSelected2((prevSizes) => {
-      const updatedSizes = [...sizes]; // Create a new array with the latest sizes
-      const sortedSizes = sortSizes(updatedSizes); // Ensure correct sorting
-      localStorage.setItem("allSizes", JSON.stringify(sortedSizes));
-      return sortedSizes;
-    });
+    setGroupSelected2(sortedSizes);
+
+    // ✅ only save the selected sizes
+    localStorage.setItem("allSizes", JSON.stringify(sortedSizes));
+
+    // // Save to local storage
+    // localStorage.setItem("allSizes", JSON.stringify(sizes));
+
+    // setGroupSelected2((prevSizes) => {
+    //   const updatedSizes = [...sizes]; // Create a new array with the latest sizes
+    //   const sortedSizes = sortSizes(updatedSizes); // Ensure correct sorting
+    //   localStorage.setItem("allSizes", JSON.stringify(sortedSizes));
+    //   return sortedSizes;
+    // });
 
     if (sizes.length > 0) {
       setSizeError3(false);
@@ -351,6 +351,25 @@ const FirstStepOfAddProduct = () => {
       return [...prevUnselected, ...newlyUnselected];
     });
   };
+
+  const handleSelectAll = () => {
+    const availableSizes = generateSizes(groupSelected[0] || '');
+    setGroupSelected2(availableSizes);
+    localStorage.setItem('allSizes', JSON.stringify(availableSizes));
+    setSizeError3(false);
+  };
+
+  const handleUnselectAll = () => {
+    setGroupSelected2([]);
+    localStorage.setItem('allSizes', JSON.stringify([]));
+    setSizeError3(false);
+  };
+
+  // Ensure groupSelected is an array, default to empty array if undefined
+  const safeGroupSelected = Array.isArray(groupSelected) ? groupSelected : [];
+  const availableSizes = safeGroupSelected?.length > 0 ? generateSizes(safeGroupSelected[0]) : [];
+  const allSelected = availableSizes?.length > 0 && groupSelected2?.length === availableSizes?.length;
+  const noneSelected = groupSelected2?.length === 0;
 
   const uploadSingleFileToGCS = async (file) => {
     try {
@@ -648,12 +667,6 @@ const FirstStepOfAddProduct = () => {
       }
       setSizeError3(false);
 
-      if (selectedSubCategories.length === 0) {
-        setSizeError4(true);
-        return;
-      }
-      setSizeError4(false);
-
       if (selectedSeasons?.length === 0) {
         setSeasonError(true);
         return;
@@ -709,12 +722,6 @@ const FirstStepOfAddProduct = () => {
       return;
     }
     setSizeError3(false);
-
-    if (selectedSubCategories.length === 0) {
-      setSizeError4(true);
-      return;
-    }
-    setSizeError4(false);
 
     if (selectedSeasons?.length === 0) {
       setSeasonError(true);
@@ -797,6 +804,7 @@ const FirstStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('allSizes') || '[]');
         JSON.parse(localStorage.removeItem('availableColors') || '[]');
         localStorage.removeItem('newArrival');
+        localStorage.removeItem('trending');
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
         JSON.parse(localStorage.removeItem('restOfOutfit') || '[]');
@@ -927,32 +935,62 @@ const FirstStepOfAddProduct = () => {
               </div>
 
               {selectedCategory && sizeRangeList[selectedCategory] && (
-                <div className="flex flex-col gap-1 w-full">
-                  <CheckboxGroup
-                    className="gap-1"
-                    label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
-                    orientation="horizontal"
-                    value={groupSelected}
-                    onChange={handleGroupSelectedChange}
-                  >
-                    {sizeRangeList[selectedCategory]?.map((size) => (
-                      <CustomCheckbox
-                        key={size}
-                        value={size}
-                        isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
-                      >
-                        {size}
-                      </CustomCheckbox>
-                    ))}
-                  </CheckboxGroup>
+                <div className="flex flex-col w-full">
+
+                  <div className='flex justify-between items-center'>
+
+                    <CheckboxGroup
+                      className="gap-1"
+                      label={<p className="font-semibold text-neutral-500 text-sm pb-1">Select size range <span className="text-red-600 pl-1">*</span></p>}
+                      orientation="horizontal"
+                      value={groupSelected}
+                      onChange={handleGroupSelectedChange}
+                    >
+                      {sizeRangeList[selectedCategory]?.map((size) => (
+                        <CustomCheckbox
+                          key={size}
+                          value={size}
+                          isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
+                        >
+                          {size}
+                        </CustomCheckbox>
+                      ))}
+                    </CheckboxGroup>
+
+                    {groupSelected?.length > 0 && (
+                      <div className="flex gap-2 mt-6">
+                        {!allSelected && (
+                          <button
+                            type="button"
+                            className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#ffddc2] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-sm text-neutral-700"
+                            onClick={handleSelectAll}
+                          >
+                            <MdCheckBox size={16} /> Select All
+                          </button>
+                        )}
+                        {!noneSelected && (
+                          <button
+                            type="button"
+                            className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#d4ffce] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-sm text-neutral-700"
+                            onClick={handleUnselectAll}
+                          >
+                            <MdCheckBoxOutlineBlank size={16} /> Unselect All
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                  </div>
+
                   {sizeError2 && (
                     <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size range.</p>
                   )}
+
                 </div>
               )}
 
               {groupSelected?.length > 0 && (
-                <div className="flex flex-col gap-1 w-full">
+                <div className="flex flex-col w-full">
                   <CheckboxGroup
                     className="gap-1"
                     label={<p className="font-semibold text-neutral-500 text-sm pb-1">Deselect sizes <span className="text-red-600 pl-1">*</span></p>}
@@ -968,7 +1006,7 @@ const FirstStepOfAddProduct = () => {
                     Selected: <span>{groupSelected2?.join(", ")}</span>
                   </p>
                   {sizeError3 && (
-                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select at least one size.</p>
+                    <p className="text-left text-red-500 font-semibold text-xs">Please select at least one size.</p>
                   )}
                 </div>
               )}
@@ -979,11 +1017,10 @@ const FirstStepOfAddProduct = () => {
                     name="subCategories"
                     control={control}
                     defaultValue={selectedSubCategories}
-                    rules={{ required: 'Sub-Category is required' }}
                     render={({ field }) => (
                       <div>
                         <Select
-                          label={<p className="font-semibold text-neutral-500 text-sm">Sub Category <span className="text-red-600 pl-1">*</span></p>}
+                          label={<p className="font-semibold text-neutral-500 text-sm">Sub Category</p>}
                           selectionMode="multiple"
                           value={selectedSubCategories}
                           placeholder="Select Sub Categories"
@@ -999,13 +1036,6 @@ const FirstStepOfAddProduct = () => {
                             </SelectItem>
                           ))}
                         </Select>
-
-                        {/* Conditional Error Display */}
-                        {errors.subCategories ? (
-                          <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.subCategories.message}</p>
-                        ) : (
-                          sizeError4 && <p className="text-left pt-2 text-red-500 font-semibold text-xs">Sub Category is required.</p>
-                        )}
                       </div>
                     )}
                   />
@@ -1050,7 +1080,7 @@ const FirstStepOfAddProduct = () => {
                 defaultValue={selectedNewArrival}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     <RadioGroup
                       {...field}
                       label={<p className="font-semibold text-neutral-500 text-sm">Is New Arrival? <span className="text-red-600 pl-1">*</span></p>}
@@ -1063,7 +1093,7 @@ const FirstStepOfAddProduct = () => {
                     </RadioGroup>
                     <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
                     {errors.newArrival && (
-                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
+                      <p className="text-left text-red-500 font-semibold text-xs">New Arrival Selection is required</p>
                     )}
                   </div>
                 )}
@@ -1075,7 +1105,7 @@ const FirstStepOfAddProduct = () => {
                 defaultValue={isTrending}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     <RadioGroup
                       {...field}
                       label={<p className="font-semibold text-neutral-500 text-sm">Is Trending? <span className="text-red-600 pl-1">*</span></p>}
@@ -1088,7 +1118,7 @@ const FirstStepOfAddProduct = () => {
                     </RadioGroup>
                     <p className="text-default-500 text-small">Selected: {isTrending}</p>
                     {errors.trending && (
-                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">Trending Selection is required</p>
+                      <p className="text-left text-red-500 font-semibold text-xs">Trending Selection is required</p>
                     )}
                   </div>
                 )}
@@ -1361,35 +1391,42 @@ const FirstStepOfAddProduct = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                 <div className='flex flex-col gap-4'>
-                  <input
-                    id='imageUpload'
-                    type='file'
-                    className='hidden'
-                    onChange={handleImageChange}
-                  />
-                  <label
-                    htmlFor='imageUpload'
-                    className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
-                      } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <MdOutlineFileUpload size={60} />
-                    <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
-                      <p className="text-[13px]">
-                        <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
-                          Click to upload
-                        </span>{" "}
-                        or drag and drop
-                      </p>
-                      <p className="text-[11px]">Max image size is 10 MB</p>
-                      <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
-                    </div>
-                  </label>
-                  {sizeError && (
-                    <p className="text-left text-red-500 font-semibold text-xs">Select product thumbnail image</p>
-                  )}
+
+                  <div>
+                    <label htmlFor="imageUpload" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Thumbnail <span className="text-red-600 pl-1">*</span></label>
+                    <input
+                      id='imageUpload'
+                      type='file'
+                      className='hidden'
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor='imageUpload'
+                      className={`flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed duration-500 ${dragging ? 'border-blue-300 bg-blue-50' : 'border-gray-400 bg-white'
+                        } hover:border-blue-300 hover:bg-blue-50 p-6 cursor-pointer`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      <MdOutlineFileUpload size={60} />
+                      <div className='space-y-1.5 text-center text-neutral-500 font-semibold'>
+                        <p className="text-[13px]">
+                          <span className="text-blue-300 underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-blue-400">
+                            Click to upload
+                          </span>{" "}
+                          or drag and drop
+                        </p>
+                        <p className="text-[11px]">Max image size is 10 MB</p>
+                        <p className="text-[11px] text-gray-500">Photo Should be in PNG, JPEG or JPG format</p>
+                      </div>
+                    </label>
+
+                    {sizeError && (
+                      <p className="text-left text-red-500 font-semibold text-xs pt-2">Select product thumbnail image</p>
+                    )}
+
+                  </div>
+
                   {image && (
                     <div className='relative'>
                       <Image

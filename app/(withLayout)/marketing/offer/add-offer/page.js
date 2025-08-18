@@ -557,13 +557,19 @@ const AddOffer = () => {
 
                 <div>
                   <label htmlFor='minAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Minimum Order Amount <span className="text-red-600 pl-1">*</span></label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                  <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                  {errors.minAmount?.type === "required" && (
+                    <p className="text-left pt-2 text-red-500 font-semibold text-xs">Min Amount is required</p>
+                  )}
                 </div>
 
                 {offerDiscountType === "Percentage" &&
                   <div>
                     <label htmlFor='maxAmount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Maximum Capped Amount <span className="text-red-600 pl-1">*</span></label>
-                    <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                    <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" type="number" />
+                    {errors.maxAmount?.type === "required" && (
+                      <p className="text-left pt-2 text-red-500 font-semibold text-xs">Max Amount is required</p>
+                    )}
                   </div>
                 }
 

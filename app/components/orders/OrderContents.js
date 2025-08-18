@@ -1548,12 +1548,12 @@ const OrderContents = () => {
 
                                   {order.orderStatus === 'Refunded' && (
                                     <Button
-                                      className="text-xs w-20"
+                                      className="text-xs"
                                       size="sm"
                                       color="default"
                                       isDisabled
                                     >
-                                      Refunded
+                                      Refund Processed
                                     </Button>
                                   )}
 

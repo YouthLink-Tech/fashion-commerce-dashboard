@@ -233,8 +233,8 @@ const ProductPage = () => {
     ) || [];
 
     // Get matching shipment handlers
-    const matchingHandlerNames = matchingZones.map(zone => {
-      const handler = shipmentHandlerList.find(h => h._id === zone.selectedShipmentHandlerId);
+    const matchingHandlerNames = matchingZones?.map(zone => {
+      const handler = shipmentHandlerList?.find(h => h?._id === zone?.selectedShipmentHandlerId);
       return handler?.shipmentHandlerName?.toLowerCase() || '';
     });
 
