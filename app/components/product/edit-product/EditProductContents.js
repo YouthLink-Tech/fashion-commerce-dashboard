@@ -939,7 +939,7 @@ const EditProductContents = () => {
         toast.error("Trending selection is required");
         return;
       }
-      setNewArrivalError(false);
+      setTrendingError(false);
 
       if (selectedSeasons?.length === 0) {
         setSeasonError(true);
@@ -1004,7 +1004,7 @@ const EditProductContents = () => {
           // Preserve whatever SKU exists already
           if (existingVariant) {
             sku = existingVariant.sku;
-            onHandSku = existingVariant.sku;
+            onHandSku = existingVariant.onHandSku;
           }
 
           // Add the variant to finalData

@@ -119,7 +119,10 @@ const EditReceiveInventory = () => {
 
       if (invalidVariantsForZero.length > 0) {
         // Handle the error: show an error message or mark fields as invalid
-        toast.error('Accept value must be greater than 0');
+        toast.error('Accept value must be greater than 0', {
+          position: "bottom-right",
+          duration: 5000,
+        });
         return; // Stop the submission
       }
 
@@ -151,7 +154,10 @@ const EditReceiveInventory = () => {
 
       if (failedUpdates.length > 0) {
         const errorMessages = failedUpdates.map(u => `${u?.productId}: ${u?.error}`).join("\n");
-        toast.error(`Some variants failed to update:\n${errorMessages}`);
+        toast.error(`Some variants failed to update:\n${errorMessages}`, {
+          position: "bottom-right",
+          duration: 5000,
+        });
         return; // Stop here, don't update purchase order
       }
 
