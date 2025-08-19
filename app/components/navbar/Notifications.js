@@ -96,9 +96,10 @@ const Notifications = () => {
         type: detail.type,
         orderNumber: detail.orderNumber,
         productId: detail.productId,
-        dateTime: detail.dateTime,
         email: detail.email,
-        orderStatus: detail.orderStatus
+        orderStatus: detail.orderStatus,
+        colorCode: detail.colorCode,
+        size: detail.size,
       };
 
       const response = await axiosSecure.post("/mark-notification-read", notificationDetails)
