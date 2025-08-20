@@ -16,28 +16,20 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/shared/switch/CustomSwitch';
-import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { MdCancel } from 'react-icons/md';
 
 const SecondStepOfAddProduct = () => {
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const { handleSubmit, setValue } = useForm();
   const [productVariants, setProductVariants] = useState([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [navigate, setNavigate] = useState(false);
   const router = useRouter();
   const axiosSecure = useAxiosSecure();
   const [locationList, isLocationPending] = useLocations();
-  const [showModal, setShowModal] = useState(false);
   const [sizeError, setSizeError] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
-
-  // Function to handle "Go Back" button click
-  const handleGoBackClick = (e) => {
-    e.preventDefault();  // Prevent immediate navigation
-    setShowModal(true);  // Show confirmation modal
-  };
 
   // Handle toggle change and update local storage
   const handleToggleChange = () => {
@@ -45,22 +37,6 @@ const SecondStepOfAddProduct = () => {
       const newState = !prevState;
       localStorage.setItem("showInventory", JSON.stringify(newState));
       return newState;
-    });
-  };
-
-  // Function to handle "Yes" button (confirm navigation)
-  const handleConfirmExit = () => {
-    setShowModal(false);
-    router.push("/product-hub/products");  // Navigate to the "Go Back" page
-  };
-
-  // Function to close the modal without navigating
-  const handleCloseModal = () => {
-    setShowModal(false);
-    // Scroll to bottom of the page
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
     });
   };
 
@@ -173,6 +149,7 @@ const SecondStepOfAddProduct = () => {
         ...currentImages,
         ...imageUrls,
       ].slice(0, 6);
+      localStorage.setItem("productVariants", JSON.stringify(updatedVariants));
       return updatedVariants;
     });
   };
@@ -257,6 +234,7 @@ const SecondStepOfAddProduct = () => {
         ...currentImages,
         ...imageUrls,
       ].slice(0, 6); // Limit to 6 images
+      localStorage.setItem("productVariants", JSON.stringify(updatedVariants));
       return updatedVariants;
     });
   };
@@ -271,6 +249,7 @@ const SecondStepOfAddProduct = () => {
       updatedVariants[variantIndex].imageUrls = updatedVariants[variantIndex].imageUrls.filter(
         (_, index) => index !== imgIndex
       );
+      localStorage.setItem("productVariants", JSON.stringify(updatedVariants));
       return updatedVariants;
     });
   };
@@ -292,6 +271,7 @@ const SecondStepOfAddProduct = () => {
 
       // Update the variant's imageUrls array
       updatedVariants[variantIndex].imageUrls = items;
+      localStorage.setItem("productVariants", JSON.stringify(updatedVariants));
 
       return updatedVariants;
     });
@@ -525,7 +505,6 @@ const SecondStepOfAddProduct = () => {
           <Link
             className="flex-1 flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/product-hub/products"
-            onClick={handleGoBackClick}  // Trigger the modal on click
           >
             <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
               <FaArrowLeft />
@@ -726,12 +705,6 @@ const SecondStepOfAddProduct = () => {
         </div>
 
       </form>
-
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
 
     </div>
   );

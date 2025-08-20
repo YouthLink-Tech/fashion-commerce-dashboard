@@ -32,7 +32,6 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import DOMPurify from "dompurify";
 import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
-import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
@@ -79,29 +78,6 @@ const FirstStepOfAddProduct = () => {
   const dropdownRef = useRef(null);
   const dropdownRefForCompleteOutfit = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-
-  // Function to handle "Go Back" button click
-  const handleGoBackClick = (e) => {
-    e.preventDefault();  // Prevent immediate navigation
-    setShowModal(true);  // Show confirmation modal
-  };
-
-  // Function to handle "Yes" button (confirm navigation)
-  const handleConfirmExit = () => {
-    setShowModal(false);
-    router.push("/product-hub/products");  // Navigate to the "Go Back" page
-  };
-
-  // Function to close the modal without navigating
-  const handleCloseModal = () => {
-    setShowModal(false);
-    // Scroll to bottom of the page
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList
@@ -167,11 +143,13 @@ const FirstStepOfAddProduct = () => {
     }
 
     setSelectedSeasons(updatedSelectedSeasons);
+    localStorage.setItem("season", JSON.stringify(updatedSelectedSeasons));
     handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected seasons to parent component
   };
 
   const handleSeasonSelectionChange = async (selectedSea) => {
     setSelectedSeasons(selectedSea);
+    localStorage.setItem("season", JSON.stringify(selectedSea));
     if (selectedSea?.length === 0) {
       setSeasonError(true);
       return;
@@ -231,11 +209,13 @@ const FirstStepOfAddProduct = () => {
     }
 
     setSelectedProductIds(updatedSelectedProducts);
+    localStorage.setItem("restOfOutfit", JSON.stringify(updatedSelectedProducts));
     handleProductSelectionChange(updatedSelectedProducts);
   };
 
   const handleProductSelectionChange = (selectedProducts) => {
     setSelectedProductIds(selectedProducts); // Update the state with selected products
+    localStorage.setItem("restOfOutfit", JSON.stringify(selectedProducts));
   };
 
   // Close dropdown when clicking outside
@@ -281,8 +261,7 @@ const FirstStepOfAddProduct = () => {
   const handleSubCategoryArray = (keys) => {
     const selectedArray = [...keys];
     setSelectedSubCategories(selectedArray);
-
-    localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
+    localStorage.setItem('subCategories', JSON.stringify(selectedArray));
   };
 
   const handleGroupSelectedChange = (sizes) => {
@@ -401,6 +380,7 @@ const FirstStepOfAddProduct = () => {
 
     if (uploadedImageUrl) {
       // Update the state with the Imgbb URL instead of the local blob URL
+      localStorage.setItem("uploadedImageUrl", uploadedImageUrl);
       setImage(uploadedImageUrl);
       setSizeError(false);
     }
@@ -408,6 +388,8 @@ const FirstStepOfAddProduct = () => {
 
   const handleImageRemove = () => {
     setImage(null);
+    localStorage.removeItem("uploadedImageUrl");
+    setSizeError(true);
   };
 
   const handleDragOver = (event) => {
@@ -432,6 +414,7 @@ const FirstStepOfAddProduct = () => {
 
     if (uploadedImageUrl) {
       // Update the state with the Imgbb URL instead of the local blob URL
+      localStorage.setItem("uploadedImageUrl", uploadedImageUrl);
       setImage(uploadedImageUrl);
       setSizeError(false);
     }
@@ -483,6 +466,9 @@ const FirstStepOfAddProduct = () => {
       const storedUploadedImageUrl = localStorage.getItem('uploadedImageUrl');
       if (storedUploadedImageUrl) {
         setImage(storedUploadedImageUrl);
+        setSizeError(false);
+      } else {
+        setSizeError(true); // Set error if no image is found (assuming required)
       }
 
       const storedDiscountType = localStorage.getItem('discountType');
@@ -492,7 +478,7 @@ const FirstStepOfAddProduct = () => {
 
       const storedDiscountValue = localStorage.getItem('discountValue');
       if (storedDiscountValue) {
-        setValue('discountValue', storedDiscountValue || 0);
+        setValue('discountValue', parseFloat(storedDiscountValue) || 0);
       }
 
       const storedProductDetails = localStorage.getItem('productDetails');
@@ -518,16 +504,19 @@ const FirstStepOfAddProduct = () => {
         setValue('category', storedCategory);
       }
 
-      const storedSeason = JSON.parse(localStorage.getItem('season') || '[]');
+      const storedSeason = safelyParseJSON(localStorage.getItem("season") || "[]");
       if (Array.isArray(storedSeason)) {
         setSelectedSeasons(storedSeason);
-        setValue('season', storedSeason);
+        setValue("season", storedSeason);
+        if (storedSeason.length === 0) {
+          setSeasonError(true);
+        }
       }
 
-      const storedProducts = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
+      const storedProducts = safelyParseJSON(localStorage.getItem("restOfOutfit") || "[]");
       if (Array.isArray(storedProducts)) {
         setSelectedProductIds(storedProducts);
-        setValue('restOfOutfit', storedProducts);
+        setValue("restOfOutfit", storedProducts);
       }
 
       const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
@@ -536,20 +525,22 @@ const FirstStepOfAddProduct = () => {
         setValue('subCategories', storedSubCategories);
       }
 
-      const storedGroupOfSizes = localStorage.getItem('groupOfSizes');
-      if (storedGroupOfSizes) {
-        setGroupSelected(JSON.parse(storedGroupOfSizes) || []);
+      const storedGroupOfSizes = safelyParseJSON(localStorage.getItem("groupOfSizes") || "[]");
+      if (Array.isArray(storedGroupOfSizes)) {
+        setGroupSelected(storedGroupOfSizes);
+        setValue("groupOfSizes", storedGroupOfSizes);
       }
 
-      const storedAllSizes = localStorage.getItem('allSizes');
-      if (storedAllSizes) {
-        setGroupSelected2(JSON.parse(storedAllSizes) || []);
+      const storedAllSizes = safelyParseJSON(localStorage.getItem("allSizes") || "[]");
+      if (Array.isArray(storedAllSizes)) {
+        setGroupSelected2(storedAllSizes);
+        setValue("allSizes", storedAllSizes);
       }
 
-      const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
+      const storedAvailableColors = safelyParseJSON(localStorage.getItem("availableColors") || "[]");
       if (Array.isArray(storedAvailableColors)) {
         setSelectedAvailableColors(storedAvailableColors);
-        setValue('availableColors', storedAvailableColors);
+        setValue("availableColors", storedAvailableColors);
       }
 
       const storedNewArrival = localStorage.getItem('newArrival');
@@ -564,13 +555,13 @@ const FirstStepOfAddProduct = () => {
         setValue('trending', storedIsTrending);
       }
 
-      const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
+      const storedVendors = safelyParseJSON(localStorage.getItem('vendors') || "[]");
       if (Array.isArray(storedVendors)) {
         setSelectedVendors(storedVendors);
         setValue('vendors', storedVendors);
       }
 
-      const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
+      const storedTags = safelyParseJSON(localStorage.getItem('tags') || "[]");
       if (Array.isArray(storedTags)) {
         setSelectedTags(storedTags);
         setValue('tags', storedTags);
@@ -582,7 +573,7 @@ const FirstStepOfAddProduct = () => {
     } catch (error) {
       console.error('Failed to load data from localStorage:', error);
     }
-  }, [setValue]);
+  }, [setValue, setImage, setDiscountType, setMaterialCare, setSizeFit, setSelectedCategory, setSelectedSeasons, setSelectedProductIds, setSelectedSubCategories, setGroupSelected, setGroupSelected2, setSelectedAvailableColors, setSelectedNewArrival, setIsTrending, setSelectedVendors, setSelectedTags, setSeasonError, setSizeError]);
 
   const generateProductID = (category) => {
     const prefix = "PPX"; // Automatically generated "PPX"
@@ -856,8 +847,7 @@ const FirstStepOfAddProduct = () => {
 
           <Link // Trigger the modal on click
             className="flex items-center gap-2 text-[10px] md:text-base justify-end"
-            href="/products"
-            onClick={handleGoBackClick}>
+            href="/product-hub/products">
             <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
               <FaArrowLeft />
             </span>
@@ -875,7 +865,12 @@ const FirstStepOfAddProduct = () => {
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
               <div>
                 <label htmlFor='productTitle' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Product Title <span className="text-red-600 pl-1">*</span></label>
-                <input id='productTitle' {...register("productTitle", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Title' type="text" />
+                <input id='productTitle' {...register("productTitle", { required: true })} className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Title' type="text"
+                  onChange={(e) => {
+                    setValue('productTitle', e.target.value);
+                    localStorage.setItem('productTitle', e.target.value);
+                  }}
+                />
                 {errors.productTitle?.type === "required" && (
                   <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Title is required</p>
                 )}
@@ -1064,6 +1059,7 @@ const FirstStepOfAddProduct = () => {
                         onChange={(newValue) => {
                           setSelectedAvailableColors(newValue);
                           field.onChange(newValue);
+                          localStorage.setItem('availableColors', JSON.stringify(newValue));
                         }}
                       />
                     </div>
@@ -1085,7 +1081,11 @@ const FirstStepOfAddProduct = () => {
                       {...field}
                       label={<p className="font-semibold text-neutral-500 text-sm">Is New Arrival? <span className="text-red-600 pl-1">*</span></p>}
                       value={selectedNewArrival}
-                      onValueChange={setSelectedNewArrival}
+                      onValueChange={(value) => {
+                        setSelectedNewArrival(value);
+                        field.onChange(value);
+                        localStorage.setItem('newArrival', value);
+                      }}
                       orientation="horizontal"
                     >
                       <Radio value="Yes">Yes</Radio>
@@ -1110,7 +1110,11 @@ const FirstStepOfAddProduct = () => {
                       {...field}
                       label={<p className="font-semibold text-neutral-500 text-sm">Is Trending? <span className="text-red-600 pl-1">*</span></p>}
                       value={isTrending}
-                      onValueChange={setIsTrending}
+                      onValueChange={(value) => {
+                        setIsTrending(value);
+                        field.onChange(value);
+                        localStorage.setItem('trending', value);
+                      }}
                       orientation="horizontal"
                     >
                       <Radio value="Yes">Yes</Radio>
@@ -1168,7 +1172,12 @@ const FirstStepOfAddProduct = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
                   <label htmlFor="regularPrice" className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Regular Price ৳ <span className="text-red-600 pl-1">*</span></label>
-                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Price' type="number" />
+                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold" placeholder='Enter Product Price' type="number"
+                    onChange={(e) => {
+                      setValue("regularPrice", e.target.value);
+                      localStorage.setItem("regularPrice", e.target.value);
+                    }}
+                  />
                   {errors.regularPrice?.type === "required" && (
                     <p className="text-left pt-2 text-red-500 font-semibold text-xs">Product Price is required</p>
                   )}
@@ -1189,6 +1198,10 @@ const FirstStepOfAddProduct = () => {
                     {...register('discountValue')}
                     className='custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold'
                     placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+                    onChange={(e) => {
+                      setValue("discountValue", e.target.value);
+                      localStorage.setItem("discountValue", e.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -1210,8 +1223,10 @@ const FirstStepOfAddProduct = () => {
                     className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     type="text"
                     onChange={(e) => {
-                      // Convert input to uppercase and remove non-alphanumeric characters
-                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      e.target.value = value; // Update input value
+                      setValue("batchCode", value);
+                      localStorage.setItem("batchCode", value);
                     }}
                   />
                   {errors.batchCode && (
@@ -1226,6 +1241,10 @@ const FirstStepOfAddProduct = () => {
                     placeholder={`Enter Weight (gram)`}
                     className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                     type="number"
+                    onChange={(e) => {
+                      setValue("weight", e.target.value);
+                      localStorage.setItem("weight", e.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -1253,6 +1272,7 @@ const FirstStepOfAddProduct = () => {
                           onChange={(newValue) => {
                             setSelectedTags(newValue);
                             field.onChange(newValue);
+                            localStorage.setItem("tags", JSON.stringify(newValue));
                           }}
                         />
                       </div>
@@ -1283,6 +1303,7 @@ const FirstStepOfAddProduct = () => {
                           onChange={(newValue) => {
                             setSelectedVendors(newValue);
                             field.onChange(newValue);
+                            localStorage.setItem("vendors", JSON.stringify(newValue));
                           }}
                         />
                       </div>
@@ -1466,12 +1487,6 @@ const FirstStepOfAddProduct = () => {
         </div>
 
       </form>
-
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
 
     </div>
   );

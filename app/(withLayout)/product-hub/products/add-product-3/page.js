@@ -15,7 +15,6 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import ExitConfirmationModal from '@/app/components/product/modal/ExitConfirmationModal';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const ThirdStepOfAddProduct = () => {
@@ -25,7 +24,6 @@ const ThirdStepOfAddProduct = () => {
   const { handleSubmit } = useForm();
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
-  const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState('Inside Dhaka');
   const [tabSelections, setTabSelections] = useState({});
 
@@ -95,28 +93,6 @@ const ThirdStepOfAddProduct = () => {
 
   // Unified selection list from all tabs
   const selectedShipmentHandler = Object.values(tabSelections).flat();
-
-  // Function to handle "Go Back" button click
-  const handleGoBackClick = (e) => {
-    e.preventDefault();  // Prevent immediate navigation
-    setShowModal(true);  // Show confirmation modal
-  };
-
-  // Function to handle "Yes" button (confirm navigation)
-  const handleConfirmExit = () => {
-    setShowModal(false);
-    router.push("/product-hub/products");  // Navigate to the "Go Back" page
-  };
-
-  // Function to close the modal without navigating
-  const handleCloseModal = () => {
-    setShowModal(false);
-    // Scroll to bottom of the page
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   // Toggle selection for an individual item
   const toggleCardSelection = (shipping) => {
@@ -333,7 +309,6 @@ const ThirdStepOfAddProduct = () => {
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/product-hub/products"
-            onClick={handleGoBackClick}  // Trigger the modal on click
           >
             <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
               <FaArrowLeft />
@@ -495,12 +470,6 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
         </div>
       </form>
-
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
 
     </div>
   );
