@@ -11,7 +11,7 @@ import MobileNavbar from "./MobileNavbar";
 import DashboardWrapperLoading from "./DashboardWrapperLoading";
 
 const ClientDashboardWrapper = ({ isSidebarCollapsed,
-  setIsSidebarCollapsed, isSidebarPinned, setIsSidebarPinned, isMobile }) => {
+  setIsSidebarCollapsed, isSidebarPinned, setIsSidebarPinned }) => {
   const [isToggle, setIsToggle] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -64,7 +64,10 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
     <div className={`sidebar-${isSidebarCollapsed ? "collapsed" : "expanded"}`}>
 
       {/* Sidebar: Fixed on large screens, hidden on smaller screens */}
-      <div className="inset-y-0 hidden xl:flex xl:w-[var(--sidebar-width)]">
+      <div
+        className={`inset-y-0 hidden xl:block xl:w-[var(--sidebar-width)] ${isSidebarPinned ? "fixed" : "absolute"
+          } z-50`}
+      >
         <SideNavbar isCollapsed={isSidebarCollapsed}
           setIsSidebarCollapsed={setIsSidebarCollapsed}
           isSidebarPinned={isSidebarPinned}

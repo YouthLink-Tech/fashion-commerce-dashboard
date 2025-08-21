@@ -11,13 +11,11 @@ const DashboardNavbar = ({ children, sidebarState, isSidebarCollapsed,
         setIsSidebarCollapsed={setIsSidebarCollapsed}
         isSidebarPinned={isSidebarPinned}
         setIsSidebarPinned={setIsSidebarPinned}
-        isMobile={isMobile}
       />
 
       {/* Main content area */}
       <div
-        className={`flex-1 ${isMobile ? "" : "ml-[var(--sidebar-width)]"} ${isSidebarPinned ? "sidebar-pinned" : ""
-          }`}
+        className={`flex-1 main-content ${isMobile ? "" : isSidebarPinned ? "ml-[var(--sidebar-width)]" : "ml-[var(--sidebar-width-collapsed)]"} ${isSidebarPinned ? "sidebar-pinned" : ""}`}
       >
         {children}
       </div>

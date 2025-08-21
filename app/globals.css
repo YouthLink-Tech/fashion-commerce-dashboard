@@ -5,6 +5,7 @@
 :root {
   --sidebar-width-expanded: 262px;
   --sidebar-width-collapsed: 62px;
+  --sidebar-width: 0;
   --top-header-height: 28px;
   --bottom-header-height-xs: 60px;
   --bottom-header-height-sm: 64px;
@@ -23,7 +24,7 @@
   --product-default: #f0f0f0;
 }
 
-/* Default to expanded state */
+/* Expanded state */
 .sidebar-expanded {
   --sidebar-width: var(--sidebar-width-expanded);
 }
@@ -33,9 +34,51 @@
   --sidebar-width: var(--sidebar-width-collapsed);
 }
 
-/* Apply margin to main content only when sidebar is pinned */
-.sidebar-pinned {
-  margin-left: var(--sidebar-width);
+/* Drawer style for unpinned sidebar */
+.sidebar-unpinned {
+  position: absolute !important; /* Override fixed positioning */
+  z-index: 60 !important; /* Higher than other elements */
+}
+
+/* Ensure main content doesn't shift when unpinned */
+.sidebar-unpinned ~ .main-content {
+  margin-left: 0 !important;
+}
+
+/* Ensure sidebar children are visible */
+.sidebar-unpinned .sidebar-content,
+.sidebar-unpinned .sidebar-header {
+  width: 100%;
+  overflow: visible;
+}
+
+/* Reduce padding in collapsed state */
+.sidebar-collapsed .sidebar-header {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Center children in collapsed state */
+.sidebar-collapsed .sidebar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Ensure logo and nav items fit within 62px */
+.sidebar-collapsed .logo,
+.sidebar-collapsed .nav-item {
+  width: 100%;
+  text-align: center;
+  overflow: visible;
+}
+
+@media (max-width: 1279px) {
+  .sidebar-collapsed,
+  .sidebar-expanded {
+    --sidebar-width: 0; /* No width on mobile */
+  }
 }
 
 @layer base {

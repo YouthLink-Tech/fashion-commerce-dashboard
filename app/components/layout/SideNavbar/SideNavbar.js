@@ -41,6 +41,10 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   const isMobile = typeof window !== "undefined" && window.innerWidth < 1280;
   let hasRenderedOthers = false;
 
+  if (isMobile && !isToggle) {
+    return null;
+  }
+
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
     return <SidebarLoading />;
@@ -207,15 +211,17 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   const toggleCollapse = () => {
     if (!isMobile) {
       setIsSidebarCollapsed(!isCollapsed);
-      if (isSidebarPinned) setIsSidebarPinned(false);
+      if (isSidebarPinned) {
+        setIsSidebarPinned(false);
+      }
     }
   };
 
   const togglePin = () => {
-    if (isMobile) return; // Disable pinning on mobile
+    if (isMobile) return;
     if (isSidebarPinned) {
       setIsSidebarPinned(false);
-      setTimeout(() => setIsSidebarCollapsed(true), 10);
+      setIsSidebarCollapsed(true);
     } else {
       setIsSidebarPinned(true);
       setIsSidebarCollapsed(false);
@@ -237,10 +243,14 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ width: isMobile || !isCollapsed ? "262px" : "var(--sidebar-width)" }}
-        animate={{ width: isMobile || !isCollapsed ? "262px" : "var(--sidebar-width)" }}
+        initial={{
+          width: isSidebarPinned ? (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)") : (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)"),
+        }}
+        animate={{
+          width: isSidebarPinned ? (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)") : (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)"),
+        }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="h-screen w-[var(--sidebar-width)] fixed z-50 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white"
+        className={`h-screen ${isSidebarPinned ? "fixed" : "absolute"} z-50 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white ${isSidebarPinned ? "" : "sidebar-unpinned"} sidebar-${isCollapsed ? "collapsed" : "expanded"}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
