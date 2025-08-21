@@ -1,7 +1,7 @@
 "use client";
-import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
+import { FaBullhorn, FaChevronLeft, FaGlobeAsia, FaThumbtack } from "react-icons/fa";
 import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
-import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
+import { BiCategory, BiChevronLeft, BiChevronRight, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog, TbBrandAppleNews } from "react-icons/tb";
@@ -21,7 +21,7 @@ import { MdSupportAgent } from "react-icons/md";
 import Logo from "./Logo";
 import SideNavbarList from "./SideNavbarList";
 
-const SideNavbar = ({ onClose }) => {
+const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isSidebarPinned, setIsSidebarPinned }) => {
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState(null);
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
@@ -38,19 +38,12 @@ const SideNavbar = ({ onClose }) => {
   const isViewer1 = role1 === "Viewer";
   const isViewer2 = role2 === "Viewer";
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1280;
   let hasRenderedOthers = false;
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
     return <SidebarLoading />;
-  };
-
-  const handleItemClick = (name) => {
-    setActiveItem(activeItem === name ? null : name);
-  };
-
-  const handleSubItemClick = (subName) => {
-    setActiveSubItem(activeSubItem === subName ? null : subName);
   };
 
   const checkPermission = (label) => {
@@ -85,6 +78,7 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Product Hub",
       icon: <FiBox />,
+      path: "/product-hub",
       permission: checkPermission("Product Hub"),
       links: [
         {
@@ -167,6 +161,7 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Supply Chain",
       icon: <LiaPeopleCarrySolid />,
+      path: "/supply-chain",
       permission: checkPermission("Supply Chain"),
       links: [
         {
@@ -191,6 +186,7 @@ const SideNavbar = ({ onClose }) => {
       name: "Settings",
       icon: <IoSettingsOutline />,
       permission: checkPermission("Settings"),
+      path: "/settings",
       links: [
         { label: "User Management", link: "/settings/enrollment", icon: <LiaUsersCogSolid /> },
         { label: "Homepage", link: "/settings/homepage", icon: <TbHomeCog /> },
@@ -208,17 +204,80 @@ const SideNavbar = ({ onClose }) => {
     },
   ];
 
+  const toggleCollapse = () => {
+    if (!isMobile) {
+      setIsSidebarCollapsed(!isCollapsed);
+      if (isSidebarPinned) setIsSidebarPinned(false);
+    }
+  };
+
+  const togglePin = () => {
+    if (isMobile) return; // Disable pinning on mobile
+    if (isSidebarPinned) {
+      setIsSidebarPinned(false);
+      setTimeout(() => setIsSidebarCollapsed(true), 10);
+    } else {
+      setIsSidebarPinned(true);
+      setIsSidebarCollapsed(false);
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (!isMobile && !isSidebarPinned && isCollapsed) {
+      setIsSidebarCollapsed(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile && !isSidebarPinned && !isCollapsed) {
+      setIsSidebarCollapsed(true);
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ x: "-100%" }} // Starts off-screen (left side)
-        animate={{ x: 0 }} // Moves in
-        exit={{ x: "-100%", transition: { duration: 0.3 } }} // Moves out on close
-        transition={{ duration: 0.3, ease: "easeInOut" }} className="h-screen w-[262px] fixed z-50 overflow-y-auto custom-scrollbar bg-white">
+        initial={{ width: isMobile || !isCollapsed ? "262px" : "var(--sidebar-width)" }}
+        animate={{ width: isMobile || !isCollapsed ? "262px" : "var(--sidebar-width)" }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+        className="h-screen w-[var(--sidebar-width)] fixed z-50 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
 
         <div className="px-4 transition-colors duration-1000 sticky top-0 pt-1.5 z-10 bg-white">
-          <Logo />
-          <hr style={{ border: "0.5px solid #ccc", margin: "8px 0" }} />
+          <div className="flex items-center justify-between relative">
+
+            {/* Left: Logo */}
+            <Logo isCollapsed={isCollapsed && !isMobile} />
+
+            {/* Right: Buttons */}
+            {!isToggle && !isMobile && (
+              <div className="flex items-center gap-2 absolute right-0">
+                {isSidebarPinned && (
+                  <button
+                    onClick={toggleCollapse}
+                    className="p-1.5 hover:text-white hover:bg-black text-black bg-white drop-shadow rounded-full"
+                  >
+                    <FaChevronLeft size={15}
+                      className={`transform ${isCollapsed ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                )}
+
+                {!isSidebarPinned && !isCollapsed && (
+                  <button
+                    onClick={togglePin}
+                    className="p-1.5 hover:text-white hover:bg-black text-black bg-white drop-shadow rounded-full"
+                  >
+                    <FaThumbtack size={15} />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <hr className="border-t border-gray-300 my-2" />
         </div>
 
         <SideNavbarList
@@ -227,12 +286,13 @@ const SideNavbar = ({ onClose }) => {
           pathname={pathname}
           onClose={onClose}
           activeItem={activeItem}
+          setActiveItem={setActiveItem}
           hasRenderedOthers={hasRenderedOthers}
-          handleItemClick={handleItemClick}
           isViewer1={isViewer1}
           isViewer2={isViewer2}
           activeSubItem={activeSubItem}
-          handleSubItemClick={handleSubItemClick}
+          setActiveSubItem={setActiveSubItem}
+          isCollapsed={isCollapsed && !isMobile}
         />
 
       </motion.div>

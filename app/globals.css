@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --sidebar-width-expanded: 262px;
+  --sidebar-width-collapsed: 62px;
   --top-header-height: 28px;
   --bottom-header-height-xs: 60px;
   --bottom-header-height-sm: 64px;
@@ -19,6 +21,21 @@
     var(--top-header-height) + var(--bottom-header-height-lg)
   );
   --product-default: #f0f0f0;
+}
+
+/* Default to expanded state */
+.sidebar-expanded {
+  --sidebar-width: var(--sidebar-width-expanded);
+}
+
+/* Collapsed state */
+.sidebar-collapsed {
+  --sidebar-width: var(--sidebar-width-collapsed);
+}
+
+/* Apply margin to main content only when sidebar is pinned */
+.sidebar-pinned {
+  margin-left: var(--sidebar-width);
 }
 
 @layer base {

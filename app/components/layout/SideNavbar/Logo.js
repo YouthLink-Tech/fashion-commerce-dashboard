@@ -3,13 +3,13 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { WEBSITE_NAME } from "@/app/config/config";
 import useLogo from '@/app/hooks/useLogo';
-import Loading from '../../shared/Loading/Loading';
 
-const Logo = () => {
+const Logo = ({ isCollapsed }) => {
 
   const [href, setHref] = useState(null);
   const [logoList, isLogoPending] = useLogo();
   const [logo, setLogo] = useState(null);
+  const [logo2, setLogo2] = useState(null);
 
   useEffect(() => {
     const localHref = localStorage.getItem("initialPage");
@@ -21,6 +21,7 @@ const Logo = () => {
   useEffect(() => {
     if (logoList && logoList.length > 0) {
       setLogo(logoList[0]?.desktopLogoUrl);
+      setLogo2(logoList[0]?.mobileLogoUrl);
     }
   }, [logoList]);
 
@@ -36,13 +37,21 @@ const Logo = () => {
           target="_blank"
           className="flex items-center justify-center gap-2"
         >
-          <Image
-            className="h-9 md:h-10 w-auto"
-            src={logo}
-            height={600}
-            width={600}
-            alt={WEBSITE_NAME}
-          />
+          {isCollapsed ?
+            <Image
+              className="h-9 md:h-10 w-auto"
+              src={logo2}
+              height={600}
+              width={600}
+              alt={WEBSITE_NAME}
+            />
+            : <Image
+              className="h-9 md:h-10 w-auto"
+              src={logo}
+              height={600}
+              width={600}
+              alt={WEBSITE_NAME}
+            />}
         </Link>
       }
     </>
