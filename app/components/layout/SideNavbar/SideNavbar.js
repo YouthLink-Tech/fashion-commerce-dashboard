@@ -6,7 +6,7 @@ import { RxDashboard } from "react-icons/rx";
 import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog, TbBrandAppleNews } from "react-icons/tb";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LiaUsersCogSolid, LiaPeopleCarrySolid } from "react-icons/lia";
 import { IoColorPaletteOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuWarehouse, LuNewspaper } from "react-icons/lu";
@@ -25,6 +25,7 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState(null);
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
+  const [isHoverEnabled, setIsHoverEnabled] = useState(true);
   const { data: session } = useSession();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions || [];
@@ -40,15 +41,6 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 1280;
   let hasRenderedOthers = false;
-
-  if (isMobile && !isToggle) {
-    return null;
-  }
-
-  // Show loading state if data is not loaded yet
-  if (isUserLoading || !existingUserData) {
-    return <SidebarLoading />;
-  };
 
   const checkPermission = (label) => {
     if (!permissions || !Array.isArray(permissions)) return false;
@@ -213,6 +205,7 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
       setIsSidebarCollapsed(!isCollapsed);
       if (isSidebarPinned) {
         setIsSidebarPinned(false);
+        setIsHoverEnabled(false);
       }
     }
   };
@@ -222,14 +215,16 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
     if (isSidebarPinned) {
       setIsSidebarPinned(false);
       setIsSidebarCollapsed(true);
+      setIsHoverEnabled(false);
     } else {
       setIsSidebarPinned(true);
       setIsSidebarCollapsed(false);
+      setIsHoverEnabled(true);
     }
   };
 
   const handleMouseEnter = () => {
-    if (!isMobile && !isSidebarPinned && isCollapsed) {
+    if (!isMobile && !isSidebarPinned && isCollapsed && isHoverEnabled) {
       setIsSidebarCollapsed(false);
     }
   };
@@ -238,6 +233,25 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
     if (!isMobile && !isSidebarPinned && !isCollapsed) {
       setIsSidebarCollapsed(true);
     }
+  };
+
+  // Re-enable hover after a short delay
+  useEffect(() => {
+    if (!isHoverEnabled) {
+      const timer = setTimeout(() => {
+        setIsHoverEnabled(true);
+      }, 300); // Adjust delay as needed (300ms is usually enough for the animation)
+      return () => clearTimeout(timer);
+    }
+  }, [isHoverEnabled]);
+
+  if (isMobile && !isToggle) {
+    return null;
+  }
+
+  // Show loading state if data is not loaded yet
+  if (isUserLoading || !existingUserData) {
+    return <SidebarLoading />;
   };
 
   return (
@@ -256,14 +270,14 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
       >
 
         <div className="px-4 transition-colors duration-1000 sticky top-0 pt-1.5 z-10 bg-white">
-          <div className="flex items-center justify-between relative">
+          <div className="flex items-center justify-between">
 
             {/* Left: Logo */}
             <Logo isCollapsed={isCollapsed && !isMobile} />
 
             {/* Right: Buttons */}
             {!isToggle && !isMobile && (
-              <div className="flex items-center gap-2 absolute right-0">
+              <div className="flex items-center gap-2 absolute right-1">
                 {isSidebarPinned && (
                   <button
                     onClick={toggleCollapse}
@@ -285,6 +299,7 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
                 )}
               </div>
             )}
+
           </div>
 
           <hr className="border-t border-gray-300 my-2" />

@@ -35,7 +35,7 @@ const Logo = ({ isCollapsed }) => {
         <Link
           href={href}
           target="_blank"
-          className="flex items-center justify-center gap-2"
+          className="flex items-center justify-center xl:justify-start gap-2"
         >
           {isCollapsed ?
             <Image
