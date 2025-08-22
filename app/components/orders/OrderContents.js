@@ -483,14 +483,6 @@ const OrderContents = () => {
       return;
     };
 
-    const dataToSend = order?.productInformation.map(product => ({
-      productId: product.productId,
-      sku: product.sku,
-      onHandSku: product.sku,
-      size: product.size,
-      color: product.color
-    }));
-
     const returnDataToSend = order?.returnInfo?.products?.map(product => ({
       productId: product.productId,
       sku: product.sku,
@@ -521,26 +513,7 @@ const OrderContents = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         if (actionType === undefined) {
-          try {
-            const response = await axiosSecure.put("/decreaseSkuFromProduct", dataToSend);
-
-            // Check the results array from the response
-            const updateResults = response?.data?.results;
-
-            if (updateResults && Array.isArray(updateResults)) {
-              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
-
-              if (successfulUpdates.length > 0) {
-                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
-              } else {
-                console.error("No successful updates occurred");
-              }
-            } else {
-              console.error("Unexpected response format:", response?.data);
-            }
-          } catch (error) {
-            console.error("Error making API request:", error);
-          }
+          updateOrderStatus(order, id, actionType, isUndo);
         }
         else if (actionType === "shipped") {
           // Open the modal for tracking number input only for 'shipped'
@@ -640,7 +613,6 @@ const OrderContents = () => {
           updateStatus = 'Processing';
           break;
       }
-      // localStorage.setItem(`undoVisible_${id}`, true);
     };
 
     const data = {
