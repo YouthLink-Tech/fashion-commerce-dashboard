@@ -262,7 +262,7 @@ const Customers = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[35%] xl:left-[34%] 2xl:left-[39%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-6 mx-auto'>
+      <div className='px-6'>
 
         <div className='flex flex-wrap lg:flex-nowrap gap-2 lg:gap-0 justify-center md:justify-between py-2 md:py-5'>
           <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl xl:text-3xl text-neutral-700'>CUSTOMER MANAGEMENT</h3>
@@ -287,7 +287,7 @@ const Customers = () => {
               </li>
             </div>
 
-            <div className='flex items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6 w-full'>
+            <div className='flex items-center justify-center md:justify-end md:gap-6 w-full'>
               <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[12px] xl:text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
                 Choose Columns <TbColumnInsertRight size={20} />
               </button>
@@ -357,7 +357,7 @@ const Customers = () => {
         </Modal>
 
         {/* table content */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+        <div className="custom-max-h overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

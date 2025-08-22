@@ -1,7 +1,7 @@
 "use client";
 import { FaBullhorn, FaChevronLeft, FaGlobeAsia, FaThumbtack } from "react-icons/fa";
 import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
-import { BiCategory, BiChevronLeft, BiChevronRight, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
+import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog, TbBrandAppleNews } from "react-icons/tb";
@@ -250,7 +250,7 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
           width: isSidebarPinned ? (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)") : (isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width-expanded)"),
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className={`h-screen ${isSidebarPinned ? "fixed" : "absolute"} z-50 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white ${isSidebarPinned ? "" : "sidebar-unpinned"} sidebar-${isCollapsed ? "collapsed" : "expanded"}`}
+        className={`h-screen z-60 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white ${isSidebarPinned ? "" : "sidebar-unpinned"} sidebar-${isCollapsed ? "collapsed" : "expanded"} border`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

@@ -65,8 +65,7 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
 
       {/* Sidebar: Fixed on large screens, hidden on smaller screens */}
       <div
-        className={`inset-y-0 hidden xl:block xl:w-[var(--sidebar-width)] ${isSidebarPinned ? "fixed" : "absolute"
-          } z-50`}
+        className={`fixed inset-y-0 hidden xl:block xl:w-[var(--sidebar-width)] z-50`}
       >
         <SideNavbar isCollapsed={isSidebarCollapsed}
           setIsSidebarCollapsed={setIsSidebarCollapsed}

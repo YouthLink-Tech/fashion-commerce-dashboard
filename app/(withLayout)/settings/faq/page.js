@@ -15,7 +15,7 @@ const FAQPage = () => {
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
 
-      <div className='px-6 max-w-screen-md mx-auto pb-6'>
+      <div className='px-6 max-w-screen-xl mx-auto pb-6'>
 
         <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between py-6'>
 

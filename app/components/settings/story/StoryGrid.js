@@ -10,12 +10,12 @@ export default function StoryGrid({
   handleDelete,
   isOurStoryPending,
 }) {
-  const skeletonCount = 8;
+  const skeletonCount = 10;
 
   // If loading, show skeleton cards
   if (isOurStoryPending) {
     return (
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <div
             key={index}
@@ -45,7 +45,7 @@ export default function StoryGrid({
 
   // If data is present
   return (
-    <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
       {ourStoryList.map((story, index) => (
         <div
           key={index}

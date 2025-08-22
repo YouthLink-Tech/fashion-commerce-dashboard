@@ -280,7 +280,7 @@ const ThirdStepOfAddProduct = () => {
   };
 
   return (
-    <div className='min-h-[calc(100vh-60px)] bg-gray-50 relative'>
+    <div className='min-h-[calc(100vh-60px)] bg-gray-50 relative px-6'>
 
       <div
         style={{
@@ -303,7 +303,7 @@ const ThirdStepOfAddProduct = () => {
         className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
+      <div className='mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>SELECT SHIPPING DETAILS</h3>
           <Link
@@ -359,7 +359,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[80vh] flex flex-col justify-between relative'>
+      <form onSubmit={handleSubmit(onSubmit)} className='mx-auto min-h-[80vh] flex flex-col justify-between relative'>
 
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto bg-white">

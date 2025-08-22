@@ -339,7 +339,7 @@ const PurchaseOrders = () => {
         </ModalContent>
       </Modal>
 
-      <div className='max-w-screen-2xl mx-auto relative'>
+      <div className='relative'>
 
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-5 gap-2 w-full'>
 
@@ -389,7 +389,7 @@ const PurchaseOrders = () => {
         </div>
 
         {/* Table */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg mt-4">
+        <div className="custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg mt-4">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

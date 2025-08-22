@@ -498,7 +498,7 @@ const SecondStepOfAddProduct = () => {
         className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
+      <div className='mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
           <h3 className='flex-1 font-semibold text-lg lg:text-2xl text-neutral-600'>INVENTORY VARIANTS</h3>
           <h3 className='flex-1 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
@@ -513,7 +513,7 @@ const SecondStepOfAddProduct = () => {
           </Link>
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[86vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[86vh] flex flex-col justify-between mx-auto relative'>
         <div>
           <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
             {productVariants?.map((variant, index) => (

@@ -118,7 +118,7 @@ const Seasons = () => {
         className='absolute inset-0 z-0 top-2 md:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[30%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 py-6'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between px-6 py-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>SEASON MANAGEMENT</h1>
 
         {isAuthorized &&
@@ -129,7 +129,7 @@ const Seasons = () => {
 
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6 relative">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 px-6 relative">
         {seasonList?.map((season, index) => {
 
           return (

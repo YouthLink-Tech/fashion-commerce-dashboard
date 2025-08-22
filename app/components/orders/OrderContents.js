@@ -1189,7 +1189,7 @@ const OrderContents = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-3 md:px-6 mx-auto'>
+      <div className='px-3 md:px-6 mx-auto'>
 
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
@@ -1226,7 +1226,7 @@ const OrderContents = () => {
             />
           </div>
 
-          <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
+          <div className='flex w-full items-center px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
 
             <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
               <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#d4ffce] px-3 md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
@@ -1405,7 +1405,7 @@ const OrderContents = () => {
         </Modal>
 
         {/* table content */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+        <div className="mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

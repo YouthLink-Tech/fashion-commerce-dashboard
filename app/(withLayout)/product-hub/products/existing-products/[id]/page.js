@@ -432,14 +432,14 @@ const ProductPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto px-6 2xl:px-0 pt-6 pb-6 relative'>
+      <div className='mx-auto px-6 pt-6 pb-6 relative'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at {decodedCategoryName}</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/product-hub/products/existing-products"> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
-      <div className='flex justify-between flex-wrap items-center gap-3 md:gap-0 max-w-screen-2xl mx-auto pb-3 px-6 2xl:px-0'>
+      <div className='flex justify-between flex-wrap items-center gap-3 md:gap-0 mx-auto pb-3 px-6'>
 
         <TabsOrder
           tabs={tabsWithCounts}
@@ -540,8 +540,8 @@ const ProductPage = () => {
         </div>
       ) : (
         paginatedProducts?.length > 0 ? (
-          <div className='mx-6 2xl:mx-0 custom-max-h-order'>
-            <div className="max-w-screen-2xl mx-auto custom-max-h-order overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+          <div className='mx-6 custom-max-h-order'>
+            <div className="mx-auto custom-max-h-order overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-[1] w-full bg-white">
                   <tr className='w-full'>

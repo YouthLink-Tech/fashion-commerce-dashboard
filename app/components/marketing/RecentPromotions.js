@@ -938,7 +938,7 @@ const RecentPromotions = () => {
   }
 
   return (
-    <div className='max-w-screen-2xl mx-auto'>
+    <div>
       <div className='flex flex-wrap justify-between items-center gap-6 mb-6 pr-4'>
         <div className="flex-1 flex flex-col gap-4">
           <select

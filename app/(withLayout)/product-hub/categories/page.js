@@ -181,7 +181,7 @@ const CategoriesOverview = () => {
         className='absolute inset-0 z-0 top-2 md:top-4 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[30%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='sticky top-0 z-10 bg-gray-50 flex items-center flex-wrap gap-4 justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex items-center flex-wrap gap-4 justify-between  px-6 pt-6'>
         <h1 className='font-semibold text-center text-[16px] lg:text-3xl text-neutral-700'>CATEGORY MANAGEMENT</h1>
 
         <div className='flex items-center gap-3 justify-center'>
@@ -202,7 +202,7 @@ const CategoriesOverview = () => {
 
       </div>
 
-      <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6 relative'>
+      <div className='p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6 relative'>
         {categoryList?.map(category => (
           <div key={category?._id} className='category-item border p-4 rounded-md bg-white'>
             <div className='flex justify-between items-center'>

@@ -89,7 +89,7 @@ const TagsPage = () => {
 
   return (
     <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
-      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6 max-w-screen-2xl mx-auto'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6'>
 
         <h1 className='font-semibold text-lg lg:text-2xl text-neutral-600'>TAG MANAGEMENT</h1>
 
@@ -101,7 +101,7 @@ const TagsPage = () => {
 
       </div>
 
-      <div className='w-full max-w-screen-2xl mx-auto'>
+      <div className='w-full'>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center w-full divide-y divide-gray-200'>
           {tagList?.map((tag, index) => (
             <div key={index} className='flex items-center justify-center w-full hover:bg-gray-100 cursor-pointer px-2 lg:px-6'>

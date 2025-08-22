@@ -189,14 +189,14 @@ const LocationsPage = () => {
         className='absolute inset-0 z-0 top-10 xl:-top-2 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='flex justify-between items-center px-6 py-3 max-w-screen-2xl mx-auto relative'>
+      <div className='flex justify-between items-center px-6 py-3 relative'>
         <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-gray-50'>LOCATION MANAGEMENT</h1>
         {isAuthorized && <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <Link className='flex items-center gap-2' href={"/supply-chain/locations/add-location"}> <FaPlus size={14} /> <span>Add</span></Link>
         </button>}
       </div>
 
-      <div className="px-6 max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+      <div className="px-6 custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 z-[1] bg-white">
             <tr>

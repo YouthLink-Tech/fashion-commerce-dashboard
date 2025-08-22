@@ -45,7 +45,7 @@ const Zone = () => {
       />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-60px)] bg-gray-50 px-10 py-8">
-        <div className="flex items-center gap-8 w-full max-w-screen-xl">
+        <div className="flex flex-col lg:flex-row items-center gap-8 w-full max-w-screen-xl">
 
           {isAuthorized ? (
             <Link

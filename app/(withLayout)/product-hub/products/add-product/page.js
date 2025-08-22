@@ -841,7 +841,7 @@ const FirstStepOfAddProduct = () => {
         className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
+      <div className='mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='flex-1 font-semibold text-lg lg:text-2xl text-neutral-600'>PRODUCT CONFIGURATION</h3>
 
@@ -857,7 +857,7 @@ const FirstStepOfAddProduct = () => {
         </div>
       </div>
 
-      <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative' onSubmit={handleSubmit(onSubmit)}>
+      <form className='relative' onSubmit={handleSubmit(onSubmit)}>
 
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
@@ -929,7 +929,7 @@ const FirstStepOfAddProduct = () => {
                 )}
               </div>
 
-              {selectedCategory && sizeRangeList[selectedCategory] && (
+              {selectedCategory && sizeRangeList?.[selectedCategory] && (
                 <div className="flex flex-col w-full">
 
                   <div className='flex justify-between items-center'>

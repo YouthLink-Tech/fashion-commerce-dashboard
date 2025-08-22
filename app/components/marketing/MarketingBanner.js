@@ -205,7 +205,7 @@ const MarketingBanner = () => {
   };
 
   return (
-    <div className='max-w-screen-2xl flex flex-col xl:flex-row justify-between gap-6'>
+    <div className='flex flex-col xl:flex-row justify-between gap-6'>
       <form onSubmit={handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-12 rounded-lg my-6 h-fit space-y-4'>
 
         <div className='flex flex-col w-full'>

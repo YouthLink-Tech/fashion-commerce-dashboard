@@ -381,7 +381,7 @@ const Inventory = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[24%] xl:left-[19%] 2xl:left-[34%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-6 mx-auto'>
+      <div className='px-6 mx-auto'>
 
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between py-2 md:py-5 gap-2'>
 
@@ -530,7 +530,7 @@ const Inventory = () => {
         </div>
 
         {/* Table */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h-inventory overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+        <div className="custom-max-h-inventory overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

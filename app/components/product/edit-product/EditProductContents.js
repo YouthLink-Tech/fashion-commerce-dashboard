@@ -1140,7 +1140,7 @@ const EditProductContents = () => {
         className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between items-center flex-wrap gap-4'>
+      <div className='mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between items-center flex-wrap gap-4'>
 
         <div className="flex-1 flex items-center gap-3 w-full">
 
@@ -1201,11 +1201,11 @@ const EditProductContents = () => {
 
         {activeTab === "product" &&
           <div className='relative'>
-            <div className='max-w-screen-2xl px-6 mx-auto pb-3'>
+            <div className='px-6 mx-auto pb-3'>
               <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>UPDATE PRODUCT DETAILS</h3>
             </div>
 
-            <div className='max-w-screen-2xl mx-auto'>
+            <div className='mx-auto'>
               <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
                 <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3 h-fit'>
                   <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
@@ -1741,7 +1741,7 @@ const EditProductContents = () => {
 
         {activeTab === "inventory" &&
           <div className='relative'>
-            <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
+            <div className=''>
               <div className='flex flex-wrap items-center justify-between px-6 gap-4 text-neutral-700'>
 
                 <h3 className='font-semibold text-lg lg:text-2xl text-neutral-600'>UPDATE INVENTORY VARIANTS</h3>
@@ -1930,7 +1930,7 @@ const EditProductContents = () => {
         }
 
         {activeTab === "shipping" &&
-          <div className='2xl:max-w-screen-2xl 2xl:mx-auto relative'>
+          <div className='relative'>
 
             <h3 className='font-semibold text-lg lg:text-2xl text-neutral-600 px-6'>UPDATE SHIPPING DETAILS</h3>
 
@@ -2072,7 +2072,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
           </div>
         }
 
-        <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
+        <div className='flex justify-between px-6 pt-8 pb-16'>
 
           {productStatus === "active" &&
             <button color="danger" className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'

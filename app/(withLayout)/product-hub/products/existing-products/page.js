@@ -96,7 +96,7 @@ const EditProduct = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className={`max-w-screen-2xl mx-auto transition-colors duration-1000 sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between gap-4 ${isScrolled ? "bg-gray-50 py-3" : "bg-transparent py-3 md:py-6"
+      <div className={`mx-auto transition-colors duration-1000 sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between gap-4 ${isScrolled ? "bg-gray-50 py-3" : "bg-transparent py-3 md:py-6"
         }`}>
         <div className="flex items-center gap-3 w-full">
 
@@ -134,8 +134,8 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       </div>
 
       {activeTab === "category" && <div>
-        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Categories</h3>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
+        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 mx-auto px-6 pb-6'>Look at Our Categories</h3>
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 mx-auto px-6">
           {categoryList?.map((category, index) => {
             // Filter products that match the current category
             const productCount = productList?.filter(product => product?.category === category?.label).length;
@@ -173,8 +173,8 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       </div>}
 
       {activeTab === "collection" && <div>
-        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Seasonal Collection</h3>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
+        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 mx-auto px-6 pb-6'>Look at Our Seasonal Collection</h3>
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 mx-auto px-6">
           {seasonList?.map((season, index) => {
             // Filter products that match the current season
             const productCount = productList?.filter(product =>

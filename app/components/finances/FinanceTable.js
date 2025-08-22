@@ -168,7 +168,7 @@ const FinanceTable = () => {
   return (
     <div className='relative'>
 
-      <div className='flex flex-col lg:flex-row items-center justify-evenly gap-6 max-w-screen-2xl mx-auto'>
+      <div className='flex flex-col lg:flex-row items-center justify-evenly gap-6'>
 
         <div className='w-full'>
           <li className="flex items-center relative group flex-1">
@@ -311,7 +311,7 @@ const FinanceTable = () => {
       </Modal>
 
       {/* TABLE */}
-      <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
+      <div className="custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
           <thead className="bg-white sticky top-0 z-[1] rounded-md">
             <tr>

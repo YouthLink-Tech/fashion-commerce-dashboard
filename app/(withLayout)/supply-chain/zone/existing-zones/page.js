@@ -128,7 +128,7 @@ const ExistingZones = () => {
   return (
     <div className='px-6 bg-gray-50 min-h-[calc(100vh-60px)]'>
 
-      <div className='py-4 w-full flex justify-between max-w-screen-2xl mx-auto'>
+      <div className='py-4 w-full flex justify-between'>
 
         <h3 className='text-start font-medium md:font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 w-full'>SHIPPING MANAGEMENT</h3>
 
@@ -139,7 +139,7 @@ const ExistingZones = () => {
 
       </div>
 
-      <div className='flex flex-wrap items-center gap-3 bg-gray-50 pt-2 max-w-screen-2xl mx-auto'>
+      <div className='flex flex-wrap items-center gap-3 bg-gray-50 pt-2'>
         <button
           className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'inside dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
@@ -177,7 +177,7 @@ const ExistingZones = () => {
         </button>
       </div>
 
-      <div className="pt-2 max-w-screen-2xl mx-auto">
+      <div className="pt-2">
 
         <p className="pt-1 pb-4 text-neutral-800 font-semibold">
           {activeTab === "inside dhaka"

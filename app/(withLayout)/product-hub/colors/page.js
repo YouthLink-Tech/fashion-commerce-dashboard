@@ -90,7 +90,7 @@ const ColorsPage = () => {
   return (
     <div className='relative bg-gray-50'>
 
-      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6 max-w-screen-2xl mx-auto'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>COLOR MANAGEMENT</h1>
 
         {isAuthorized &&
@@ -101,7 +101,7 @@ const ColorsPage = () => {
 
       </div>
 
-      <div className='w-full divide-y divide-gray-200 pt-2 max-w-screen-2xl mx-auto'>
+      <div className='w-full divide-y divide-gray-200 pt-2'>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center w-full divide-y divide-gray-200'>
           {colorList?.map((color, index) => (

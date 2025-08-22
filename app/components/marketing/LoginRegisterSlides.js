@@ -253,7 +253,7 @@ const LoginRegisterSlides = () => {
   }
 
   return (
-    <div className='max-w-screen-2xl my-3'>
+    <div className='my-3'>
 
       <form onSubmit={handleSubmit(onSubmit)} className='grid grid-cols-1 gap-8 py-3 h-fit'>
 
