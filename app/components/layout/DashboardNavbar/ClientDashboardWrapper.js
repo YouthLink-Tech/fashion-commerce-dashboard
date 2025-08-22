@@ -64,9 +64,7 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
     <div className={`sidebar-${isSidebarCollapsed ? "collapsed" : "expanded"}`}>
 
       {/* Sidebar: Fixed on large screens, hidden on smaller screens */}
-      <div
-        className={`fixed inset-y-0 hidden xl:block xl:w-[var(--sidebar-width)] z-50`}
-      >
+      <div className={`fixed inset-y-0 hidden xl:block xl:w-[var(--sidebar-width)] z-50`}>
         <SideNavbar isCollapsed={isSidebarCollapsed}
           setIsSidebarCollapsed={setIsSidebarCollapsed}
           isSidebarPinned={isSidebarPinned}
@@ -105,12 +103,12 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
         handleLogout={handleLogout}
       />
       <MobileNavbar
-        isToggle={isToggle}
-        setIsToggle={setIsToggle}
         session={session}
         status={status}
         existingUserData={existingUserData}
         handleLogout={handleLogout}
+        isToggle={isToggle}
+        setIsToggle={setIsToggle}
       />
     </div>
   );
