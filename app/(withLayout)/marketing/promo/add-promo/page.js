@@ -4,7 +4,7 @@ import { Checkbox, DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -15,7 +15,7 @@ const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false }
 
 const AddPromo = () => {
 
-  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, reset, control, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosSecure = useAxiosSecure();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +28,26 @@ const AddPromo = () => {
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+  useEffect(() => {
+    const clonePromoData = localStorage.getItem("clonePromoData");
+    if (clonePromoData) {
+      const parsed = JSON.parse(clonePromoData);
+
+      // Prefill form
+      reset({
+        ...parsed,
+        promoCode: "", // force blank
+      });
+
+      // Set states too
+      if (parsed.promoDiscountType) setPromoDiscountType(parsed.promoDiscountType);
+      if (parsed.promoDescription) setPromoDescription(parsed.promoDescription);
+      if (parsed.imageUrl) setImage(parsed.imageUrl);
+      if (parsed.isWelcomeEmailPromoCode) setIsSelected(parsed.isWelcomeEmailPromoCode);
+    }
+    localStorage.removeItem("clonePromoData");
+  }, [reset]);
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -197,10 +217,15 @@ const AddPromo = () => {
           duration: 5000
         })
         localStorage.setItem('activeTabMarketingPage', "view performance");
+        localStorage.removeItem("clonePromoData");
         router.push("/marketing");
       }
     } catch (err) {
-      toast.error("Failed to publish promo!");
+      if (err.response && err.response.status === 400) {
+        toast.error(err.response.data.message || "Promo code already exists!");
+      } else {
+        toast.error("Failed to publish promo!");
+      }
     } finally {
       setIsSubmitting(false);
     }

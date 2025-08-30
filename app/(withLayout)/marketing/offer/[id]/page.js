@@ -522,8 +522,13 @@ const EditOffer = () => {
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Error editing offer:', error);
-      toast.error('Failed to update offer. Please try again!');
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response.data.message || "Offer title already exists!");
+      } else {
+        console.error('Error editing offer:', error);
+        toast.error("Failed to update offer. Please try again!");
+      }
+    } finally {
       setIsSubmitting(false);
     }
   };

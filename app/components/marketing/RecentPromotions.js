@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { FaRegClone } from "react-icons/fa6";
 import Swal from 'sweetalert2';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -284,116 +285,31 @@ const RecentPromotions = () => {
     });
   };
 
-  const handleDeletePromo = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await axiosSecure.delete(`/deletePromo/${id}`);
-          if (res?.data?.deletedCount) {
-            refetchPromo();
-            toast.custom((t) => (
-              <div
-                className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-              >
-                <div className="pl-6">
-                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-                </div>
-                <div className="flex-1 w-0 p-4">
-                  <div className="flex items-start">
-                    <div className="ml-3 flex-1">
-                      <p className="text-base font-bold text-gray-900">
-                        Promo Removed!
-                      </p>
-                      <p className="mt-1 text-sm text-gray-500">
-                        The promo has been successfully deleted!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex border-l border-gray-200">
-                  <button
-                    onClick={() => toast.dismiss(t.id)}
-                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                  >
-                    <RxCross2 />
-                  </button>
-                </div>
-              </div>
-            ), {
-              position: "bottom-right",
-              duration: 5000
-            })
-          }
-        } catch (error) {
-          toast.error('Failed to delete promo. Please try again!');
-        }
-      }
-    });
+  const handleClonePromo = (item) => {
+    const clonePromoData = { ...item };
+
+    // remove values that should not be cloned
+    delete clonePromoData.promoCode;
+    delete clonePromoData.expiryDate;
+    delete clonePromoData._id; // make sure the new one doesn’t reuse old ID
+
+    // store clone data in localStorage
+    localStorage.setItem("clonePromoData", JSON.stringify(clonePromoData));
+    router.push("/marketing/promo/add-promo");
+
   };
 
-  const handleDeleteOffer = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await axiosSecure.delete(`/deleteOffer/${id}`);
-          if (res?.data?.deletedCount) {
-            refetchOffer();
-            toast.custom((t) => (
-              <div
-                className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-              >
-                <div className="pl-6">
-                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-                </div>
-                <div className="flex-1 w-0 p-4">
-                  <div className="flex items-start">
-                    <div className="ml-3 flex-1">
-                      <p className="text-base font-bold text-gray-900">
-                        Offer Removed!
-                      </p>
-                      <p className="mt-1 text-sm text-gray-500">
-                        The offer has been successfully deleted!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex border-l border-gray-200">
-                  <button
-                    onClick={() => toast.dismiss(t.id)}
-                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                  >
-                    <RxCross2 />
-                  </button>
-                </div>
-              </div>
-            ), {
-              position: "bottom-right",
-              duration: 5000
-            })
-          }
-        } catch (error) {
-          toast.error('Failed to delete offer. Please try again!');
-        }
-      }
-    });
+  const handleCloneOffer = (item) => {
+    const cloneOfferData = { ...item };
+
+    // remove values that should not be cloned
+    delete cloneOfferData.offerTitle;
+    delete cloneOfferData.expiryDate;
+    delete cloneOfferData._id; // make sure the new one doesn’t reuse old ID
+
+    // store clone data in localStorage
+    localStorage.setItem("cloneOfferData", JSON.stringify(cloneOfferData));
+    router.push("/marketing/offer/add-offer");
   };
 
   const handleStatusChangePromo = async (id, currentStatus) => {
@@ -653,20 +569,20 @@ const RecentPromotions = () => {
                               <div className="group relative">
 
                                 <button disabled={!isOwner}>
-                                  <RiDeleteBinLine
+                                  <FaRegClone
                                     onClick={() =>
                                       item?.promoCode
-                                        ? handleDeletePromo(item._id)
-                                        : handleDeleteOffer(item._id)
+                                        ? handleClonePromo(item)
+                                        : handleCloneOffer(item)
                                     }
-                                    size={22}
+                                    size={18}
                                     className={`text-red-500 ${!isOwner ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                   />
                                 </button>
                                 {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                                   {!isOwner
                                     ? "N/A"
-                                    : "Delete"
+                                    : "Clone"
                                   }
                                 </span>}
                               </div>

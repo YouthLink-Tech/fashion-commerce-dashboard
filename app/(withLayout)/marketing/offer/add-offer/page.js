@@ -1,6 +1,6 @@
 "use client";
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -15,14 +15,13 @@ import useProductsInformation from '@/app/hooks/useProductsInformation';
 import ProductSearchSelect from '@/app/components/marketing/ProductSearchSelect';
 import useOffers from '@/app/hooks/useOffers';
 import { HiCheckCircle } from 'react-icons/hi2';
-import { isValidImageFile } from '@/app/components/shared/upload/isValidImageFile';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
 const AddOffer = () => {
 
-  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosSecure = useAxiosSecure();
   const [offerDiscountType, setOfferDiscountType] = useState('Percentage');
@@ -45,6 +44,37 @@ const AddOffer = () => {
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+  useEffect(() => {
+    const cloneOfferData = localStorage.getItem("cloneOfferData");
+    if (cloneOfferData) {
+      const parsed = JSON.parse(cloneOfferData);
+
+      // Prefill form
+      reset({
+        ...parsed,
+        offerTitle: "", // force blank
+      });
+
+      // Set states too    
+      if (parsed.offerDiscountType) setOfferDiscountType(parsed?.offerDiscountType);
+      if (parsed.offerDescription) setOfferDescription(parsed.offerDescription);
+      if (parsed.imageUrl) setImage(parsed.imageUrl);
+      if (parsed.selectedCategories) setSelectedCategories(parsed.selectedCategories || []);
+      if (parsed.selectedProductIds) setSelectedProductIds(parsed.selectedProductIds || []);
+
+      // Determine which tab to show based on the fetched data
+      if (parsed?.selectedCategories?.length > 0) {
+        setSelectedTab('Categories');
+      } else if (parsed.selectedProductIds?.length > 0) {
+        setSelectedTab('Products');
+      } else {
+        setSelectedTab('Products'); // Default tab if both are empty
+      }
+    }
+
+    localStorage.removeItem("cloneOfferData");
+  }, [reset]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -471,10 +501,15 @@ const AddOffer = () => {
           duration: 5000
         })
         localStorage.setItem('activeTabMarketingPage', "view performance");
+        localStorage.removeItem("cloneOfferData");
         router.push("/marketing");
       }
     } catch (err) {
-      toast.error("Failed to publish offer!");
+      if (err.response && err.response.status === 400) {
+        toast.error(err.response.data.message || "Offer title already exists!");
+      } else {
+        toast.error("Failed to publish offer!");
+      }
     } finally {
       setIsSubmitting(false);
     }

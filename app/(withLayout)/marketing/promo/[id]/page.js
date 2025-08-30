@@ -233,8 +233,13 @@ const EditPromo = () => {
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Error editing promo:', error);
-      toast.error('Failed to update promo. Please try again!');
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response.data.message || "Promo code already exists!");
+      } else {
+        console.error('Error editing promo:', error);
+        toast.error('Failed to update promo. Please try again!');
+      }
+    } finally {
       setIsSubmitting(false);
     }
   };

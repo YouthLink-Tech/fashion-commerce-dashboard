@@ -90,8 +90,8 @@ const EditProductContents = () => {
   const [locationList, isLocationPending] = useLocations();
   const [colorList, isColorPending] = useColors();
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [groupSelected, setGroupSelected] = React.useState();
-  const [groupSelected2, setGroupSelected2] = React.useState();
+  const [groupSelected, setGroupSelected] = React.useState([]);
+  const [groupSelected2, setGroupSelected2] = React.useState([]);
   const [productVariants, setProductVariants] = useState([]);
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
@@ -414,14 +414,15 @@ const EditProductContents = () => {
     });
   };
 
-  const handleSelectAll = () => {
+  const handleAllToggle = () => {
     const availableSizes = generateSizes(groupSelected[0] || '');
-    setGroupSelected2(availableSizes);
-    setSizeError3(false);
-  };
-
-  const handleUnselectAll = () => {
-    setGroupSelected2([]);
+    if (groupSelected2.length === availableSizes.length) {
+      setGroupSelected2([]);
+      localStorage.setItem('allSizes', JSON.stringify([]));
+    } else {
+      setGroupSelected2(availableSizes);
+      localStorage.setItem('allSizes', JSON.stringify(availableSizes));
+    }
     setSizeError3(false);
   };
 
@@ -429,7 +430,6 @@ const EditProductContents = () => {
   const safeGroupSelected = Array.isArray(groupSelected) ? groupSelected : [];
   const availableSizes = safeGroupSelected?.length > 0 ? generateSizes(safeGroupSelected[0]) : [];
   const allSelected = availableSizes?.length > 0 && groupSelected2?.length === availableSizes?.length;
-  const noneSelected = groupSelected2?.length === 0;
 
   const uploadSingleFileToGCS = async (file) => {
     try {
@@ -1295,28 +1295,6 @@ const EditProductContents = () => {
                               </CustomCheckbox>
                             ))}
                           </CheckboxGroup>
-                          {groupSelected?.length > 0 && (
-                            <div className="flex gap-2 mt-6">
-                              {!allSelected && (
-                                <button
-                                  type="button"
-                                  className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#ffddc2] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-sm text-neutral-700"
-                                  onClick={handleSelectAll}
-                                >
-                                  <MdCheckBox size={16} /> Select All
-                                </button>
-                              )}
-                              {!noneSelected && (
-                                <button
-                                  type="button"
-                                  className="relative z-[1] flex items-center gap-x-2 rounded-lg bg-[#d4ffce] px-3 py-1.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-sm text-neutral-700"
-                                  onClick={handleUnselectAll}
-                                >
-                                  <MdCheckBoxOutlineBlank size={16} /> Unselect All
-                                </button>
-                              )}
-                            </div>
-                          )}
                         </div>
 
                         {sizeError2 && (
@@ -1328,17 +1306,29 @@ const EditProductContents = () => {
 
                     {groupSelected?.length > 0 && (
                       <div className="flex flex-col w-full">
-                        <CheckboxGroup
-                          className="gap-1"
-                          label={<p className="font-semibold text-neutral-500 text-sm pb-1">Deselect sizes <span className="text-red-600 pl-1">*</span></p>}
-                          orientation="horizontal"
-                          value={groupSelected2}
-                          onChange={handleGroupSelected2Change}
-                        >
-                          {generateSizes(groupSelected[0] || '')?.map(size => (
-                            <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
-                          ))}
-                        </CheckboxGroup>
+                        <div className='flex items-start gap-2'>
+                          <CustomCheckbox2
+                            key="all"
+                            value="All"
+                            isSelected={allSelected}
+                            onChange={handleAllToggle}
+                          >
+                            All
+                          </CustomCheckbox2>
+                          <CheckboxGroup
+                            className="gap-1"
+                            orientation="horizontal"
+                            value={groupSelected2}
+                            onChange={handleGroupSelected2Change}
+                          >
+                            {generateSizes(groupSelected[0] || '')?.map(size => {
+                              return (
+                                <CustomCheckbox2 key={size} value={size} isSelected={groupSelected2.includes(size)}>{size}</CustomCheckbox2>
+                              )
+                            }
+                            )}
+                          </CheckboxGroup>
+                        </div>
                         <p className="my-2 ml-1 text-default-500 text-sm font-semibold">
                           Selected: <span>{groupSelected2?.join(", ")}</span>
                         </p>
