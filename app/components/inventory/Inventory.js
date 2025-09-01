@@ -18,11 +18,14 @@ import { useSearchParams } from 'next/navigation';
 import CustomPagination from '../shared/pagination/CustomPagination';
 import PaginationSelect from '../shared/pagination/PaginationSelect';
 import LocationDropdown from '../product/dropdown/LocationDropdown';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { BiTransferAlt, BiMinusCircle } from "react-icons/bi";
 
 const Inventory = () => {
 
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -37,6 +40,7 @@ const Inventory = () => {
   const [locationNameForMessage, setLocationNameForMessage] = useState("");
   const [showLowStock, setShowLowStock] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
+  const [selectedReturnInfos, setSelectedReturnInfos] = useState([]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -339,6 +343,41 @@ const Inventory = () => {
     });
   };
 
+  const handleReturnSkuClick = (product) => {
+    // Find orders with returnInfo for the matching product
+    const returnOrders = orderList?.filter((order) =>
+      order.returnInfo?.products.some(
+        (returnProduct) =>
+          returnProduct.productId === product.productId &&
+          returnProduct.size === product.size &&
+          returnProduct.color.color === product.colorCode
+      )
+    );
+
+    if (returnOrders?.length > 0) {
+      // Collect all return information for the product
+      const returnInfos = returnOrders.map((order) => {
+        const matchingProduct = order.returnInfo.products.find(
+          (p) =>
+            p.productId === product.productId &&
+            p.size === product.size &&
+            p.color.color === product.colorCode
+        );
+        return {
+          orderId: order.orderNumber,
+          dateTime: order.returnInfo.dateTime,
+          reason: order.returnInfo.reason,
+          issue: order.returnInfo.issue,
+          description: order.returnInfo.description,
+          returnSku: matchingProduct ? matchingProduct.sku : 0,
+          returnProduct: matchingProduct,
+        };
+      });
+      setSelectedReturnInfos(returnInfos);
+      onOpen();
+    }
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -569,6 +608,7 @@ const Inventory = () => {
                   // Calculate "onProcess" and "available"
                   let onPending = 0; // Default value
                   let onProcess = 0; // Default value
+                  // let 
 
                   // Check for matching products in the orderList
                   orderList?.forEach(order => {
@@ -589,8 +629,6 @@ const Inventory = () => {
                       }
                     });
                   });
-
-                  console.log(product, "product");
 
                   return (
                     <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
@@ -614,8 +652,17 @@ const Inventory = () => {
                       <td key="onProcess" className="text-center"> {isMatchingLocation ? onProcess : 0}</td>
                       <td key="available" className="text-center"> {product?.sku}</td>
                       <td key="onHand" className="text-center">{product?.onHandSku}</td>
-                      <td key="returnSku" className="text-center">{product?.returnSku ? product?.returnSku : 0}</td>
-                      <td key="forfeitedSku" className="text-center">{product?.returnSku ? product?.returnSku : 0}</td>
+                      {product?.returnSku ?
+                        <td onClick={() => handleReturnSkuClick(product)} key="returnSku" className="text-center text-blue-600 cursor-pointer">
+                          {product?.returnSku}
+                        </td> :
+                        <td key="returnSku" className="text-center">
+                          0
+                        </td>
+                      }
+                      <td key="forfeitedSku" className="text-center">
+                        {product?.forfeitedSku ? product?.forfeitedSku : 0}
+                      </td>
                     </tr>
                   );
                 })
@@ -639,6 +686,75 @@ const Inventory = () => {
         />
 
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="bg-gray-200">
+                <h2 className="text-lg font-semibold px-2">Return Details</h2>
+              </ModalHeader>
+              <ModalBody className="modal-body-scroll">
+                {selectedReturnInfos.length > 0 ? (
+                  <div className="space-y-6">
+                    {selectedReturnInfos.map((returnInfo, index) => (
+                      <div key={index} className="border-b pb-4">
+                        <p>
+                          <strong>Order ID:</strong> {returnInfo.orderId}
+                        </p>
+                        <p>
+                          <strong>Date of Return:</strong> {returnInfo.dateTime}
+                        </p>
+                        <p>
+                          <strong>Reason for Return:</strong> {returnInfo.reason}
+                        </p>
+                        {returnInfo.issue && (
+                          <p>
+                            <strong>Issue:</strong> {returnInfo.issue}
+                          </p>
+                        )}
+                        {returnInfo.description && (
+                          <p>
+                            <strong>Description:</strong> {returnInfo.description}
+                          </p>
+                        )}
+                        {returnInfo.returnSku && (
+                          <p>
+                            <strong>Return SKU:</strong> {returnInfo.returnSku}
+                          </p>
+                        )}
+                        <div className="mt-4 flex justify-end gap-4">
+                          <button
+                            className="w-fit rounded-lg bg-[#d4ffce] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm relative z-[1] flex items-center justify-center gap-x-2 ease-in-out"
+                          // onClick={() => handleTransferToAvailable(returnInfo)}
+                          >
+                            <BiTransferAlt size={18} /> Transfer to Available SKU
+                          </button>
+                          <button
+                            className="w-fit rounded-lg bg-[#ffddc2] hover:bg-[#fbcfb0] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 md:text-sm relative z-[1] flex items-center justify-center gap-x-2 ease-in-out"
+                          // onClick={() => handleForfeitItem(returnInfo)}
+                          >
+                            <BiMinusCircle size={18} /> Forfeit this Item
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No return information available.</p>
+                )}
+              </ModalBody>
+              <ModalFooter className='flex justify-end items-center border'>
+                <div className='flex gap-4 items-center'>
+                  <Button size='sm' color='danger' variant="flat" onPress={onClose}>
+                    Cancel
+                  </Button>
+                </div>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
     </div>
   );
