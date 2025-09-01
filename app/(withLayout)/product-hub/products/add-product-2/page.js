@@ -78,7 +78,7 @@ const SecondStepOfAddProduct = () => {
           if (existingVariant) {
             allVariants.push(existingVariant);
           } else {
-            allVariants.push({ color, size, sku: 0, onHandSku: 0, imageUrls: [], location: primaryLocationName });
+            allVariants.push({ color, size, sku: 0, onHandSku: 0, returnSku: 0, imageUrls: [], location: primaryLocationName });
           }
         }
       }
@@ -277,7 +277,7 @@ const SecondStepOfAddProduct = () => {
     });
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = () => {
     try {
 
       const invalidVariants = productVariants.filter(
@@ -295,8 +295,9 @@ const SecondStepOfAddProduct = () => {
       const formattedData = productVariants.map((variant, index) => {
         return activeLocations?.map(location => ({
           ...variant,
-          sku: 0, // Set SKU 0
-          onHandSku: 0, // Set SKU 0
+          sku: 0, // Set sku 0
+          onHandSku: 0, // Set onHandSku 0
+          returnSku: 0, // Set returnSku 0
           location: location.locationName,
         }));
       });
@@ -312,7 +313,7 @@ const SecondStepOfAddProduct = () => {
   };
 
   // New function for "Save for Now" button
-  const onSaveForNow = async (formData) => {
+  const onSaveForNow = async () => {
 
     const storedFormattedDate = localStorage.getItem("formattedDate");
     const storedProductTitle = localStorage.getItem('productTitle');
@@ -347,7 +348,8 @@ const SecondStepOfAddProduct = () => {
       return activeLocations?.map(location => ({
         ...variant,
         sku: 0, // Set SKU to 0
-        onHandSku: 0, // Set SKU to 0
+        onHandSku: 0, // Set onHandSku to 0
+        returnSku: 0, // Set returnSku to 0
         location: location.locationName,
       }));
     });

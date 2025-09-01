@@ -678,7 +678,7 @@ const EditProductContents = () => {
     for (const color of colors) {
       for (const size of sizes) {
         if (!variants.some(variant => variant?.color?.value === color?.value && variant?.size === size)) {
-          variants.push({ color, size, sku: "", onHandSku: "", imageUrls: [], location: primaryLocationName });
+          variants.push({ color, size, sku: "", onHandSku: "", returnSku: "", imageUrls: [], location: primaryLocationName });
         }
       }
     }
@@ -999,12 +999,14 @@ const EditProductContents = () => {
 
           // Initialize SKU for the current variant
           let sku = 0; // Default SKU for new active locations
-          let onHandSku = 0; // Default SKU for new active locations
+          let onHandSku = 0; // Default onHandSku for new active locations
+          let returnSku = 0; // Default returnSku for new active locations
 
           // Preserve whatever SKU exists already
           if (existingVariant) {
             sku = existingVariant.sku;
             onHandSku = existingVariant.onHandSku;
+            returnSku = existingVariant.returnSku;
           }
 
           // Add the variant to finalData
@@ -1013,6 +1015,7 @@ const EditProductContents = () => {
             size: variant.size,
             sku,
             onHandSku,
+            returnSku,
             imageUrls: primaryImageUrls, // Use the same imageUrls for all locations
             location: location.locationName,
           });
