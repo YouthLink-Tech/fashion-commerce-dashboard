@@ -1,377 +1,325 @@
-import React, { useMemo } from 'react';
-import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
+import React from 'react';
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
-// Define styles
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 60,
-    paddingVertical: 40
+    paddingHorizontal: 40,
+    paddingVertical: 20,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    alignItems: "center"
+    marginBottom: 10,
   },
   heading: {
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  statusBadge: (status) => ({
-    padding: 5,
-    fontSize: 16,
-    borderRadius: 10,
-    // Dynamic colors (matching Tailwind classes)
-    color:
-      status === "pending"
-        ? "#b58900" // text-yellow-600
-        : status === "ordered"
-          ? "#1d4ed8" // text-blue-600
-          : status === "received"
-            ? "#166534" // text-green-600
-            : status === "canceled"
-              ? "#b91c1c" // text-red-600
-              : "#4b5563", // text-gray-600
-
-    backgroundColor:
-      status === "pending"
-        ? "#fef3c7" // bg-yellow-100
-        : status === "ordered"
-          ? "#dbeafe" // bg-blue-100
-          : status === "received"
-            ? "#d1fae5" // bg-green-100
-            : status === "canceled"
-              ? "#fee2e2" // bg-red-100
-              : "#f3f4f6", // bg-gray-100
-  }),
-  originDestination: {
-    flexDirection: 'row',
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20
-  },
-  originDestinationDiv: {
-    flexDirection: 'column',
-    flex: 1
-  },
-  section: {
-    marginBottom: 20
-  },
-  subHeading: {
-    fontSize: 14,
-    marginBottom: 5,
-    fontWeight: 'bold'
-  },
-  tableSubHeading: {
     fontSize: 14,
     fontWeight: 'bold',
   },
-  text: {
+  statusBadge: (status) => ({
+    padding: 4,
     fontSize: 12,
-    color: '#333'
+    borderRadius: 8,
+    color:
+      status === 'pending' ? '#b58900' :
+        status === 'ordered' ? '#1d4ed8' :
+          status === 'received' ? '#166534' :
+            status === 'canceled' ? '#b91c1c' : '#4b5563',
+    backgroundColor:
+      status === 'pending' ? '#fef3c7' :
+        status === 'ordered' ? '#dbeafe' :
+          status === 'received' ? '#d1fae5' :
+            status === 'canceled' ? '#fee2e2' : '#f3f4f6',
+  }),
+  originDestination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  originDestinationDiv: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+  section: {
+    marginBottom: 10,
+  },
+  subHeading: {
+    fontSize: 12,
+    marginBottom: 4,
+    fontWeight: 'bold',
+  },
+  tableSubHeading: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  text: {
+    fontSize: 10,
+    color: '#333',
   },
   table: {
-    display: 'table',
     width: '100%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: '#ccc',
   },
   tableRow: {
-    display: 'table-row',
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    borderBottomStyle: 'solid',
   },
   tableHeaderRow: {
     backgroundColor: '#f0f0f0',
   },
   tableCell: {
-    flex: 1, // Ensures even distribution of columns
+    flex: 1,
     textAlign: 'center',
-    padding: 5,
-    fontSize: 10,
+    padding: 4,
+    fontSize: 8,
   },
   tableHeader: {
     fontWeight: 'bold',
   },
   imageContainer: {
-    display: 'flex',
-    flexDirection: 'row', // Adjusted for stacking elements vertically
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 10, // Similar to Tailwind's gap-x/y utilities
-    padding: 5,
-    textAlign: 'center',
-  },
-  imageWrapper: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 30,
-    width: 30
+    padding: 4,
   },
   textBold: {
-    fontWeight: 700, // Bold font
-    color: '#1D4ED8', // Tailwind's text-blue-700
-    fontSize: 10, // Adjust text size
+    fontWeight: 700,
+    color: '#1D4ED8',
+    fontSize: 8,
     textAlign: 'left',
-    marginBottom: 5
   },
   textMedium: {
     fontWeight: 500,
-    fontSize: 10,
+    fontSize: 8,
     textAlign: 'left',
-    marginBottom: 5
-  },
-  textRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5, // Tailwind's gap-2
-    fontSize: 10,
-    marginBottom: 5
-  },
-  image: {
-    width: 50,
-    height: 50,
-    objectFit: 'contain',
   },
   footerDiv: {
     flexDirection: 'row',
-    flexWrap: "wrap",
-    justifyContent: "space-between"
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   shipmentDetails: {
-    flex: 1
+    flex: 1,
+  },
+  supplierNote: {
+    marginTop: 10,
+    fontSize: 10,
+    color: '#333',
   },
   additionalDetails: {
-    flex: 1
+    flex: 1,
   },
   totalAcceptRejectDiv: {
-    display: "flex",
     flexDirection: 'row',
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-    marginTop: 20,
+    justifyContent: 'space-between',
+    marginBottom: 8,
+    marginTop: 10,
   },
   costSummaryDiv: {
-    display: "flex",
     flexDirection: 'row',
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 5
-  },
-  costAdjustmentSubHeading: {
-    fontSize: 14,
-    marginBottom: 5,
-    marginTop: 5,
-    fontWeight: 'bold'
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   borderOfTotal: {
-    borderTop: 2,
-  }
+    borderTop: 1,
+  },
 });
 
 const PurchaseOrderPDF = ({ data }) => {
-
-  // Assuming purchaseOrderVariants is your array of variants
+  // Calculate totals
   const calculateTotals = () => {
-    return data?.purchaseOrderVariants.reduce(
-      (acc, variant) => {
-        const quantity = parseFloat(variant.quantity) || 0; // Default to 0 if undefined or NaN
-        const cost = parseFloat(variant.cost) || 0; // Default to 0 if undefined or NaN
-        const taxPercentage = parseFloat(variant.tax) || 0; // Default to 0 if undefined or NaN
-
-        // Calculate subtotal for this variant
-        const subtotal = quantity * cost; // Subtotal: cost based on quantity
-        const taxAmount = (subtotal * taxPercentage) / 100; // Calculate tax based on percentage
-
-        // Update totals
-        acc.totalQuantity += quantity; // Sum of quantities
-        acc.totalSubtotal += subtotal; // Total subtotal of all variants
-        acc.totalTax += taxAmount; // Sum of tax amounts
-
-        return acc; // Return the accumulator for the next iteration
-      },
-      {
-        totalQuantity: 0, // Initialize total quantity
-        totalSubtotal: 0, // Initialize total subtotal (costs before tax)
-        totalTax: 0, // Initialize total tax
-      }
+    return (
+      data?.purchaseOrderVariants?.reduce(
+        (acc, variant) => {
+          const quantity = parseFloat(variant.quantity) || 0;
+          const cost = parseFloat(variant.cost) || 0;
+          const taxPercentage = parseFloat(variant.tax) || 0;
+          const subtotal = quantity * cost;
+          const taxAmount = (subtotal * taxPercentage) / 100;
+          acc.totalQuantity += quantity;
+          acc.totalSubtotal += subtotal;
+          acc.totalTax += taxAmount;
+          return acc;
+        },
+        {
+          totalQuantity: 0,
+          totalSubtotal: 0,
+          totalTax: 0,
+        }
+      ) || { totalQuantity: 0, totalSubtotal: 0, totalTax: 0 }
     );
   };
+
   const totals = calculateTotals();
-  // Access totals
   const { totalQuantity, totalSubtotal, totalTax } = totals;
-
-  // Calculate total price including tax
   const totalPrice = totalSubtotal + totalTax;
-  const total = totalPrice + data?.shipping - data?.discount;
+  const total = totalPrice + (data?.shipping || 0) - (data?.discount || 0);
 
-  const totalAcceptRejectValues = useMemo(() =>
-    data?.purchaseOrderVariants?.reduce(
-      ({ totalQuantity, totalAccept, totalReject }, { quantity = 0, accept = 0, reject = 0 }) => ({
-        totalQuantity: totalQuantity + quantity,
-        totalAccept: totalAccept + accept,
-        totalReject: totalReject + reject,
-      }),
-      { totalQuantity: 0, totalAccept: 0, totalReject: 0 }
-    ),
-    [data?.purchaseOrderVariants]
-  );
+  // Calculate accept/reject totals
+  const totalAcceptRejectValues = data?.purchaseOrderVariants?.reduce(
+    ({ totalQuantity, totalAccept, totalReject }, { quantity = 0, accept = 0, reject = 0 }) => ({
+      totalQuantity: totalQuantity + quantity,
+      totalAccept: totalAccept + accept,
+      totalReject: totalReject + reject,
+    }),
+    { totalQuantity: 0, totalAccept: 0, totalReject: 0 }
+  ) || { totalQuantity: 0, totalAccept: 0, totalReject: 0 };
+
+  // Precompute table rows
+  const precomputedRows = data?.selectedProducts?.map((product, index) => {
+    const variant = data?.purchaseOrderVariants[index] || {};
+    const quantity = parseFloat(variant.quantity) || 0;
+    const cost = parseFloat(variant.cost) || 0;
+    const taxPercentage = parseFloat(variant.tax) || 0;
+    const totalCost = quantity * cost;
+    const taxAmount = (totalCost * taxPercentage) / 100;
+    const total = totalCost + taxAmount;
+    return { product: product || {}, quantity, cost, taxPercentage, total };
+  }) || [];
+
+  // Paginate rows (20 per page)
+  const chunkArray = (array, size) => {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  };
+  const pages = chunkArray(precomputedRows, 20);
 
   return (
     <Document>
-      <Page size="A4" style={styles.container}>
+      {pages.map((chunk, pageIndex) => (
+        <Page key={pageIndex} size="A4" style={styles.container}>
+          {/* Header (only on first page) */}
+          {pageIndex === 0 && (
+            <>
+              <View style={styles.header}>
+                <Text style={styles.heading}>#{data?.purchaseOrderNumber || 'N/A'}</Text>
+                <Text style={styles.statusBadge(data?.purchaseOrderStatus)}>
+                  {data?.purchaseOrderStatus === 'pending'
+                    ? 'Pending'
+                    : data?.purchaseOrderStatus === 'received'
+                      ? 'Received'
+                      : data?.purchaseOrderStatus === 'canceled'
+                        ? 'Canceled'
+                        : data?.purchaseOrderStatus === 'ordered'
+                          ? 'Ordered'
+                          : 'Unknown'}
+                </Text>
+              </View>
+              <View style={styles.originDestination}>
+                <View style={styles.originDestinationDiv}>
+                  <Text style={styles.subHeading}>Supplier</Text>
+                  <Text style={styles.text}>{data?.selectedVendor?.value || 'N/A'}</Text>
+                  <Text style={styles.text}>{data?.selectedVendor?.vendorAddress || 'N/A'}</Text>
+                </View>
+                <View style={styles.originDestinationDiv}>
+                  <Text style={styles.subHeading}>Destination</Text>
+                  <Text style={styles.text}>{data?.selectedLocation?.locationName || 'N/A'}</Text>
+                  <Text style={styles.text}>{data?.selectedLocation?.locationAddress || 'N/A'}</Text>
+                  <Text style={styles.text}>
+                    {data?.selectedLocation?.cityName || 'N/A'}, {data?.selectedLocation?.postalCode || 'N/A'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.originDestination}>
+                <View style={styles.originDestinationDiv}>
+                  <Text style={styles.subHeading}>Payment Terms</Text>
+                  <Text style={styles.text}>{data?.paymentTerms || 'N/A'}</Text>
+                </View>
+                <View style={styles.originDestinationDiv}>
+                  <Text style={styles.subHeading}>Estimated Arrival</Text>
+                  <Text style={styles.text}>{data?.estimatedArrival || 'N/A'}</Text>
+                </View>
+              </View>
+            </>
+          )}
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.heading}>#{data?.purchaseOrderNumber}</Text>
-          <Text style={styles.statusBadge(data?.purchaseOrderStatus)}>{data?.purchaseOrderStatus === "pending" ? "Pending"
-            : data?.purchaseOrderStatus === "received" ? "Received"
-              : data?.purchaseOrderStatus === "canceled" ? "Canceled"
-                : data?.purchaseOrderStatus === "ordered" ? "Ordered"
-                  : "Unknown"}</Text>
-        </View>
-
-        {/* Supplier and Destination */}
-        <View style={styles.originDestination}>
-          <View style={styles.originDestinationDiv}>
-            <Text style={styles.subHeading}>Supplier</Text>
-            <Text style={styles.text}>
-              {data?.selectedVendor?.value}
-            </Text>
-            <Text style={styles.text}>{data?.selectedVendor?.vendorAddress}</Text>
-          </View>
-
-          <View style={styles.originDestinationDiv}>
-            <Text style={styles.subHeading}>Destination</Text>
-            <Text style={styles.text}>
-              {data?.selectedLocation?.locationName}
-            </Text>
-            <Text style={styles.text}>
-              {data?.selectedLocation?.locationAddress}, {data?.selectedLocation?.cityName}, {data?.selectedLocation?.postalCode}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.originDestination}>
-          <View style={styles.originDestinationDiv}>
-            <Text style={styles.subHeading}>Payment Terms</Text>
-            <Text style={styles.text}>
-              {data?.paymentTerms}
-            </Text>
-          </View>
-
-          <View style={styles.originDestinationDiv}>
-            <Text style={styles.subHeading}>Estimated Arrival</Text>
-            <Text style={styles.text}>
-              {data?.estimatedArrival}
-            </Text>
-          </View>
-        </View>
-
-        {/* Products Table */}
-        <View style={styles.section}>
-          <View style={styles.totalAcceptRejectDiv}>
-            <Text style={styles.tableSubHeading}>Ordered Products</Text>
-            <Text style={styles.text}>Total accepted : {totalAcceptRejectValues.totalAccept} of {totalAcceptRejectValues.totalQuantity}</Text>
-            <Text style={styles.text}>Total rejected : {totalAcceptRejectValues.totalReject} of {totalAcceptRejectValues.totalQuantity}</Text>
-          </View>
-          <View style={styles.table}>
-            {/* Table Header */}
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Products</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Quantity</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Cost</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Tax</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Total</Text>
+          {/* Products Table */}
+          <View style={styles.section}>
+            <View style={styles.totalAcceptRejectDiv}>
+              <Text style={styles.tableSubHeading}>Ordered Products</Text>
+              <Text style={styles.text}>
+                Total accepted: {totalAcceptRejectValues.totalAccept} of {totalAcceptRejectValues.totalQuantity}
+              </Text>
+              <Text style={styles.text}>
+                Total rejected: {totalAcceptRejectValues.totalReject} of {totalAcceptRejectValues.totalQuantity}
+              </Text>
             </View>
-            {/* Table Rows */}
-            {data?.selectedProducts?.map((product, index) => {
-
-              const quantity = parseFloat(data?.purchaseOrderVariants[index]?.quantity) || 0; // Default to 0 if undefined or NaN
-              const cost = parseFloat(data?.purchaseOrderVariants[index]?.cost) || 0; // Default to 0 if undefined or NaN
-              const taxPercentage = parseFloat(data?.purchaseOrderVariants[index]?.tax) || 0; // Default to 0 if undefined or NaN
-
-              // Calculate total
-              const totalCost = quantity * cost; // Calculate cost based on quantity and cost per item
-              const taxAmount = (totalCost * taxPercentage) / 100; // Calculate tax based on percentage
-              const total = totalCost + taxAmount;
-
-              return (
+            <View style={styles.table}>
+              <View style={[styles.tableRow, styles.tableHeaderRow]}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Products</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Quantity</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Cost</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Tax</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Total</Text>
+              </View>
+              {chunk.map((row, index) => (
                 <View key={index} style={styles.tableRow}>
                   <View style={[styles.tableCell, styles.imageContainer]}>
-                    <View style={styles.imageWrapper}>
-                      <Image alt="Product Image" src={product?.imageUrl} style={styles.image} />
-                    </View>
                     <View>
-                      <Text style={styles.textBold}>{product?.productTitle}</Text>
-                      <Text style={styles.textMedium}>{product?.size}</Text>
-                      <View style={styles.textRow}>
-                        <Text>{product?.name}</Text>
-                      </View>
+                      <Text style={styles.textBold}>{row.product?.productTitle || 'N/A'}</Text>
+                      <Text style={styles.textMedium}>{row.product?.size || 'N/A'}</Text>
                     </View>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text>{data?.purchaseOrderVariants[index]?.quantity || 0}</Text>
+                    <Text>{row.quantity}</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text>{data?.purchaseOrderVariants[index]?.cost || 0}</Text>
+                    <Text>{row.cost}</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text>{data?.purchaseOrderVariants[index]?.tax || 0}</Text>
+                    <Text>{row.taxPercentage}</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text>{total.toFixed(2)}</Text>
+                    <Text>{row.total.toFixed(2)}</Text>
                   </View>
                 </View>
-              )
-            })}
-          </View>
-        </View>
-
-        <View style={styles.footerDiv}>
-          {/* Additional Details */}
-          <View style={styles.shipmentDetails}>
-            <Text style={styles.subHeading}>Additional Details</Text>
-            <Text style={styles.text}>Reference Number</Text>
-            <Text>{data?.referenceNumber === "" ? " " : data?.referenceNumber}</Text>
-            <Text style={styles.text}>Supplier Note</Text>
-            <Text>{data?.supplierNote === "" ? " " : data?.supplierNote}</Text>
-          </View>
-
-          {/* Cost summary */}
-          <View style={styles.additionalDetails}>
-            <Text style={styles.subHeading}>Cost summary</Text>
-            <View style={styles.costSummaryDiv}>
-              <Text style={[styles.text]}>Taxes <Text style={[styles.text, { color: '#9CA3AF' }]}>(included)</Text></Text>
-              <Text style={styles.text}>{totalTax.toFixed(2)}</Text>
-            </View>
-            <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>Subtotal <Text style={[styles.text, { color: '#9CA3AF' }]}>({totalQuantity} items)</Text></Text>
-              <Text style={styles.text}>{totalPrice.toFixed(2)}</Text>
-            </View>
-            <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>+Shipping</Text>
-              <Text style={styles.text}>{data?.shipping}</Text>
-            </View>
-            <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>-Discount</Text>
-              <Text style={styles.text}>{data?.discount}</Text>
-            </View>
-            <View style={[styles.costSummaryDiv, styles.borderOfTotal]}>
-              <Text style={[styles.text, { marginTop: 5 }]}>Total</Text>
-              <Text style={styles.text}>{total}</Text>
+              ))}
             </View>
           </View>
-        </View>
 
-      </Page>
-    </Document >
-  )
+          {/* Footer (only on the last page) */}
+          {pageIndex === pages.length - 1 && (
+            <View style={styles.footerDiv}>
+              <View style={styles.shipmentDetails}>
+                <Text style={styles.subHeading}>Additional Details</Text>
+                <Text style={styles.text}>Reference Number</Text>
+                <Text style={styles.text}>{data?.referenceNumber || '--'}</Text>
+                <Text style={styles.supplierNote}>Supplier Note</Text>
+                <Text style={styles.text}>{data?.supplierNote || '--'}</Text>
+              </View>
+              <View style={styles.additionalDetails}>
+                <Text style={styles.subHeading}>Cost Summary</Text>
+                <View style={styles.costSummaryDiv}>
+                  <Text style={styles.text}>Taxes (included)</Text>
+                  <Text style={styles.text}>{totalTax.toFixed(2)}</Text>
+                </View>
+                <View style={styles.costSummaryDiv}>
+                  <Text style={styles.text}>Subtotal ({totalQuantity} items)</Text>
+                  <Text style={styles.text}>{totalPrice.toFixed(2)}</Text>
+                </View>
+                <View style={styles.costSummaryDiv}>
+                  <Text style={styles.text}>+Shipping</Text>
+                  <Text style={styles.text}>{data?.shipping || 0}</Text>
+                </View>
+                <View style={styles.costSummaryDiv}>
+                  <Text style={styles.text}>-Discount</Text>
+                  <Text style={styles.text}>{data?.discount || 0}</Text>
+                </View>
+                <View style={[styles.costSummaryDiv, styles.borderOfTotal]}>
+                  <Text style={[styles.text, { marginTop: 4 }]}>Total</Text>
+                  <Text style={styles.text}>{total.toFixed(2)}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+        </Page>
+      ))}
+    </Document>
+  );
 };
 
 export default PurchaseOrderPDF;

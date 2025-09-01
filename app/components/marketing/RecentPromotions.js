@@ -447,7 +447,7 @@ const RecentPromotions = () => {
     return (
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => {
-          // const isExpired = new Date(item?.expiryDate) < currentDate;
+          const isExpired = new Date(item?.expiryDate) < currentDate;
           // const isExpandedItem = isExpanded === item._id;
 
           const totalPromoApplied = item?.promoCode
@@ -545,7 +545,7 @@ const RecentPromotions = () => {
                             {isAuthorized &&
                               <div className="group relative">
                                 <button
-                                  disabled={!isAuthorized}>
+                                  disabled={!isAuthorized || isExpired}>
                                   <MdOutlineModeEdit
                                     onClick={() =>
                                       item?.promoCode
@@ -553,15 +553,13 @@ const RecentPromotions = () => {
                                         : router.push(`/marketing/offer/${item._id}`)
                                     }
                                     size={22}
-                                    className={`text-blue-500 ${!isAuthorized ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                    className={`text-blue-500 ${(!isAuthorized || isExpired) ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                   />
                                 </button>
-                                {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-
-                                  {!isAuthorized
-                                    ? "N/A"
-                                    : "Edit"}
-                                </span>}
+                                {(!isAuthorized || !isExpired) &&
+                                  <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                                    Edit
+                                  </span>}
                               </div>
                             }
 
@@ -599,6 +597,7 @@ const RecentPromotions = () => {
                               onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
                               size="md"
                               color="primary"
+                              disabled={isExpired}
                             />
                           }
                         </td>

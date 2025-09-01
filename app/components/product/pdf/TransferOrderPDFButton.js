@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BsFiletypePdf } from "react-icons/bs";
-import TransferOrderPDF from "./TransferOrderPDF";
 
 const TransferOrderPDFButton = ({
   transferOrderNumber,
@@ -16,54 +15,80 @@ const TransferOrderPDFButton = ({
   trackingNumber,
   shippingCarrier,
 }) => {
-  const [pdfModule, setPdfModule] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Dynamically import @react-pdf/renderer for client-side rendering
-    import("@react-pdf/renderer")
-      .then((module) => {
-        setPdfModule(module); // Store the dynamically imported module
-      })
-      .catch((error) => {
-        console.error("Failed to load @react-pdf/renderer:", error);
-      });
-  }, []);
+  // const handlePdfClick = async () => {
+  //   if (!pdfModule) {
+  //     console.error("PDF module not loaded yet.");
+  //     return;
+  //   }
+
+  //   setIsLoading(true); // Show loading state
+
+  //   try {
+  //     const { pdf } = pdfModule; // Use the dynamically imported pdf function
+  //     const blob = await pdf(
+  //       <TransferOrderPDF
+  //         data={{
+  //           transferOrderNumber,
+  //           transferOrderStatus,
+  //           selectedOrigin,
+  //           selectedDestination,
+  //           estimatedArrival,
+  //           selectedProducts,
+  //           transferOrderVariants,
+  //           referenceNumber,
+  //           supplierNote,
+  //           trackingNumber,
+  //           shippingCarrier,
+  //         }}
+  //       />
+  //     ).toBlob();
+
+  //     const blobUrl = URL.createObjectURL(blob);
+  //     window.open(blobUrl, "_blank"); // Open PDF in a new tab
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   } finally {
+  //     setIsLoading(false); // Hide loading state
+  //   }
+  // };
 
   const handlePdfClick = async () => {
-    if (!pdfModule) {
-      console.error("PDF module not loaded yet.");
-      return;
-    }
-
-    setIsLoading(true); // Show loading state
-
+    setIsLoading(true);
     try {
-      const { pdf } = pdfModule; // Use the dynamically imported pdf function
-      const blob = await pdf(
-        <TransferOrderPDF
-          data={{
-            transferOrderNumber,
-            transferOrderStatus,
-            selectedOrigin,
-            selectedDestination,
-            estimatedArrival,
-            selectedProducts,
-            transferOrderVariants,
-            referenceNumber,
-            supplierNote,
-            trackingNumber,
-            shippingCarrier,
-          }}
-        />
-      ).toBlob();
+      const payload = {
+        transferOrderNumber,
+        transferOrderStatus,
+        selectedOrigin,
+        selectedDestination,
+        estimatedArrival,
+        selectedProducts,
+        transferOrderVariants,
+        referenceNumber,
+        supplierNote,
+        trackingNumber,
+        shippingCarrier,
+      };
+      // console.log('Sending payload:', JSON.stringify(payload, null, 2)); // Log for debugging
+      const response = await fetch('/api/generate-transfer-order-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json(); // Get error details from server
+        throw new Error(errorData.error || 'PDF generation failed');
+      }
+
+      const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, "_blank"); // Open PDF in a new tab
+      window.open(blobUrl, '_blank');
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error('Client-side error:', error.message); // Improved error logging
     } finally {
-      setIsLoading(false); // Hide loading state
+      setIsLoading(false);
     }
   };
 

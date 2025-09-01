@@ -540,6 +540,7 @@ const Inventory = () => {
                 <th key="available" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">SKU Available</th>
                 <th key="onHand" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">SKU On Hand</th>
                 <th key="returnSku" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Return SKU</th>
+                <th key="forfeitedSku" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Forfeited SKU</th>
               </tr>
             </thead>
 
@@ -589,6 +590,8 @@ const Inventory = () => {
                     });
                   });
 
+                  console.log(product, "product");
+
                   return (
                     <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
                       <td key="product" className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
@@ -612,6 +615,7 @@ const Inventory = () => {
                       <td key="available" className="text-center"> {product?.sku}</td>
                       <td key="onHand" className="text-center">{product?.onHandSku}</td>
                       <td key="returnSku" className="text-center">{product?.returnSku ? product?.returnSku : 0}</td>
+                      <td key="forfeitedSku" className="text-center">{product?.returnSku ? product?.returnSku : 0}</td>
                     </tr>
                   );
                 })

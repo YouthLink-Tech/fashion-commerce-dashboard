@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BsFiletypePdf } from "react-icons/bs";
-import PurchaseOrderPDF from "./PurchaseOrderPDF";
 
 const PurchaseOrderPDFButton = ({
   selectedVendor,
@@ -21,44 +20,49 @@ const PurchaseOrderPDFButton = ({
   purchaseOrderNumber,
   purchaseOrderStatus
 }) => {
-  const [pdfModule, setPdfModule] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Dynamically import @react-pdf/renderer for client-side rendering
-    import("@react-pdf/renderer")
-      .then((module) => {
-        setPdfModule(module); // Store the dynamically imported module
-      })
-      .catch((error) => {
-        console.error("Failed to load @react-pdf/renderer:", error);
-      });
-  }, []);
-
+  // In PurchaseOrderPDFButton.js
   const handlePdfClick = async () => {
-    if (!pdfModule) {
-      console.error("PDF module not loaded yet.");
-      return;
-    }
-
-    setIsLoading(true); // Show loading state
-
+    setIsLoading(true);
     try {
-      const { pdf } = pdfModule; // Use the dynamically imported pdf function
-      const blob = await pdf(
-        <PurchaseOrderPDF
-          data={{
-            selectedVendor, selectedLocation, paymentTerms, estimatedArrival, referenceNumber, supplierNote, totalTax, totalPrice, totalQuantity, shipping, discount, total, selectedProducts, purchaseOrderVariants, purchaseOrderNumber, purchaseOrderStatus
-          }}
-        />
-      ).toBlob();
+      const payload = {
+        selectedVendor,
+        selectedLocation,
+        paymentTerms,
+        estimatedArrival,
+        referenceNumber,
+        supplierNote,
+        totalTax,
+        totalPrice,
+        totalQuantity,
+        shipping,
+        discount,
+        total,
+        selectedProducts,
+        purchaseOrderVariants,
+        purchaseOrderNumber,
+        purchaseOrderStatus,
+      };
+      // console.log('Sending payload:', JSON.stringify(payload, null, 2)); // Log for debugging
+      const response = await fetch('/api/generate-purchase-order-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json(); // Get error details from server
+        throw new Error(errorData.error || 'PDF generation failed');
+      }
+
+      const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, "_blank"); // Open PDF in a new tab
+      window.open(blobUrl, '_blank');
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error('Client-side error:', error.message); // Improved error logging
     } finally {
-      setIsLoading(false); // Hide loading state
+      setIsLoading(false);
     }
   };
 
