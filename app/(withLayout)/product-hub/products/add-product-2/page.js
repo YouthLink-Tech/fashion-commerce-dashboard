@@ -78,7 +78,7 @@ const SecondStepOfAddProduct = () => {
           if (existingVariant) {
             allVariants.push(existingVariant);
           } else {
-            allVariants.push({ color, size, sku: 0, onHandSku: 0, returnSku: 0, imageUrls: [], location: primaryLocationName });
+            allVariants.push({ color, size, sku: 0, onHandSku: 0, returnSku: 0, forfeitedSku: 0, imageUrls: [], location: primaryLocationName });
           }
         }
       }
@@ -298,6 +298,7 @@ const SecondStepOfAddProduct = () => {
           sku: 0, // Set sku 0
           onHandSku: 0, // Set onHandSku 0
           returnSku: 0, // Set returnSku 0
+          forfeitedSku: 0, // Set forfeitedSku 0
           location: location.locationName,
         }));
       });
@@ -350,6 +351,7 @@ const SecondStepOfAddProduct = () => {
         sku: 0, // Set SKU to 0
         onHandSku: 0, // Set onHandSku to 0
         returnSku: 0, // Set returnSku to 0
+        forfeitedSku: 0, // Set forfeitedSku to 0
         location: location.locationName,
       }));
     });

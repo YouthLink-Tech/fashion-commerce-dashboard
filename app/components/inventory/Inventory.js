@@ -26,6 +26,7 @@ const Inventory = () => {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen2, onOpen2, onOpenChange2 } = useDisclosure();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -41,6 +42,7 @@ const Inventory = () => {
   const [showLowStock, setShowLowStock] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
   const [selectedReturnInfos, setSelectedReturnInfos] = useState([]);
+  const [selectedForfeitedInfos, setSelectedForfeitedInfos] = useState([]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -65,7 +67,8 @@ const Inventory = () => {
           color: variant?.color.label, // Display color label
           colorCode: variant?.color.color, // Display color code for visualization
           sku: variant?.sku,
-          returnSku: variant?.returnSku || 0,
+          returnSku: variant?.returnSku,
+          forfeitedSku: variant?.forfeitedSku,
           onHandSku: variant?.onHandSku,
           imageUrl: variant?.imageUrls[0], // Assuming we want the first image
           productId: product?.productId,
@@ -189,6 +192,7 @@ const Inventory = () => {
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
+        forfeitedSku: product.forfeitedSku,
       };
     });
 
@@ -220,6 +224,7 @@ const Inventory = () => {
       { header: "Available", dataKey: "available" },
       { header: "On Hand", dataKey: "onHand" },
       { header: "Return SKU", dataKey: "returnSku" },
+      { header: "Forfeited SKU", dataKey: "forfeitedSku" },
     ];
 
     const rows = paginatedProducts.map(product => {
@@ -253,6 +258,7 @@ const Inventory = () => {
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
+        forfeitedSku: product.forfeitedSku,
       };
     });
 
@@ -301,6 +307,7 @@ const Inventory = () => {
         available: product.sku,
         onHand: product.onHandSku,
         returnSku: product.returnSku,
+        forfeitedSku: product.forfeitedSku,
       };
     });
 
@@ -377,6 +384,11 @@ const Inventory = () => {
       onOpen();
     }
   };
+
+  const handleForfeitedSkuClick = (product) => {
+    // setSelectedForfeitedInfos(forfeitedInfos)
+    onOpen2();
+  }
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -660,9 +672,14 @@ const Inventory = () => {
                           0
                         </td>
                       }
-                      <td key="forfeitedSku" className="text-center">
-                        {product?.forfeitedSku ? product?.forfeitedSku : 0}
-                      </td>
+                      {product?.forfeitedSku ?
+                        <td onClick={() => handleForfeitedSkuClick(product)} key="forfeitedSku" className="text-center text-blue-600 cursor-pointer">
+                          {product?.forfeitedSku}
+                        </td> :
+                        <td key="forfeitedSku" className="text-center">
+                          0
+                        </td>
+                      }
                     </tr>
                   );
                 })
@@ -697,30 +714,30 @@ const Inventory = () => {
               <ModalBody className="modal-body-scroll">
                 {selectedReturnInfos.length > 0 ? (
                   <div className="space-y-6">
-                    {selectedReturnInfos.map((returnInfo, index) => (
+                    {selectedReturnInfos?.map((returnInfo, index) => (
                       <div key={index} className="border-b pb-4">
                         <p>
-                          <strong>Order ID:</strong> {returnInfo.orderId}
+                          <strong>Order ID:</strong> {returnInfo?.orderId}
                         </p>
                         <p>
-                          <strong>Date of Return:</strong> {returnInfo.dateTime}
+                          <strong>Date of Return:</strong> {returnInfo?.dateTime}
                         </p>
                         <p>
-                          <strong>Reason for Return:</strong> {returnInfo.reason}
+                          <strong>Reason for Return:</strong> {returnInfo?.reason}
                         </p>
-                        {returnInfo.issue && (
+                        {returnInfo?.issue && (
                           <p>
-                            <strong>Issue:</strong> {returnInfo.issue}
+                            <strong>Issue:</strong> {returnInfo?.issue}
                           </p>
                         )}
-                        {returnInfo.description && (
+                        {returnInfo?.description && (
                           <p>
-                            <strong>Description:</strong> {returnInfo.description}
+                            <strong>Description:</strong> {returnInfo?.description}
                           </p>
                         )}
-                        {returnInfo.returnSku && (
+                        {returnInfo?.returnSku && (
                           <p>
-                            <strong>Return SKU:</strong> {returnInfo.returnSku}
+                            <strong>Return SKU:</strong> {returnInfo?.returnSku}
                           </p>
                         )}
                         <div className="mt-4 flex justify-end gap-4">
@@ -742,6 +759,61 @@ const Inventory = () => {
                   </div>
                 ) : (
                   <p>No return information available.</p>
+                )}
+              </ModalBody>
+              <ModalFooter className='flex justify-end items-center border'>
+                <div className='flex gap-4 items-center'>
+                  <Button size='sm' color='danger' variant="flat" onPress={onClose}>
+                    Cancel
+                  </Button>
+                </div>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isOpen2} onOpenChange={onOpenChange2} size='2xl'>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="bg-gray-200">
+                <h2 className="text-lg font-semibold px-2">Forfeited Details</h2>
+              </ModalHeader>
+              <ModalBody className="modal-body-scroll">
+                {selectedForfeitedInfos.length > 0 ? (
+                  <div className="space-y-6">
+                    {selectedForfeitedInfos?.map((forfeitedInfo, index) => (
+                      <div key={index} className="border-b pb-4">
+                        <p>
+                          <strong>Order ID:</strong> {forfeitedInfo?.orderId}
+                        </p>
+                        <p>
+                          <strong>Date of Return:</strong> {forfeitedInfo?.dateTime}
+                        </p>
+                        <p>
+                          <strong>Reason for Return:</strong> {forfeitedInfo?.reason}
+                        </p>
+                        {forfeitedInfo?.issue && (
+                          <p>
+                            <strong>Issue:</strong> {forfeitedInfo?.issue}
+                          </p>
+                        )}
+                        {forfeitedInfo?.description && (
+                          <p>
+                            <strong>Description:</strong> {forfeitedInfo?.description}
+                          </p>
+                        )}
+                        {forfeitedInfo?.forfeitedSku && (
+                          <p>
+                            <strong>Forfeited SKU:</strong> {forfeitedInfo?.forfeitedSku}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No forfeit information available.</p>
                 )}
               </ModalBody>
               <ModalFooter className='flex justify-end items-center border'>
