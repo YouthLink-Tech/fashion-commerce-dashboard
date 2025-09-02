@@ -305,6 +305,8 @@ const RecentPromotions = () => {
     // remove values that should not be cloned
     delete cloneOfferData.offerTitle;
     delete cloneOfferData.expiryDate;
+    delete cloneOfferData.selectedCategories;
+    delete cloneOfferData.selectedProductIds;
     delete cloneOfferData._id; // make sure the new one doesn’t reuse old ID
 
     // store clone data in localStorage

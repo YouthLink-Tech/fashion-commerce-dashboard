@@ -103,6 +103,7 @@ const EditProductContents = () => {
   const [selectedSeasons, setSelectedSeasons] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const selectedCategoryRef = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
   const [activeTab, setActiveTab] = useState('product');
   const [existingVariants, setExistingVariants] = useState([]);
@@ -699,6 +700,10 @@ const EditProductContents = () => {
   }, [setValue, locationList]);
 
   useEffect(() => {
+    selectedCategoryRef.current = selectedCategory;
+  }, [selectedCategory]);
+
+  useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
     if (status !== "authenticated" || !session?.user?.accessToken) return;
@@ -746,13 +751,13 @@ const EditProductContents = () => {
           return;
         }
         else {
-          router.push(`/product-hub/products/existing-products/${selectedCategory}`);
+          router.push(`/product-hub/products/existing-products/${selectedCategoryRef.current || 'default'}`);
         }
       }
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status, router, decodedSeasonName, selectedCategory]);
+  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status, router, decodedSeasonName]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {
@@ -1266,7 +1271,6 @@ const EditProductContents = () => {
                         onChange={(e) => {
                           handleCategoryChange(e.target.value);
                         }}
-                        disabled
                       >
                         <option value="" disabled className='bg-white'>Select a category</option>
                         {categoryList?.map((category) => (

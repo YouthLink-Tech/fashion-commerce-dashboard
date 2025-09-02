@@ -205,6 +205,12 @@ const EditOffer = () => {
     document.getElementById('imageUpload').value = ''; // Clear the file input
   };
 
+  const isOfferActive = (offer) => {
+    const now = new Date();
+    return new Date(offer?.expiryDate) >= now;
+    // return offer?.offerStatus && new Date(offer?.expiryDate) >= now; // if offer status off, then that offer related item can be selected for new offer
+  };
+
   // Handle category selection
   const handleCategorySelectionChange = async (categoryLabel) => {
     setSelectedCategories((prevCategories) => {
@@ -219,17 +225,18 @@ const EditOffer = () => {
       // Get the currently edited offer's ID
       const currentOfferId = id;
 
-      // Get all products in other offers (excluding the current offer)
-      const productsInOtherOffers = offerList
-        ?.filter((offer) => offer?._id !== currentOfferId) // Ignore the current offer
-        ?.flatMap((offer) => offer?.selectedProductIds);
+      // Only check other *active* offers
+      const otherActiveOffers = offerList?.filter(
+        (offer) => offer?._id !== currentOfferId && isOfferActive(offer)
+      );
+
+      // Get products from other active offers
+      const productsInOtherOffers = otherActiveOffers?.flatMap(
+        (offer) => offer?.selectedProductIds
+      );
 
       // Check if any of the new categories are in another offer (excluding the current offer)
-      const categoryConflict = updatedSelectedCategories?.some((category) =>
-        offerList?.some((offer) =>
-          offer._id !== currentOfferId && offer?.selectedCategories?.includes(category)
-        )
-      );
+      const categoryConflict = updatedSelectedCategories?.some((category) => otherActiveOffers?.some((offer) => offer?.selectedCategories?.includes(category)));
 
       // Check if products under the selected category are already in another offer
       const hasProductConflict = updatedSelectedCategories?.some((category) => {
@@ -339,16 +346,16 @@ const EditOffer = () => {
     );
 
     // Ignore the current offer when checking for conflicts
-    const otherOffers = offerList.filter(offer => offer._id !== id);
+    const otherActiveOffers = offerList.filter(offer => offer._id !== id && isOfferActive(offer));
 
     // Check if any selected product is already in another offer
     const hasConflict = selectedIds.some((prodId) =>
-      otherOffers.some((offer) => offer.selectedProductIds.includes(prodId))
+      otherActiveOffers.some((offer) => offer.selectedProductIds.includes(prodId))
     );
 
     // Check if any selected product's category is already in another offer
     const categoryConflict = selectedProductsCategories.some((category) =>
-      otherOffers.some((offer) => offer.selectedCategories.includes(category))
+      otherActiveOffers.some((offer) => offer.selectedCategories.includes(category))
     );
 
     if (hasConflict) {

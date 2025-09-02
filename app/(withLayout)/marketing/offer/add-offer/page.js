@@ -1,6 +1,6 @@
 "use client";
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -60,17 +60,6 @@ const AddOffer = () => {
       if (parsed.offerDiscountType) setOfferDiscountType(parsed?.offerDiscountType);
       if (parsed.offerDescription) setOfferDescription(parsed.offerDescription);
       if (parsed.imageUrl) setImage(parsed.imageUrl);
-      if (parsed.selectedCategories) setSelectedCategories(parsed.selectedCategories || []);
-      if (parsed.selectedProductIds) setSelectedProductIds(parsed.selectedProductIds || []);
-
-      // Determine which tab to show based on the fetched data
-      if (parsed?.selectedCategories?.length > 0) {
-        setSelectedTab('Categories');
-      } else if (parsed.selectedProductIds?.length > 0) {
-        setSelectedTab('Products');
-      } else {
-        setSelectedTab('Products'); // Default tab if both are empty
-      }
     }
 
     localStorage.removeItem("cloneOfferData");
@@ -182,6 +171,12 @@ const AddOffer = () => {
     setImage(null);
   };
 
+  const isOfferActive = (offer) => {
+    const now = new Date();
+    return new Date(offer?.expiryDate) >= now;
+    // return offer?.offerStatus && new Date(offer?.expiryDate) >= now; // if offer status off, then that offer related item can be selected for new offer
+  };
+
   const handleProductSelectionChange = async (selectedIds) => {
     if (selectedIds.length === 0) {
       setProductIdError(true);
@@ -198,14 +193,14 @@ const AddOffer = () => {
 
     // Check if any selected product is already in another offer
     const hasConflict = selectedIds?.some((prodId) =>
-      offerList?.some((offer) =>
+      offerList?.some((offer) => isOfferActive(offer) &&
         offer?.selectedProductIds?.includes(prodId)
       )
     );
 
     // Check if any selected product's category is already in another offer
     const categoryConflict = selectedProductsCategories?.some((category) =>
-      offerList?.some((offer) =>
+      offerList?.some((offer) => isOfferActive(offer) &&
         offer?.selectedCategories.includes(category)
       )
     );
@@ -301,11 +296,11 @@ const AddOffer = () => {
     }
 
     // Step 1: Get the list of product IDs already part of any offers
-    const productsInOffers = offerList?.flatMap((offer) => offer?.selectedProductIds);
+    const productsInOffers = offerList?.filter(isOfferActive)?.flatMap((offer) => offer?.selectedProductIds);
 
     // Step 2: Check if the selected categories are already part of an offer
     const categoryConflict = updatedSelectedCategories?.some((category) =>
-      offerList?.some((offer) => offer?.selectedCategories?.includes(category)) // Check if category is already in offer
+      offerList?.some((offer) => isOfferActive(offer) && offer?.selectedCategories?.includes(category)) // Check if category is already in offer
     );
 
     // Step 3: Check if any of the selected categories' products are already part of an offer
