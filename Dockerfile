@@ -1,44 +1,34 @@
-# Base image
-FROM node:18-alpine AS base
-
 # Stage 1: Dependencies
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:18-alpine AS deps
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm ci
+# Install only production dependencies
+RUN npm ci --omit=dev
 
 # Stage 2: Build
-FROM base AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
 ENV NEXT_TELEMETRY_DISABLED=1
-
+# Enable standalone output
 RUN npm run build
+# Clean up to reduce size
+RUN rm -rf node_modules .next/cache
 
-# Stage 3: Production runtime
-FROM base AS runner
+# Stage 3: Production
+FROM node:18-alpine AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-
+ENV PORT=3000
+# Add non-root user (matching your setup)
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
-
-# Copy files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
-
+# Copy standalone output and essential files
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
-
 EXPOSE 3000
-ENV PORT=3000
-
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

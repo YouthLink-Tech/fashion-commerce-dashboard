@@ -4,6 +4,7 @@ const nextConfig = {
     domains: ['i.ibb.co', 'i.ibb.co.com', 'storage.googleapis.com', 'media.poshax.shop'], // Add your external image domain(s) here
   },
   reactStrictMode: false,
+  output: 'standalone',
 };
 
 export default nextConfig;
