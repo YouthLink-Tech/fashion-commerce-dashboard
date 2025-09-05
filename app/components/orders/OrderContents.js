@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Textarea } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Radio, RadioGroup, Textarea } from "@nextui-org/react";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useDisclosure } from '@nextui-org/react';
@@ -86,10 +86,10 @@ const OrderContents = () => {
   const [orderToUpdateOnHold, setOrderToUpdateOnHold] = useState({}); // selected order for update
   const [onHoldReason, setOnHoldReason] = useState("");
   const [isOnHoldModalOpen, setOnHoldModalOpen] = useState(false);
-  const [orderIdToUpdateDeclined, setOrderIdToUpdateDeclined] = useState(null); // Store order ID
-  const [orderToUpdateDeclined, setOrderToUpdateDeclined] = useState({}); // selected order for update
-  const [declinedReason, setDeclinedReason] = useState("");
-  const [isDeclinedModalOpen, setDeclinedModalOpen] = useState(false);
+  const [isAcceptRejectModalOpen, setAcceptRejectModalOpen] = useState(false);
+  const [orderIdToUpdateAcceptReject, setOrderIdToUpdateAcceptReject] = useState(null); // Stores order ID
+  const [orderToUpdateAcceptReject, setOrderToUpdateAcceptReject] = useState({}); // selected order for update
+  const [productDecisions, setProductDecisions] = useState({});
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [selectedHandler, setSelectedHandler] = useState(null);
@@ -290,7 +290,7 @@ const OrderContents = () => {
         filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
         break;
       case 'Returns & Refunds':
-        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
+        filtered = orderList?.filter(order => ['Return Requested', 'Processed', 'Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
         break;
       default:
         filtered = orderList;
@@ -390,7 +390,7 @@ const OrderContents = () => {
       'New Orders': list?.filter(order => order?.orderStatus === 'Pending').length || 0,
       'Active Orders': list?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus)).length || 0,
       'Completed Orders': list?.filter(order => order?.orderStatus === 'Delivered').length || 0,
-      'Returns & Refunds': list?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
+      'Returns & Refunds': list?.filter(order => ['Return Requested', 'Processed', 'Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
     };
   };
 
@@ -527,11 +527,11 @@ const OrderContents = () => {
           setOrderIdToUpdateOnHold(id); // Set the order ID for modal
           setOnHoldModalOpen(true);  // Open the modal
         }
-        else if (actionType === "declined") {
+        else if (actionType === "approved") {
           // Open the modal for on hold input only for 'onHold'
-          setOrderToUpdateDeclined(order);
-          setOrderIdToUpdateDeclined(id); // Set the order ID for modal
-          setDeclinedModalOpen(true);  // Open the modal
+          setOrderToUpdateAcceptReject(order);
+          setOrderIdToUpdateAcceptReject(id); // Set the order ID for modal
+          setAcceptRejectModalOpen(true);  // Open the modal
         }
         else if (actionType === "refunded") {
           try {
@@ -574,12 +574,16 @@ const OrderContents = () => {
       color: product.color
     }));
 
-    const returnDataToSend = order?.returnInfo?.products?.map(product => ({
-      productId: product.productId,
-      sku: product.sku,
-      size: product.size,
-      color: product.color
-    }));
+    // 👉 Auto-decide status for approve/reject flow
+    if (actionType === "approved") {
+      const allRejected = order?.returnInfo?.products?.every(
+        (p) => p.status === "Rejected"
+      );
+
+      if (allRejected) {
+        actionType = "declined"; // auto switch
+      }
+    }
 
     let updateStatus;
 
@@ -598,10 +602,10 @@ const OrderContents = () => {
           updateStatus = 'Delivered';
           break;
         case 'approved':
-          updateStatus = 'Request Accepted';
+          updateStatus = 'Processed';
           break;
         case 'declined':
-          updateStatus = 'Request Declined';
+          updateStatus = 'Declined';
           break;
         case 'returned':
           updateStatus = 'Return Initiated';
@@ -633,9 +637,14 @@ const OrderContents = () => {
         : {}), // Add selectedHandler details if provided for shipped
       ...(isUndo && { isUndo: true }),
       ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {}),
-      ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
+      // ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
+      ...(actionType === "approved" || actionType === "declined" ? {
+        returnInfo: {
+          ...order.returnInfo,
+          products: order.returnInfo.products,
+        },
+      } : {}),
       dataToSend,
-      returnDataToSend
     };
 
     try {
@@ -1139,6 +1148,8 @@ const OrderContents = () => {
     return <Loading />;
   };
 
+  console.log(selectedOrder, "selectedOrder");
+
   return (
     <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50'>
 
@@ -1476,16 +1487,13 @@ const OrderContents = () => {
 
                                   {order.orderStatus === 'Return Requested' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onPress={() => handleActions(order._id, 'approved')} color='success' isDisabled={!isAuthorized} size="sm" variant="flat">
-                                        Approve
-                                      </Button>
-                                      <Button isDisabled={!isAuthorized} className="text-xs w-20" onPress={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
-                                        Decline
+                                      <Button className="text-xs w-28" onPress={() => handleActions(order._id, 'approved')} color='danger' isDisabled={!isAuthorized} size="sm" variant="flat">
+                                        Review Request
                                       </Button>
                                     </div>
                                   )}
 
-                                  {order.orderStatus === 'Request Accepted' && (
+                                  {order.orderStatus === 'Processed' && (
                                     <div className="flex items-center gap-2">
                                       <Button className="text-xs w-20" onPress={() => handleActions(order._id, 'returned')} size="sm" color="secondary"
                                         isDisabled={!isAuthorized}
@@ -1495,7 +1503,7 @@ const OrderContents = () => {
                                     </div>
                                   )}
 
-                                  {order.orderStatus === 'Request Declined' && (
+                                  {order.orderStatus === 'Declined' && (
                                     <div className="flex items-center gap-2">
                                       <Button className="text-xs w-20"
                                         isDisabled size="sm"
@@ -1525,7 +1533,7 @@ const OrderContents = () => {
                                       color="default"
                                       isDisabled
                                     >
-                                      Refund Processed
+                                      Refund Completed
                                     </Button>
                                   )}
 
@@ -1702,48 +1710,75 @@ const OrderContents = () => {
                     <div className='flex flex-col gap-4'>
 
                       <div>
-                        {["Request Accepted", "Return Initiated", "Refunded"].includes(selectedOrder?.orderStatus) && (
-                          <p className="text-green-500 text-lg font-bold pb-2.5">Approved</p>
-                        )}
-
-                        {selectedOrder?.declinedReason && selectedOrder?.orderStatus === "Request Declined" &&
-                          (
-                            <div>
-                              <p className="text-red-500 text-lg font-bold">Declined</p>
-                              <p className="pb-4">
-                                <strong>Declined Reason:</strong> <i>{selectedOrder?.declinedReason}</i>
-                              </p>
-                            </div>
-                          )}
                         <p><strong>Return Date & Time :</strong> {selectedOrder?.returnInfo?.dateTime}</p>
-                        <p><strong>Return Reason :</strong> {selectedOrder?.returnInfo?.reason}</p>
                         {selectedOrder?.returnInfo?.description && <p><strong>Description :</strong> <i>{selectedOrder?.returnInfo?.description}</i></p>}
                       </div>
 
                       <div>
                         <p className='font-bold text-lg'>Returned Product Details</p>
-                        {selectedOrder?.returnInfo?.products?.map((product, index) => (
-                          <div key={index} className="mb-4">
-                            <p><strong>Product : </strong> {product?.productTitle}</p>
-                            <p><strong>Product ID : </strong> {product?.productId}</p>
-                            <p><strong>Size:</strong>  {product?.size}</p>
-                            <p className='flex items-center gap-2'><strong>Color:</strong>
-                              {product?.color?.label}
-                              <span
-                                style={{
-                                  display: 'inline-block',
-                                  width: '20px',
-                                  height: '20px',
-                                  backgroundColor: product.color?.color || '#fff',
-                                  marginRight: '8px',
-                                  borderRadius: '4px'
-                                }}
-                              />
-                            </p>
-                            <p><strong>Unit Price:</strong> ৳ {product?.finalUnitPrice}</p>
-                            <p><strong>SKU:</strong> {product?.sku}</p>
-                          </div>
-                        ))}
+                        {selectedOrder?.returnInfo?.products?.map((product, index) => {
+                          const isLast = index === selectedOrder?.returnInfo?.products?.length - 1;
+                          return (
+                            <div key={index} className={`py-3 ${!isLast ? "border-b border-gray-200" : ""}`}>
+
+                              {/* Product Title + Status Badge */}
+                              <div className="flex items-center justify-between">
+                                <p className="font-semibold">
+                                  {product?.productTitle}
+                                </p>
+                                {product?.status === "Accepted" && (
+                                  <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                    Accepted
+                                  </span>
+                                )}
+                                {product?.status === "Rejected" && (
+                                  <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                    Rejected
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Declined reason (if rejected) */}
+                              {product?.status === "Rejected" && product?.declineReason && (
+                                <p className="text-red-500 text-xs italic mt-1">
+                                  Reason: {product.declineReason}
+                                </p>
+                              )}
+
+                              {/* Product Details */}
+                              <p><strong>Product ID : </strong> {product?.productId}</p>
+                              <p><strong>Size:</strong> {product?.size}</p>
+                              <p className='flex items-center gap-2'>
+                                <strong>Color:</strong>
+                                {product?.color?.label}
+                                <span
+                                  style={{
+                                    display: 'inline-block',
+                                    width: '20px',
+                                    height: '20px',
+                                    backgroundColor: product.color?.color || '#fff',
+                                    marginRight: '8px',
+                                    borderRadius: '4px'
+                                  }}
+                                />
+                              </p>
+                              <p><strong>Unit Price:</strong> ৳ {product?.finalUnitPrice}</p>
+                              <p><strong>SKU:</strong> {product?.sku}</p>
+
+                              {/* Show issues per product */}
+                              {product?.issues?.length > 0 && (
+                                <div className="mt-[3px] text-xs md:text-[13px] text-red-500">
+                                  <h5 className="">Issues:</h5>
+                                  <ul className="list-disc list-inside space-y-0.5">
+                                    {product.issues.map((issue, idx) => (
+                                      <li key={`${product._id}-issue-${idx}`}>{issue}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
                       </div>
 
                     </div>
@@ -1985,64 +2020,177 @@ const OrderContents = () => {
           </ModalContent>
         </Modal>
 
-        {/* Modal of Declined reason */}
-        <Modal size='lg' isOpen={isDeclinedModalOpen} onOpenChange={(isOpen) => {
-          setDeclinedModalOpen(isOpen)
+        {/* Modal of Review Request */}
+        <Modal size='xl' isOpen={isAcceptRejectModalOpen} onOpenChange={(isOpen) => {
+          setAcceptRejectModalOpen(isOpen)
           if (!isOpen) {
-            setDeclinedModalOpen(false);
-            setDeclinedReason('');
+            setAcceptRejectModalOpen(false);
+            setProductDecisions({});
           }
         }}>
           <ModalContent>
-            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Provide a Reason for Declining the Order</ModalHeader>
-            <ModalBody>
+            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Return Review Request</ModalHeader>
+            <ModalBody className="modal-body-scroll mt-2">
+              {orderToUpdateAcceptReject?.returnInfo?.products?.map((product, idx) => {
 
-              <div className='flex justify-between items-center gap-2 my-2'>
-                <Textarea
-                  clearable
-                  disableAnimation
-                  variant="underlined"
-                  fullWidth
-                  size="lg"
-                  placeholder="Enter declined reason"
-                  value={declinedReason}
-                  onChange={(e) => setDeclinedReason(e.target.value)}
-                  isInvalid={declinedReason.length > 0 && declinedReason.length < 10}
-                  errorMessage={
-                    declinedReason.length > 0 && declinedReason.length < 10
-                      ? "Minimum 10 characters required"
-                      : ""
-                  }
-                />
-              </div>
+                const decision = productDecisions[product._id] || { status: "Accepted", declineReason: "" };
 
+                return (
+                  <div key={idx} className="border-2 border-neutral-100 p-3 rounded">
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={product?.thumbnailImgUrl}
+                        height={1200}
+                        width={1200}
+                        alt={product?.productTitle}
+                        className="w-20 h-20"
+                      />
+                      <div className='flex items-end justify-between w-full'>
+
+                        {/* Product Details */}
+                        <div className='font-semibold text-neutral-400'>
+                          <h4 className="line-clamp-1 text-neutral-600">
+                            {product?.productTitle}
+                          </h4>
+                          <div className="mt-[3px] flex gap-x-1.5 text-xs md:text-[13px]">
+                            <h5>Size:</h5>
+                            <span>{product?.size}</span>
+                          </div>
+                          <div className="mt-[3px] flex gap-x-1.5 text-xs md:text-[13px]">
+                            <h5>Color:</h5>
+                            <div className="flex items-center gap-x-1">
+                              <div
+                                style={{
+                                  backgroundColor: product?.color?.color,
+                                }}
+                                className="size-3.5 rounded-full"
+                              />
+                              {product?.color?.label}
+                            </div>
+                          </div>
+                          <p className='mt-[3px] text-xs md:text-[13px]'>Total Requested: {product?.sku}</p>
+
+                          {/* Issues */}
+                          {product?.issues?.length > 0 && (
+                            <div className="mt-[3px] text-xs md:text-[13px] text-red-500">
+                              <h5 className="">Issues:</h5>
+                              <ul className="list-disc list-inside space-y-0.5">
+                                {product.issues.map((issue, idx) => (
+                                  <li key={idx}>{issue}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                        </div>
+
+                        {/* Quantity Selector */}
+                        <RadioGroup
+                          label={<p className="font-semibold text-neutral-500 text-sm">Decision</p>}
+                          value={decision.status}
+                          onValueChange={(value) => {
+                            setProductDecisions((prev) => ({
+                              ...prev,
+                              [product._id]: {
+                                ...prev[product._id],
+                                status: value,
+                                declineReason: value === "Accepted" ? "" : prev[product._id]?.declineReason || ""
+                              },
+                            }));
+                          }}
+                          orientation="horizontal"
+                        >
+                          <Radio value="Accepted">Accept</Radio>
+                          <Radio value="Rejected">Reject</Radio>
+                        </RadioGroup>
+
+                      </div>
+
+                    </div>
+
+                    {/* Decline Reason (only if reject > 0) */}
+                    {decision.status === "Rejected" && (
+                      <Textarea
+                        clearable
+                        disableAnimation
+                        variant="underlined"
+                        fullWidth
+                        size="lg"
+                        placeholder="Enter decline reason"
+                        value={decision.declineReason}
+                        onChange={(e) =>
+                          setProductDecisions((prev) => ({
+                            ...prev,
+                            [product._id]: { ...prev[product._id], declineReason: e.target.value }
+                          }))
+                        }
+                        isInvalid={
+                          decision.declineReason?.length > 0 && decision.declineReason?.length < 10
+                        }
+                        errorMessage={
+                          decision.declineReason?.length > 0 && decision.declineReason?.length < 10
+                            ? "Minimum 10 characters required"
+                            : ""
+                        }
+                        className="w-full mt-2 rounded p-2"
+                      />
+                    )}
+
+                  </div>
+                );
+              })}
             </ModalBody>
             <ModalFooter>
               <Button
                 color="primary"
-                size='sm'
+                size="sm"
                 onPress={async () => {
+                  let hasError = false;
 
-                  // When toggle is ON, ensure tracking number is entered
-                  if (!declinedReason) {
-                    toast.error("Please enter declined reason.");
-                    return; // Stop execution if no tracking number is provided
-                  }
+                  // 📝 directly update orderToUpdateAcceptReject
+                  orderToUpdateAcceptReject.returnInfo.products =
+                    orderToUpdateAcceptReject?.returnInfo?.products?.map((product) => {
+                      const decision = productDecisions[product._id] || {
+                        status: "Accepted",
+                        declineReason: "",
+                      };
 
-                  // Check if declined reason is less than 10 characters
-                  if (declinedReason.length < 10) {
-                    toast.error("Minimum 10 characters required!");
-                    return;
-                  }
+                      if (decision.status === "Rejected") {
+                        if (!decision.declineReason) {
+                          toast.error(`Please provide decline reason for ${product.productTitle}`);
+                          hasError = true;
+                        } else if (decision.declineReason.length < 10) {
+                          toast.error(
+                            `Reason for ${product.productTitle} must be at least 10 characters`
+                          );
+                          hasError = true;
+                        }
+                      }
 
-                  // Update order status with tracking number and selected handler
-                  await updateOrderStatus(orderToUpdateDeclined, orderIdToUpdateDeclined, "declined", false, declinedReason);
-                  setDeclinedModalOpen(false); // Close modal after submission
-                  setDeclinedReason(''); // Clear input field
+                      return {
+                        ...product,
+                        status: decision.status,
+                        declineReason:
+                          decision.status === "Rejected" ? decision.declineReason : "",
+                      };
+                    });
+
+                  if (hasError) return;
+
+                  // Now orderToUpdateAcceptReject already contains updated products
+                  await updateOrderStatus(
+                    orderToUpdateAcceptReject,
+                    orderIdToUpdateAcceptReject,
+                    "approved"
+                  );
+
+                  setAcceptRejectModalOpen(false);
+                  setProductDecisions({});
                 }}
               >
                 Confirm
               </Button>
+
             </ModalFooter>
           </ModalContent>
         </Modal>
