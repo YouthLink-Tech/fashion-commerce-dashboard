@@ -487,7 +487,8 @@ const OrderContents = () => {
       productId: product.productId,
       sku: product.sku,
       size: product.size,
-      color: product.color
+      color: product.color,
+      status: product.status
     }));
 
     const actionMessages = {
@@ -533,7 +534,7 @@ const OrderContents = () => {
           setOrderIdToUpdateAcceptReject(id); // Set the order ID for modal
           setAcceptRejectModalOpen(true);  // Open the modal
         }
-        else if (actionType === "refunded") {
+        else if (actionType === "returned") {
           try {
             const response = await axiosSecure.put("/addReturnSkuToProduct", returnDataToSend);
 
@@ -555,6 +556,9 @@ const OrderContents = () => {
             console.error("Error making API request:", error);
           }
         }
+        else if (actionType === "refunded") {
+          updateOrderStatus(order, id, actionType, isUndo);
+        }
         else {
           // For all other statuses, update order directly
           updateOrderStatus(order, id, actionType, isUndo); // Keep the existing logic for non-shipped actions
@@ -574,7 +578,7 @@ const OrderContents = () => {
       color: product.color
     }));
 
-    // 👉 Auto-decide status for approve/reject flow
+    // Auto-decide status for approve/reject flow
     if (actionType === "approved") {
       const allRejected = order?.returnInfo?.products?.every(
         (p) => p.status === "Rejected"
@@ -637,7 +641,6 @@ const OrderContents = () => {
         : {}), // Add selectedHandler details if provided for shipped
       ...(isUndo && { isUndo: true }),
       ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {}),
-      // ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
       ...(actionType === "approved" || actionType === "declined" ? {
         returnInfo: {
           ...order.returnInfo,
@@ -1147,8 +1150,6 @@ const OrderContents = () => {
   if (isOrderListPending || isShippingPending || isUserLoading || isShipmentHandlerPending) {
     return <Loading />;
   };
-
-  console.log(selectedOrder, "selectedOrder");
 
   return (
     <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50'>
@@ -1726,6 +1727,11 @@ const OrderContents = () => {
                                 <p className="font-semibold">
                                   {product?.productTitle}
                                 </p>
+                                {product?.status === "Pending" && (
+                                  <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                    Under Review
+                                  </span>
+                                )}
                                 {product?.status === "Accepted" && (
                                   <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
                                     Accepted

@@ -20,13 +20,16 @@ import PaginationSelect from '../shared/pagination/PaginationSelect';
 import LocationDropdown from '../product/dropdown/LocationDropdown';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { BiTransferAlt, BiMinusCircle } from "react-icons/bi";
+import toast from 'react-hot-toast';
+import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
 const Inventory = () => {
 
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { isOpen2, onOpen2, onOpenChange2 } = useDisclosure();
+  const { isOpen: isOpen2, onOpen: onOpen2, onOpenChange: onOpenChange2 } = useDisclosure();
+  const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -357,7 +360,8 @@ const Inventory = () => {
         (returnProduct) =>
           returnProduct.productId === product.productId &&
           returnProduct.size === product.size &&
-          returnProduct.color.color === product.colorCode
+          returnProduct.color.color === product.colorCode &&
+          returnProduct.status === "Accepted"
       )
     );
 
@@ -373,10 +377,7 @@ const Inventory = () => {
         return {
           orderId: order.orderNumber,
           dateTime: order.returnInfo.dateTime,
-          reason: order.returnInfo.reason,
-          issue: order.returnInfo.issue,
           description: order.returnInfo.description,
-          returnSku: matchingProduct ? matchingProduct.sku : 0,
           returnProduct: matchingProduct,
         };
       });
@@ -386,8 +387,109 @@ const Inventory = () => {
   };
 
   const handleForfeitedSkuClick = (product) => {
-    // setSelectedForfeitedInfos(forfeitedInfos)
-    onOpen2();
+    // Find orders with returnInfo for the matching product
+    const returnOrders = orderList?.filter((order) =>
+      order.returnInfo?.products.some(
+        (returnProduct) =>
+          returnProduct.productId === product.productId &&
+          returnProduct.size === product.size &&
+          returnProduct.color.color === product.colorCode &&
+          returnProduct.status === "Accepted" &&
+          returnProduct.transferStatus === "Forfeited"
+      )
+    );
+
+    if (returnOrders?.length > 0) {
+      // Collect all return information for the product
+      const returnInfos = returnOrders.map((order) => {
+        const matchingProduct = order.returnInfo.products.find(
+          (p) =>
+            p.productId === product.productId &&
+            p.size === product.size &&
+            p.color.color === product.colorCode
+        );
+        return {
+          orderId: order.orderNumber,
+          dateTime: order.returnInfo.dateTime,
+          description: order.returnInfo.description,
+          returnProduct: matchingProduct,
+        };
+      });
+      setSelectedForfeitedInfos(returnInfos);
+      onOpen2();
+    }
+  };
+
+  const handleTransferToAvailable = async (returnInfo) => {
+    const status = returnInfo?.returnProduct?.status;
+    const transferSku = returnInfo?.returnProduct?.sku;
+    const productId = returnInfo?.returnProduct?.productId;
+    const color = returnInfo?.returnProduct?.color;
+    const size = returnInfo?.returnProduct?.size;
+    const orderNumber = returnInfo?.orderId;
+
+    if (status !== "Accepted") {
+      toast.error("This item cannot be transferred unless it is Accepted.");
+      return;
+    };
+
+    const info = {
+      productId,
+      transferSku,
+      color,
+      size,
+      orderNumber
+    };
+
+    try {
+      const response = await axiosSecure.post(
+        "/transferReturnSkuToAvailable",
+        info
+      );
+      if (response.data.message) {
+        toast.success(response.data.message);
+        refetch();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to transfer SKU.");
+    }
+  };
+
+  const handleForfeitItem = async (returnInfo) => {
+    const status = returnInfo?.returnProduct?.status;
+    const transferSku = returnInfo?.returnProduct?.sku;
+    const productId = returnInfo?.returnProduct?.productId;
+    const color = returnInfo?.returnProduct?.color;
+    const size = returnInfo?.returnProduct?.size;
+    const orderNumber = returnInfo?.orderId;
+
+    if (status !== "Accepted") {
+      toast.error("This item cannot be transferred unless it is Accepted.");
+      return;
+    };
+
+    const info = {
+      productId,
+      transferSku,
+      color,
+      size,
+      orderNumber
+    };
+
+    try {
+      const response = await axiosSecure.post(
+        "/transferReturnSkuToForfeited",
+        info
+      );
+      if (response.data.message) {
+        toast.success(response.data.message);
+        refetch();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to transfer SKU.");
+    }
   }
 
   useEffect(() => {
@@ -664,22 +766,12 @@ const Inventory = () => {
                       <td key="onProcess" className="text-center"> {isMatchingLocation ? onProcess : 0}</td>
                       <td key="available" className="text-center"> {product?.sku}</td>
                       <td key="onHand" className="text-center">{product?.onHandSku}</td>
-                      {product?.returnSku ?
-                        <td onClick={() => handleReturnSkuClick(product)} key="returnSku" className="text-center text-blue-600 cursor-pointer">
-                          {product?.returnSku}
-                        </td> :
-                        <td key="returnSku" className="text-center">
-                          0
-                        </td>
-                      }
-                      {product?.forfeitedSku ?
-                        <td onClick={() => handleForfeitedSkuClick(product)} key="forfeitedSku" className="text-center text-blue-600 cursor-pointer">
-                          {product?.forfeitedSku}
-                        </td> :
-                        <td key="forfeitedSku" className="text-center">
-                          0
-                        </td>
-                      }
+                      <td onClick={() => handleReturnSkuClick(product)} key="returnSku" className="text-center text-blue-600 cursor-pointer">
+                        {product?.returnSku}
+                      </td>
+                      <td onClick={() => handleForfeitedSkuClick(product)} key="forfeitedSku" className="text-center text-blue-600 cursor-pointer">
+                        {product?.forfeitedSku}
+                      </td>
                     </tr>
                   );
                 })
@@ -714,48 +806,80 @@ const Inventory = () => {
               <ModalBody className="modal-body-scroll">
                 {selectedReturnInfos.length > 0 ? (
                   <div className="space-y-6">
-                    {selectedReturnInfos?.map((returnInfo, index) => (
-                      <div key={index} className="border-b pb-4">
-                        <p>
-                          <strong>Order ID:</strong> {returnInfo?.orderId}
-                        </p>
-                        <p>
-                          <strong>Date of Return:</strong> {returnInfo?.dateTime}
-                        </p>
-                        <p>
-                          <strong>Reason for Return:</strong> {returnInfo?.reason}
-                        </p>
-                        {returnInfo?.issue && (
-                          <p>
-                            <strong>Issue:</strong> {returnInfo?.issue}
-                          </p>
-                        )}
-                        {returnInfo?.description && (
-                          <p>
-                            <strong>Description:</strong> {returnInfo?.description}
-                          </p>
-                        )}
-                        {returnInfo?.returnSku && (
-                          <p>
-                            <strong>Return SKU:</strong> {returnInfo?.returnSku}
-                          </p>
-                        )}
-                        <div className="mt-4 flex justify-end gap-4">
-                          <button
-                            className="w-fit rounded-lg bg-[#d4ffce] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm relative z-[1] flex items-center justify-center gap-x-2 ease-in-out"
-                          // onClick={() => handleTransferToAvailable(returnInfo)}
-                          >
-                            <BiTransferAlt size={18} /> Transfer to Available SKU
-                          </button>
-                          <button
-                            className="w-fit rounded-lg bg-[#ffddc2] hover:bg-[#fbcfb0] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 md:text-sm relative z-[1] flex items-center justify-center gap-x-2 ease-in-out"
-                          // onClick={() => handleForfeitItem(returnInfo)}
-                          >
-                            <BiMinusCircle size={18} /> Forfeit this Item
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    {selectedReturnInfos
+                      .filter((returnInfo) => returnInfo?.returnProduct?.transferStatus !== "Forfeited") // skip forfeited
+                      .map((returnInfo, index) => {
+                        const isLast = index === selectedReturnInfos?.length - 1;
+                        return (
+                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 ${!isLast ? "border-b border-gray-200" : ""}`}>
+
+                            <p>
+                              <span className="font-semibold text-gray-900">Order ID:</span>{" "}
+                              {returnInfo?.orderId}
+                            </p>
+
+                            <p>
+                              <span className="font-semibold text-gray-900">Date of Return:</span>{" "}
+                              {returnInfo?.dateTime}
+                            </p>
+
+                            {returnInfo?.returnProduct?.issues?.length > 0 && (
+                              <p>
+                                <span className="font-semibold text-gray-900">Issues:</span>{" "}
+                                <span className="text-gray-700">
+                                  {returnInfo.returnProduct.issues.join(", ")}
+                                </span>
+                              </p>
+                            )}
+
+                            {returnInfo?.description && (
+                              <p>
+                                <span className="font-semibold text-gray-900">Description:</span>{" "}
+                                {returnInfo?.description}
+                              </p>
+                            )}
+
+                            <div className='flex justify-between items-center'>
+
+                              {returnInfo?.returnProduct?.status === "Accepted" && (
+                                <p>
+                                  <span className="font-semibold text-gray-900">Return SKU:</span>{" "}
+                                  {returnInfo?.returnProduct?.sku}
+                                </p>
+                              )}
+
+                              {/* Actions */}
+                              <div className="mt-1 flex flex-wrap justify-end gap-3">
+
+                                {returnInfo?.returnProduct?.transferStatus === "Transferred" ?
+                                  <p className='py-1 font-semibold bg-green-100 text-green-700 text-xs px-2 rounded-full'>
+                                    Already Transferred to Available
+                                  </p>
+                                  :
+                                  <>
+                                    <button
+                                      className="flex items-center gap-2 rounded-lg bg-green-100 px-4 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                      onClick={() => handleTransferToAvailable(returnInfo)}
+                                    >
+                                      <BiTransferAlt size={14} />
+                                      Transfer to Available SKU
+                                    </button>
+                                    <button
+                                      className="flex items-center gap-2 rounded-lg bg-red-100 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-200"
+                                      onClick={() => handleForfeitItem(returnInfo)}
+                                    >
+                                      <BiMinusCircle size={14} />
+                                      Forfeit this Item
+                                    </button>
+                                  </>
+                                }
+                              </div>
+
+                            </div>
+
+                          </div>
+                        )
+                      })}
                   </div>
                 ) : (
                   <p>No return information available.</p>
@@ -783,37 +907,56 @@ const Inventory = () => {
               <ModalBody className="modal-body-scroll">
                 {selectedForfeitedInfos.length > 0 ? (
                   <div className="space-y-6">
-                    {selectedForfeitedInfos?.map((forfeitedInfo, index) => (
-                      <div key={index} className="border-b pb-4">
-                        <p>
-                          <strong>Order ID:</strong> {forfeitedInfo?.orderId}
-                        </p>
-                        <p>
-                          <strong>Date of Return:</strong> {forfeitedInfo?.dateTime}
-                        </p>
-                        <p>
-                          <strong>Reason for Return:</strong> {forfeitedInfo?.reason}
-                        </p>
-                        {forfeitedInfo?.issue && (
-                          <p>
-                            <strong>Issue:</strong> {forfeitedInfo?.issue}
-                          </p>
-                        )}
-                        {forfeitedInfo?.description && (
-                          <p>
-                            <strong>Description:</strong> {forfeitedInfo?.description}
-                          </p>
-                        )}
-                        {forfeitedInfo?.forfeitedSku && (
-                          <p>
-                            <strong>Forfeited SKU:</strong> {forfeitedInfo?.forfeitedSku}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                    {selectedForfeitedInfos
+                      .filter((returnInfo) => returnInfo?.returnProduct?.transferStatus !== "Transferred") // skip transferred
+                      .map((returnInfo, index) => {
+                        const isLast = index === selectedForfeitedInfos?.length - 1;
+                        return (
+                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 ${!isLast ? "border-b border-gray-200" : ""}`}>
+
+                            <p>
+                              <span className="font-semibold text-gray-900">Order ID:</span>{" "}
+                              {returnInfo?.orderId}
+                            </p>
+
+                            <p>
+                              <span className="font-semibold text-gray-900">Date of Return:</span>{" "}
+                              {returnInfo?.dateTime}
+                            </p>
+
+                            {returnInfo?.returnProduct?.issues?.length > 0 && (
+                              <p>
+                                <span className="font-semibold text-gray-900">Issues:</span>{" "}
+                                <span className="text-gray-700">
+                                  {returnInfo.returnProduct.issues.join(", ")}
+                                </span>
+                              </p>
+                            )}
+
+                            {returnInfo?.description && (
+                              <p>
+                                <span className="font-semibold text-gray-900">Description:</span>{" "}
+                                {returnInfo?.description}
+                              </p>
+                            )}
+
+                            <div className='flex justify-between items-center'>
+
+                              {returnInfo?.returnProduct?.status === "Accepted" && (
+                                <p>
+                                  <span className="font-semibold text-gray-900">Forfeited SKU:</span>{" "}
+                                  {returnInfo?.returnProduct?.sku}
+                                </p>
+                              )}
+
+                            </div>
+
+                          </div>
+                        )
+                      })}
                   </div>
                 ) : (
-                  <p>No forfeit information available.</p>
+                  <p>No forfeited information available.</p>
                 )}
               </ModalBody>
               <ModalFooter className='flex justify-end items-center border'>
