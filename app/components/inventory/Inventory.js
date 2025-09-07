@@ -22,6 +22,7 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDi
 import { BiTransferAlt, BiMinusCircle } from "react-icons/bi";
 import toast from 'react-hot-toast';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { FaHistory } from 'react-icons/fa';
 
 const Inventory = () => {
 
@@ -384,6 +385,26 @@ const Inventory = () => {
       setSelectedReturnInfos(returnInfos);
       onOpen();
     }
+  };
+
+  // filter forfeited items once
+  const filteredReturnInfos = (selectedReturnInfos ?? []).filter(
+    (ri) => ri?.returnProduct?.transferStatus !== "Forfeited"
+  );
+
+  // only open modal if there's something to show
+  const shouldOpen = isOpen && filteredReturnInfos.length > 0;
+
+  const hasTransferredHistory = (product) => {
+    return orderList?.some((order) =>
+      order.returnInfo?.products.some(
+        (returnProduct) =>
+          returnProduct.productId === product.productId &&
+          returnProduct.size === product.size &&
+          returnProduct.color.color === product.colorCode &&
+          returnProduct.transferStatus === "Transferred"
+      )
+    );
   };
 
   const handleForfeitedSkuClick = (product) => {
@@ -766,10 +787,29 @@ const Inventory = () => {
                       <td key="onProcess" className="text-center"> {isMatchingLocation ? onProcess : 0}</td>
                       <td key="available" className="text-center"> {product?.sku}</td>
                       <td key="onHand" className="text-center">{product?.onHandSku}</td>
-                      <td onClick={() => handleReturnSkuClick(product)} key="returnSku" className="text-center text-blue-600 cursor-pointer">
-                        {product?.returnSku}
+                      <td
+                        key="returnSku"
+                        onClick={() =>
+                          (product?.returnSku > 0 || hasTransferredHistory(product)) &&
+                          handleReturnSkuClick(product)
+                        }
+                        className={`text-center ${product?.returnSku > 0
+                          ? "text-blue-600 cursor-pointer"
+                          : hasTransferredHistory(product)
+                            ? "cursor-pointer"
+                            : ""
+                          }`}
+                      >
+                        {product?.returnSku === 0 && hasTransferredHistory(product) ? (
+                          <span className="flex items-center justify-center gap-1 text-blue-600">
+                            0 <FaHistory className="text-amber-500" size={14} title="Transferred history" />
+                          </span>
+                        ) : (
+                          product?.returnSku
+                        )}
                       </td>
-                      <td onClick={() => handleForfeitedSkuClick(product)} key="forfeitedSku" className="text-center text-blue-600 cursor-pointer">
+                      <td onClick={() => handleForfeitedSkuClick(product)} key="forfeitedSku" className={`text-center ${product?.forfeitedSku > 0 ? "text-blue-600 cursor-pointer" : ""
+                        }`}>
                         {product?.forfeitedSku}
                       </td>
                     </tr>
@@ -796,7 +836,7 @@ const Inventory = () => {
 
       </div>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+      <Modal isOpen={shouldOpen} onOpenChange={onOpenChange} size='2xl'>
         <ModalContent>
           {(onClose) => (
             <>
@@ -809,9 +849,8 @@ const Inventory = () => {
                     {selectedReturnInfos
                       .filter((returnInfo) => returnInfo?.returnProduct?.transferStatus !== "Forfeited") // skip forfeited
                       .map((returnInfo, index) => {
-                        const isLast = index === selectedReturnInfos?.length - 1;
                         return (
-                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 ${!isLast ? "border-b border-gray-200" : ""}`}>
+                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 border-b border-gray-200 last:border-b-0 last:mb-0`}>
 
                             <p>
                               <span className="font-semibold text-gray-900">Order ID:</span>{" "}
@@ -910,9 +949,8 @@ const Inventory = () => {
                     {selectedForfeitedInfos
                       .filter((returnInfo) => returnInfo?.returnProduct?.transferStatus !== "Transferred") // skip transferred
                       .map((returnInfo, index) => {
-                        const isLast = index === selectedForfeitedInfos?.length - 1;
                         return (
-                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 ${!isLast ? "border-b border-gray-200" : ""}`}>
+                          <div key={index} className={`bg-white p-4 space-y-2 text-sm text-gray-700 mb-4 border-b border-gray-200 last:border-b-0 last:mb-0`}>
 
                             <p>
                               <span className="font-semibold text-gray-900">Order ID:</span>{" "}
