@@ -1,12 +1,12 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Radio, RadioGroup, Textarea } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Textarea } from "@nextui-org/react";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useDisclosure } from '@nextui-org/react';
 import toast from 'react-hot-toast';
-import { FaUndo } from 'react-icons/fa';
+import { FaCheck, FaUndo } from 'react-icons/fa';
 import Barcode from '@/app/components/layout/Barcode/Barcode';
 import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
@@ -483,6 +483,14 @@ const OrderContents = () => {
       return;
     };
 
+    // For 'approved' (review request), skip Swal and open modal directly
+    if (actionType === "approved") {
+      setOrderToUpdateAcceptReject(order);
+      setOrderIdToUpdateAcceptReject(id);
+      setAcceptRejectModalOpen(true);
+      return; // exit early
+    }
+
     const returnDataToSend = order?.returnInfo?.products?.map(product => ({
       productId: product.productId,
       sku: product.sku,
@@ -528,12 +536,12 @@ const OrderContents = () => {
           setOrderIdToUpdateOnHold(id); // Set the order ID for modal
           setOnHoldModalOpen(true);  // Open the modal
         }
-        else if (actionType === "approved") {
-          // Open the modal for on hold input only for 'onHold'
-          setOrderToUpdateAcceptReject(order);
-          setOrderIdToUpdateAcceptReject(id); // Set the order ID for modal
-          setAcceptRejectModalOpen(true);  // Open the modal
-        }
+        // else if (actionType === "approved") {
+        //   // Open the modal for on hold input only for 'onHold'
+        //   setOrderToUpdateAcceptReject(order);
+        //   setOrderIdToUpdateAcceptReject(id); // Set the order ID for modal
+        //   setAcceptRejectModalOpen(true);  // Open the modal
+        // }
         else if (actionType === "returned") {
           try {
             const response = await axiosSecure.put("/addReturnSkuToProduct", returnDataToSend);
@@ -2027,29 +2035,32 @@ const OrderContents = () => {
         </Modal>
 
         {/* Modal of Review Request */}
-        <Modal size='xl' isOpen={isAcceptRejectModalOpen} onOpenChange={(isOpen) => {
+        <Modal size='2xl' isOpen={isAcceptRejectModalOpen} onOpenChange={(isOpen) => {
           setAcceptRejectModalOpen(isOpen)
           if (!isOpen) {
             setAcceptRejectModalOpen(false);
-            setProductDecisions({});
           }
         }}>
           <ModalContent>
             <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Return Review Request (Order #{orderToUpdateAcceptReject?.orderNumber})</ModalHeader>
-            <ModalBody className="modal-body-scroll mt-2">
+            <ModalBody className="modal-body-scroll mt-2 mx-3">
               {orderToUpdateAcceptReject?.returnInfo?.products?.map((product, idx) => {
 
-                const decision = productDecisions[product._id] || { status: "Accepted", declineReason: "" };
+                const decision =
+                  productDecisions[orderToUpdateAcceptReject._id]?.[product._id] || {
+                    status: "",
+                    declineReason: "",
+                  };
 
                 return (
-                  <div key={idx} className="border-2 border-neutral-200 p-3 rounded">
-                    <div className="flex items-center gap-2">
+                  <div key={idx} className="border-2 border-neutral-200 px-6 py-4 rounded">
+                    <div className="flex items-center gap-4">
                       <Image
                         src={product?.thumbnailImgUrl}
                         height={1200}
                         width={1200}
                         alt={product?.productTitle}
-                        className="w-28 h-28"
+                        className="w-28 h-28 object-cover"
                       />
                       <div className='flex items-end justify-between w-full'>
 
@@ -2091,24 +2102,70 @@ const OrderContents = () => {
                         </div>
 
                         {/* Quantity Selector */}
-                        <RadioGroup
-                          label={<p className="font-semibold text-neutral-500 text-sm">Decision</p>}
-                          value={decision.status}
-                          onValueChange={(value) => {
-                            setProductDecisions((prev) => ({
-                              ...prev,
-                              [product._id]: {
-                                ...prev[product._id],
-                                status: value,
-                                declineReason: value === "Accepted" ? "" : prev[product._id]?.declineReason || ""
-                              },
-                            }));
-                          }}
-                          orientation="horizontal"
-                        >
-                          <Radio value="Accepted">Accept</Radio>
-                          <Radio value="Rejected">Reject</Radio>
-                        </RadioGroup>
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="font-semibold text-neutral-500 text-sm">Decision</p>
+                          <div className="flex gap-3">
+                            {/* Accept Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setProductDecisions((prev) => ({
+                                  ...prev,
+                                  [orderToUpdateAcceptReject._id]: {
+                                    ...prev[orderToUpdateAcceptReject._id],
+                                    [product._id]: {
+                                      status:
+                                        prev[orderToUpdateAcceptReject._id]?.[product._id]?.status === "Accepted"
+                                          ? ""
+                                          : "Accepted",
+                                      declineReason: "",
+                                    },
+                                  },
+                                }))
+                              }
+                              className={`w-7 h-7 rounded-full flex items-center justify-center border transition-colors duration-200 ease-in-out ${decision.status === "Accepted"
+                                ? "border-green-500 bg-green-100 text-green-500"
+                                : "border-gray-300 text-gray-400 hover:border-green-500 hover:bg-green-50 hover:text-green-500"
+                                }`}
+                              title="Accept return request"
+                              aria-label="Accept return request"
+                            >
+                              <RxCheck size={16} />
+                            </button>
+
+                            {/* Reject Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setProductDecisions((prev) => ({
+                                  ...prev,
+                                  [orderToUpdateAcceptReject._id]: {
+                                    ...prev[orderToUpdateAcceptReject._id],
+                                    [product._id]: {
+                                      status:
+                                        prev[orderToUpdateAcceptReject._id]?.[product._id]?.status === "Rejected"
+                                          ? ""
+                                          : "Rejected",
+                                      declineReason:
+                                        prev[orderToUpdateAcceptReject._id]?.[product._id]?.status === "Rejected"
+                                          ? ""
+                                          : prev[orderToUpdateAcceptReject._id]?.[product._id]?.declineReason || "",
+                                    },
+                                  },
+                                }))
+                              }
+                              className={`w-7 h-7 rounded-full flex items-center justify-center border transition-colors duration-200 ease-in-out ${decision.status === "Rejected"
+                                ? "border-red-500 bg-red-100 text-red-500"
+                                : "border-gray-300 text-gray-400 hover:border-red-500 hover:bg-red-50 hover:text-red-500"
+                                }`}
+                              title="Reject return request"
+                              aria-label="Reject return request"
+                            >
+                              <RxCross2 size={16} />
+                            </button>
+                          </div>
+
+                        </div>
 
                       </div>
 
@@ -2127,7 +2184,13 @@ const OrderContents = () => {
                         onChange={(e) =>
                           setProductDecisions((prev) => ({
                             ...prev,
-                            [product._id]: { ...prev[product._id], declineReason: e.target.value }
+                            [orderToUpdateAcceptReject._id]: {
+                              ...prev[orderToUpdateAcceptReject._id],
+                              [product._id]: {
+                                ...prev[orderToUpdateAcceptReject._id]?.[product._id],
+                                declineReason: e.target.value,
+                              },
+                            },
                           }))
                         }
                         isInvalid={
@@ -2156,10 +2219,16 @@ const OrderContents = () => {
                   // 📝 directly update orderToUpdateAcceptReject
                   orderToUpdateAcceptReject.returnInfo.products =
                     orderToUpdateAcceptReject?.returnInfo?.products?.map((product) => {
-                      const decision = productDecisions[product._id] || {
-                        status: "Accepted",
+                      const decision = productDecisions[orderToUpdateAcceptReject._id]?.[product._id] || {
+                        status: "",
                         declineReason: "",
                       };
+
+                      // 🚨 Check if no decision selected
+                      if (decision.status === "") {
+                        toast.error(`Please select a decision for ${product.productTitle}`);
+                        hasError = true;
+                      }
 
                       if (decision.status === "Rejected") {
                         if (!decision.declineReason) {
@@ -2183,20 +2252,35 @@ const OrderContents = () => {
 
                   if (hasError) return;
 
-                  // Now orderToUpdateAcceptReject already contains updated products
-                  await updateOrderStatus(
-                    orderToUpdateAcceptReject,
-                    orderIdToUpdateAcceptReject,
-                    "approved"
-                  );
-
+                  // Close modal first
                   setAcceptRejectModalOpen(false);
-                  setProductDecisions({});
+
+                  // Show confirmation Swal
+                  const result = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to confirm this return request?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes"
+                  });
+
+                  if (result.isConfirmed) {
+                    // Now orderToUpdateAcceptReject already contains updated products
+                    await updateOrderStatus(
+                      orderToUpdateAcceptReject,
+                      orderIdToUpdateAcceptReject,
+                      "approved"
+                    );
+
+                    setAcceptRejectModalOpen(false);
+                    setProductDecisions({});
+                  }
                 }}
               >
                 Confirm
               </Button>
-
             </ModalFooter>
           </ModalContent>
         </Modal>

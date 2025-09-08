@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { FaHistory } from 'react-icons/fa';
 import { useAuth } from '@/app/contexts/auth';
+import Swal from 'sweetalert2';
 
 const currentModule = "Product Hub";
 
@@ -481,14 +482,25 @@ const Inventory = () => {
     };
 
     try {
-      const response = await axiosSecure.post(
-        "/transferReturnSkuToAvailable",
-        info
-      );
-      if (response.data.message) {
-        toast.success(response.data.message);
-        await refetch();
-        onClose();
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Return this SKU to available?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+      });
+      if (result.isConfirmed) {
+        const response = await axiosSecure.post(
+          "/transferReturnSkuToAvailable",
+          info
+        );
+        if (response.data.message) {
+          toast.success(response.data.message);
+          await refetch();
+          onClose();
+        }
       }
     } catch (err) {
       console.error(err);
@@ -518,14 +530,25 @@ const Inventory = () => {
     };
 
     try {
-      const response = await axiosSecure.post(
-        "/transferReturnSkuToForfeited",
-        info
-      );
-      if (response.data.message) {
-        toast.success(response.data.message);
-        await refetch();
-        onClose();
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Forfeit this returned SKU?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+      });
+      if (result.isConfirmed) {
+        const response = await axiosSecure.post(
+          "/transferReturnSkuToForfeited",
+          info
+        );
+        if (response.data.message) {
+          toast.success(response.data.message);
+          await refetch();
+          onClose();
+        }
       }
     } catch (err) {
       console.error(err);
