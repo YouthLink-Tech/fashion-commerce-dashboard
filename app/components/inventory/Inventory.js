@@ -23,6 +23,9 @@ import { BiTransferAlt, BiMinusCircle } from "react-icons/bi";
 import toast from 'react-hot-toast';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { FaHistory } from 'react-icons/fa';
+import { useAuth } from '@/app/contexts/auth';
+
+const currentModule = "Product Hub";
 
 const Inventory = () => {
 
@@ -35,7 +38,7 @@ const Inventory = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [productList, isProductPending, refetch] = useProductsInformation();
-  const [orderList, isOrderPending] = useOrders();
+  const [orderList, isOrderPending, refetchOrder] = useOrders();
   const [locationList, isLocationPending] = useLocations();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dropdownRef = useRef(null);
@@ -47,6 +50,12 @@ const Inventory = () => {
   const [showOutOfStock, setShowOutOfStock] = useState(false);
   const [selectedReturnInfos, setSelectedReturnInfos] = useState([]);
   const [selectedForfeitedInfos, setSelectedForfeitedInfos] = useState([]);
+  const { existingUserData, isUserLoading } = useAuth();
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
+  const isOwner = role === "Owner";
 
   useEffect(() => {
     if (searchQuery) {
@@ -96,6 +105,8 @@ const Inventory = () => {
           colorCode: variant?.color.color, // Display color code for visualization
           sku: variant?.sku,
           onHandSku: variant?.onHandSku,
+          returnSku: variant?.returnSku,
+          forfeitedSku: variant?.forfeitedSku,
           imageUrl: variant?.imageUrls[0], // Assuming we want the first image
           productId: product?.productId,
         }))
@@ -354,9 +365,14 @@ const Inventory = () => {
     });
   };
 
-  const handleReturnSkuClick = (product) => {
+  const handleReturnSkuClick = async (product) => {
+    // make sure data is fresh before opening
+    await refetch();
+    await refetchOrder();
+
     // Find orders with returnInfo for the matching product
     const returnOrders = orderList?.filter((order) =>
+      (order.orderStatus === "Return Initiated" || order.orderStatus === "Refunded") && // ✅ only these statuses
       order.returnInfo?.products.some(
         (returnProduct) =>
           returnProduct.productId === product.productId &&
@@ -407,7 +423,11 @@ const Inventory = () => {
     );
   };
 
-  const handleForfeitedSkuClick = (product) => {
+  const handleForfeitedSkuClick = async (product) => {
+    // make sure data is fresh before opening
+    await refetch();
+    await refetchOrder();
+
     // Find orders with returnInfo for the matching product
     const returnOrders = orderList?.filter((order) =>
       order.returnInfo?.products.some(
@@ -441,7 +461,7 @@ const Inventory = () => {
     }
   };
 
-  const handleTransferToAvailable = async (returnInfo) => {
+  const handleTransferToAvailable = async (returnInfo, onClose) => {
     const status = returnInfo?.returnProduct?.status;
     const transferSku = returnInfo?.returnProduct?.sku;
     const productId = returnInfo?.returnProduct?.productId;
@@ -469,7 +489,9 @@ const Inventory = () => {
       );
       if (response.data.message) {
         toast.success(response.data.message);
-        refetch();
+        await refetch();
+        await refetchOrder();
+        onClose();
       }
     } catch (err) {
       console.error(err);
@@ -477,7 +499,7 @@ const Inventory = () => {
     }
   };
 
-  const handleForfeitItem = async (returnInfo) => {
+  const handleForfeitItem = async (returnInfo, onClose) => {
     const status = returnInfo?.returnProduct?.status;
     const transferSku = returnInfo?.returnProduct?.sku;
     const productId = returnInfo?.returnProduct?.productId;
@@ -505,13 +527,15 @@ const Inventory = () => {
       );
       if (response.data.message) {
         toast.success(response.data.message);
-        refetch();
+        await refetch();
+        await refetchOrder();
+        onClose();
       }
     } catch (err) {
       console.error(err);
       toast.error("Failed to transfer SKU.");
     }
-  }
+  };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -529,7 +553,7 @@ const Inventory = () => {
     }
   }, [paginatedProducts]);
 
-  if (isProductPending || isOrderPending || isLocationPending) {
+  if (isProductPending || isOrderPending || isLocationPending || isUserLoading) {
     return <Loading />
   };
 
@@ -721,7 +745,7 @@ const Inventory = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedProducts?.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center p-4 text-gray-500 py-80">
+                  <td colSpan="7" className="text-center p-4 text-gray-500 py-80">
                     <h1 className="text-xl font-semibold text-neutral-800">No Products Available!</h1>
                     <div>
                       {locationNameForMessage === "" ? (
@@ -896,20 +920,24 @@ const Inventory = () => {
                                   </p>
                                   :
                                   <>
-                                    <button
-                                      className="flex items-center gap-2 rounded-lg bg-green-100 px-4 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
-                                      onClick={() => handleTransferToAvailable(returnInfo)}
-                                    >
-                                      <BiTransferAlt size={14} />
-                                      Transfer to Available SKU
-                                    </button>
-                                    <button
-                                      className="flex items-center gap-2 rounded-lg bg-red-100 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-200"
-                                      onClick={() => handleForfeitItem(returnInfo)}
-                                    >
-                                      <BiMinusCircle size={14} />
-                                      Forfeit this Item
-                                    </button>
+                                    {isOwner &&
+                                      <>
+                                        <button
+                                          className="flex items-center gap-2 rounded-lg bg-green-100 px-4 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                          onClick={() => handleTransferToAvailable(returnInfo, onClose)}
+                                        >
+                                          <BiTransferAlt size={14} />
+                                          Transfer to Available SKU
+                                        </button>
+                                        <button
+                                          className="flex items-center gap-2 rounded-lg bg-red-100 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-200"
+                                          onClick={() => handleForfeitItem(returnInfo, onClose)}
+                                        >
+                                          <BiMinusCircle size={14} />
+                                          Forfeit this Item
+                                        </button>
+                                      </>
+                                    }
                                   </>
                                 }
                               </div>
