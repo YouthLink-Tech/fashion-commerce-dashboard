@@ -367,7 +367,6 @@ const Inventory = () => {
 
   const handleReturnSkuClick = async (product) => {
     // make sure data is fresh before opening
-    await refetch();
     await refetchOrder();
 
     // Find orders with returnInfo for the matching product
@@ -425,7 +424,6 @@ const Inventory = () => {
 
   const handleForfeitedSkuClick = async (product) => {
     // make sure data is fresh before opening
-    await refetch();
     await refetchOrder();
 
     // Find orders with returnInfo for the matching product
@@ -490,7 +488,6 @@ const Inventory = () => {
       if (response.data.message) {
         toast.success(response.data.message);
         await refetch();
-        await refetchOrder();
         onClose();
       }
     } catch (err) {
@@ -528,7 +525,6 @@ const Inventory = () => {
       if (response.data.message) {
         toast.success(response.data.message);
         await refetch();
-        await refetchOrder();
         onClose();
       }
     } catch (err) {

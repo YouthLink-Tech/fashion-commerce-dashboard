@@ -2035,21 +2035,21 @@ const OrderContents = () => {
           }
         }}>
           <ModalContent>
-            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Return Review Request</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Return Review Request (Order #{orderToUpdateAcceptReject?.orderNumber})</ModalHeader>
             <ModalBody className="modal-body-scroll mt-2">
               {orderToUpdateAcceptReject?.returnInfo?.products?.map((product, idx) => {
 
                 const decision = productDecisions[product._id] || { status: "Accepted", declineReason: "" };
 
                 return (
-                  <div key={idx} className="border-2 border-neutral-100 p-3 rounded">
+                  <div key={idx} className="border-2 border-neutral-200 p-3 rounded">
                     <div className="flex items-center gap-2">
                       <Image
                         src={product?.thumbnailImgUrl}
                         height={1200}
                         width={1200}
                         alt={product?.productTitle}
-                        className="w-20 h-20"
+                        className="w-28 h-28"
                       />
                       <div className='flex items-end justify-between w-full'>
 
