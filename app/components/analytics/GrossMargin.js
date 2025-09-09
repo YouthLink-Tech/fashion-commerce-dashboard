@@ -18,7 +18,7 @@ const GrossMargin = () => {
         </p>
         <h1 className='font-semibold text-neutral-700 text-2xl'>Gross Margin</h1>
       </div>
-      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {analyticsProfitability?.grossMarginPercent} %</h4>
+      <h4 className='font-semibold text-3xl text-neutral-800'>{analyticsProfitability?.grossMarginPercent} %</h4>
     </div>
   );
 };

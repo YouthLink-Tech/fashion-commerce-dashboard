@@ -838,12 +838,12 @@ const Inventory = () => {
                         }
                         className={`text-center ${product?.returnSku > 0
                           ? "text-blue-600 cursor-pointer"
-                          : hasTransferredHistory(product)
+                          : (hasTransferredHistory(product) && isMatchingLocation)
                             ? "cursor-pointer"
                             : ""
                           }`}
                       >
-                        {product?.returnSku === 0 && hasTransferredHistory(product) ? (
+                        {(product?.returnSku === 0 && hasTransferredHistory(product) && isMatchingLocation) ? (
                           <span className="flex items-center justify-center gap-1 text-blue-600">
                             0 <FaHistory className="text-amber-500" size={14} title="Transferred history" />
                           </span>
