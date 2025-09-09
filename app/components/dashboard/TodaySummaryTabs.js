@@ -4,7 +4,6 @@ import { useState } from 'react';
 import TabsButton from './TabsButton'; // Adjust path as needed
 import useTodaysOrders from '@/app/hooks/useTodaysOrders';
 import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa6';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 
 const TodaySummaryTabs = () => {
