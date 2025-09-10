@@ -10,6 +10,8 @@ import AverageOrderValue from '@/app/components/analytics/AverageOrderValue';
 import GrossMargin from '@/app/components/analytics/GrossMargin';
 import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
 import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
+import TopProducts from '@/app/components/analytics/TopProducts';
+import MarketingROI from '@/app/components/analytics/MarketingROI';
 
 const AnalyticsPage = () => {
   return (
@@ -52,13 +54,22 @@ const AnalyticsPage = () => {
           <AverageOrderValue />
         </div>
 
-        <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6'>
-          <SalesTrendChart />
-          <ProfitabilityBreakdown />
+        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6">
+          <div className="flex-1 w-full md:w-auto">
+            <SalesTrendChart />
+          </div>
+          <div className="flex-1 w-full md:w-auto">
+            <ProfitabilityBreakdown />
+          </div>
         </div>
 
-        <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6'>
-
+        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6">
+          <div className="flex-1 w-full md:w-auto">
+            <TopProducts />
+          </div>
+          <div className="flex-1 w-full md:w-auto">
+            <MarketingROI />
+          </div>
         </div>
 
       </div>

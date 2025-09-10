@@ -140,8 +140,7 @@ const SalesTrendChart = () => {
           cy={cy}
           r={6}
           fill="#000"
-          stroke="#fff"
-          strokeWidth={2}
+          strokeWidth={3}
         />
       );
     }
@@ -162,8 +161,8 @@ const SalesTrendChart = () => {
   };
 
   return (
-    <div className="p-8 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Sales Trend</h2>
+    <div className="p-8 bg-white rounded-lg drop-shadow">
+      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold mb-2">Sales Trend</h2>
 
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
@@ -175,7 +174,7 @@ const SalesTrendChart = () => {
                 setRange(r);
                 setSelectedDateRange(null);
               }}
-              className={`px-4 py-2 text-sm rounded-full font-medium transition-colors ${range === r && !selectedDateRange
+              className={`px-3 py-1.5 2xl:px-4 2xl:py-2 text-xs 2xl:text-sm rounded-full font-medium transition-colors ${range === r && !selectedDateRange
                 ? "bg-green-100 text-green-800"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
@@ -225,7 +224,7 @@ const SalesTrendChart = () => {
                 type="monotone"
                 dataKey="sales"
                 name="Revenue"
-                stroke="#000"
+                stroke="#4b5563"
                 strokeWidth={3}
                 dot={<HighlightDot />}
                 activeDot={{ r: 6 }}
