@@ -8,6 +8,8 @@ import NetProfit from '@/app/components/analytics/NetProfit';
 import ReturnOnAdvertisingSpend from '@/app/components/analytics/ReturnOnAdvertisingSpend';
 import AverageOrderValue from '@/app/components/analytics/AverageOrderValue';
 import GrossMargin from '@/app/components/analytics/GrossMargin';
+import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
+import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
 
 const AnalyticsPage = () => {
   return (
@@ -42,13 +44,20 @@ const AnalyticsPage = () => {
         </div>
 
         <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6'>
-
           <TotalRevenue />
           <GrossProfit />
           <GrossMargin />
           {/* <NetProfit /> */}
           {/* <ReturnOnAdvertisingSpend /> */}
           <AverageOrderValue />
+        </div>
+
+        <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6'>
+          <SalesTrendChart />
+          <ProfitabilityBreakdown />
+        </div>
+
+        <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6'>
 
         </div>
 
