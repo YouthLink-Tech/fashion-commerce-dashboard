@@ -11,16 +11,16 @@ const TopProducts = () => {
   if (isTopProductsPending) return <AnalyticsTable />;
 
   return (
-    <div className="p-8 bg-white rounded-lg drop-shadow">
-      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-2"><HiOutlineArrowTrendingUp className='text-green-600' /> Most Sold Products</h2>
-      <p className='pt-2 text-center md:text-start font-semibold text-sm text-neutral-500 mb-4'>Top performing products</p>
+    <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto">
+      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-3"><HiOutlineArrowTrendingUp className='text-green-600' /> Most Sold Products</h2>
+      <p className='pt-2 text-start font-semibold text-sm text-neutral-500 mb-4'>Top performing products</p>
       <table className="w-full text-left border-collapse">
         <thead className="sticky top-0 z-[1] bg-white">
           <tr>
             <th key="product" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Product</th>
             <th key="revenue" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Revenue</th>
             <th key="profit" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Profit</th>
-            <th key="marginPercent" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Margin</th>
+            <th key="marginPercent" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-end">Margin</th>
           </tr>
         </thead>
 
@@ -38,13 +38,13 @@ const TopProducts = () => {
                   <td key="product" className={`text-xs p-3 text-neutral-800`}>
                     {product?.productName}
                   </td>
-                  <td key="revenue" className={`text-xs p-3 text-neutral-800`}>
+                  <td key="revenue" className={`text-xs p-3 text-neutral-800 text-center`}>
                     ৳ {product?.revenue}
                   </td>
-                  <td key="profit" className={`text-xs p-3 text-neutral-800`}>
+                  <td key="profit" className={`text-xs p-3 text-neutral-800 text-center`}>
                     ৳ {product?.profit}
                   </td>
-                  <td key="marginPercent" className={`text-xs p-3 text-neutral-800`}>
+                  <td key="marginPercent" className={`text-xs p-3 text-neutral-800 text-end`}>
                     {product?.marginPercent} %
                   </td>
                 </React.Fragment>

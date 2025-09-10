@@ -14,6 +14,8 @@ import { DateRangePicker, Spinner } from "@nextui-org/react";
 import { IoMdClose } from "react-icons/io";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { useAxiosSecure } from "@/app/hooks/useAxiosSecure";
+import { useSession } from "next-auth/react";
+import { TbBrandGoogleAnalytics } from "react-icons/tb";
 
 const SalesTrendChart = () => {
   const axiosSecure = useAxiosSecure();
@@ -22,6 +24,7 @@ const SalesTrendChart = () => {
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { data: session, status } = useSession();
 
   // Format for API
   const formatDate = (dateObj) => {
@@ -44,16 +47,21 @@ const SalesTrendChart = () => {
 
   // Fetch sales trend
   useEffect(() => {
+
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
     const fetchSalesTrend = async () => {
       setLoading(true);
       setError(null);
       try {
-        const params = {};
+        let params = {};
+
         if (startDate && endDate) {
-          params.startDate = startDate;
-          params.endDate = endDate;
-        } else {
-          params.range = range;
+          // Custom range
+          params = { startDate, endDate };
+        } else if (range) {
+          // Predefined range: daily / weekly / monthly
+          params = { range };
         }
 
         const { data } = await axiosSecure.get("/analytics/sales-trend", { params });
@@ -72,9 +80,8 @@ const SalesTrendChart = () => {
         setLoading(false);
       }
     };
-
     fetchSalesTrend();
-  }, [startDate, endDate, range, axiosSecure]);
+  }, [startDate, endDate, range, axiosSecure, session?.user?.accessToken, status,]);
 
   // Reset
   const handleReset = () => {
@@ -149,7 +156,7 @@ const SalesTrendChart = () => {
 
   // Dynamic formatter: if daily → show hours, else show dates
   const formatXAxis = (value) => {
-    if (range === "daily") {
+    if (range === "daily" && !startDate && !endDate) {
       // value like "2025-09-09 13:00"
       return value.split(" ")[1]; // HH:00
     }
@@ -162,7 +169,8 @@ const SalesTrendChart = () => {
 
   return (
     <div className="p-8 bg-white rounded-lg drop-shadow">
-      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold mb-2">Sales Trend</h2>
+      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-3"> <TbBrandGoogleAnalytics className='text-green-600' /> Sales Trend</h2>
+      <p className='pt-2 text-start font-semibold text-sm text-neutral-500 mb-4'>Tracking revenue patterns</p>
 
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
