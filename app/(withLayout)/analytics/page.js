@@ -12,6 +12,7 @@ import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
 import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
 import TopProducts from '@/app/components/analytics/TopProducts';
 import MarketingROI from '@/app/components/analytics/MarketingROI';
+import LowStock from '@/app/components/analytics/LowStock';
 
 const AnalyticsPage = () => {
   return (
@@ -63,12 +64,12 @@ const AnalyticsPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6">
+        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6 h-fit">
           <div className="flex-1 w-full md:w-auto">
-            <TopProducts />
+            <LowStock />
           </div>
           <div className="flex-1 w-full md:w-auto">
-            <MarketingROI />
+            <TopProducts />
           </div>
         </div>
 

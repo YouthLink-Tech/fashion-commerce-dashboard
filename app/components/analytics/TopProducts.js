@@ -35,7 +35,7 @@ const TopProducts = () => {
             topProducts?.map((product, index) => (
               <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
                 <React.Fragment key={`${product?.productId || index}`}>
-                  <td key="product" className={`text-xs p-3 text-neutral-800`}>
+                  <td key="product" className={`text-xs font-bold text-blue-700 text-start`}>
                     {product?.productName}
                   </td>
                   <td key="revenue" className={`text-xs p-3 text-neutral-800 text-center`}>
