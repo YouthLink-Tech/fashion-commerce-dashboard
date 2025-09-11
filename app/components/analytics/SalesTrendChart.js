@@ -223,7 +223,7 @@ const SalesTrendChart = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="date" tickFormatter={formatXAxis} stroke="#6b7280" />
               <YAxis
-                tickFormatter={(value) => `$${value.toLocaleString()}`}
+                tickFormatter={(value) => `৳${value.toLocaleString()}`}
                 stroke="#6b7280"
               />
               <Tooltip content={<CustomTooltip />} />
