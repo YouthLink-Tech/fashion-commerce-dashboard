@@ -52,12 +52,16 @@ const AnalyticsPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6 h-fit">
-          <div className="flex-1 w-full md:w-auto">
-            <LowStock />
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <div className="h-full">
+            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+              <LowStock />
+            </div>
           </div>
-          <div className="flex-1 w-full md:w-auto">
-            <TopProducts />
+          <div className="h-full">
+            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+              <TopProducts />
+            </div>
           </div>
         </div>
 

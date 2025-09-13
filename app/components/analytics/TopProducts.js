@@ -11,7 +11,7 @@ const TopProducts = () => {
   if (isTopProductsPending) return <AnalyticsTable />;
 
   return (
-    <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto">
+    <div className="overflow-x-auto">
       <h2 className="text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-3"><HiOutlineArrowTrendingUp className='text-green-600' /> Most Sold Products</h2>
       <p className='pt-2 text-start font-semibold text-sm text-neutral-500 mb-4'>Top performing products</p>
       <table className="w-full text-left border-collapse">

@@ -9,7 +9,7 @@ const useAnalyticsLowStock = () => {
     queryKey: ["analyticsLowStock"],
     queryFn: async () => {
       const res = await axiosSecure.get("/analytics/low-stock");
-      return res?.data?.lowStockVariants;
+      return res?.data?.lowStockProducts;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds
     onError: (err) => {
