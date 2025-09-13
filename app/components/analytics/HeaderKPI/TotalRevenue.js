@@ -1,14 +1,18 @@
-"use client";
 import React from 'react';
-import useAnalyticsSales from '@/app/hooks/useAnalyticsSales';
-import AnalyticsCard from '../shared/Loading/AnalyticsCard';
 import { CiDollar } from "react-icons/ci";
+import AnalyticsCard from '../../shared/Loading/AnalyticsCard';
 
-const TotalRevenue = () => {
+const TotalRevenue = ({ totalRevenue, loading, error }) => {
 
-  const [analyticsSales, isAnalyticsSalesPending] = useAnalyticsSales();
+  if (loading || totalRevenue === null || totalRevenue === undefined) return <AnalyticsCard />;
 
-  if (isAnalyticsSalesPending) return <AnalyticsCard />;
+  if (error) {
+    return (
+      <div className="h-80 flex justify-center items-center">
+        <p className="text-red-600 text-lg font-medium">{error}</p>
+      </div>
+    );
+  };
 
   return (
     <div className='border p-8 rounded-lg bg-white'>
@@ -18,7 +22,7 @@ const TotalRevenue = () => {
         </p>
         <h1 className='font-semibold text-neutral-700 text-2xl'>Total Revenue</h1>
       </div>
-      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {analyticsSales?.totalRevenue}</h4>
+      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {totalRevenue}</h4>
     </div>
   );
 };

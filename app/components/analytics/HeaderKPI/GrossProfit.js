@@ -1,14 +1,18 @@
-"use client";
-import useAnalyticsProfitability from '@/app/hooks/useAnalyticsProfitability';
 import React from 'react';
-import AnalyticsCard from '../shared/Loading/AnalyticsCard';
 import { BsGraphUpArrow } from "react-icons/bs";
+import AnalyticsCard from '../../shared/Loading/AnalyticsCard';
 
-const GrossProfit = () => {
+const GrossProfit = ({ grossProfit, loading, error }) => {
 
-  const [analyticsProfitability, isAnalyticsProfitabilityPending] = useAnalyticsProfitability();
+  if (loading || grossProfit === null || grossProfit === undefined) return <AnalyticsCard />;
 
-  if (isAnalyticsProfitabilityPending) return <AnalyticsCard />;
+  if (error) {
+    return (
+      <div className="h-80 flex justify-center items-center">
+        <p className="text-red-600 text-lg font-medium">{error}</p>
+      </div>
+    );
+  };
 
   return (
     <div className='border p-8 rounded-lg bg-white'>
@@ -18,7 +22,7 @@ const GrossProfit = () => {
         </p>
         <h1 className='font-semibold text-neutral-700 text-2xl'>Gross Profit</h1>
       </div>
-      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {analyticsProfitability?.grossProfit}</h4>
+      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {grossProfit}</h4>
     </div>
   );
 };

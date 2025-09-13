@@ -2,17 +2,12 @@ import React from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import TotalRevenue from '@/app/components/analytics/TotalRevenue';
-import GrossProfit from '@/app/components/analytics/GrossProfit';
-import NetProfit from '@/app/components/analytics/NetProfit';
-import ReturnOnAdvertisingSpend from '@/app/components/analytics/ReturnOnAdvertisingSpend';
-import AverageOrderValue from '@/app/components/analytics/AverageOrderValue';
-import GrossMargin from '@/app/components/analytics/GrossMargin';
 import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
 import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
 import TopProducts from '@/app/components/analytics/TopProducts';
 import MarketingROI from '@/app/components/analytics/MarketingROI';
 import LowStock from '@/app/components/analytics/LowStock';
+import Header from '@/app/components/analytics/HeaderKPI/Header';
 
 const AnalyticsPage = () => {
   return (
@@ -42,18 +37,11 @@ const AnalyticsPage = () => {
       <div className='relative mx-auto px-6 pb-4'>
 
         <div className='w-full mb-6'>
-          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Financial Analytics</h3>
-          <p className='pt-2 text-center md:text-start font-semibold text-sm text-neutral-500'>Your Analytics Details & performance overview</p>
+          <h3 className='text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Financial Analytics</h3>
+          <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Your Analytics Details & performance overview</p>
         </div>
 
-        <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6'>
-          <TotalRevenue />
-          <GrossProfit />
-          <GrossMargin />
-          {/* <NetProfit /> */}
-          {/* <ReturnOnAdvertisingSpend /> */}
-          <AverageOrderValue />
-        </div>
+        <Header />
 
         <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6">
           <div className="flex-1 w-full md:w-auto">

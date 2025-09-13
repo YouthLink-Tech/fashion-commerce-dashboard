@@ -1,14 +1,18 @@
-"use client";
-import useAnalyticsSales from '@/app/hooks/useAnalyticsSales';
 import React from 'react';
 import { IoCartOutline } from "react-icons/io5";
-import AnalyticsCard from '../shared/Loading/AnalyticsCard';
+import AnalyticsCard from '../../shared/Loading/AnalyticsCard';
 
-const AverageOrderValue = () => {
+const AverageOrderValue = ({ averageOrderValue, loading, error }) => {
 
-  const [analyticsSales, isAnalyticsSalesPending] = useAnalyticsSales();
+  if (loading || averageOrderValue === null || averageOrderValue === undefined) return <AnalyticsCard />;
 
-  if (isAnalyticsSalesPending) return <AnalyticsCard />;
+  if (error) {
+    return (
+      <div className="h-80 flex justify-center items-center">
+        <p className="text-red-600 text-lg font-medium">{error}</p>
+      </div>
+    );
+  };
 
   return (
     <div className='border p-8 rounded-lg bg-white'>
@@ -18,7 +22,7 @@ const AverageOrderValue = () => {
         </p>
         <h1 className='font-semibold text-neutral-700 text-2xl'>AOV</h1>
       </div>
-      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {analyticsSales?.averageOrderValue}</h4>
+      <h4 className='font-semibold text-3xl text-neutral-800'>৳ {averageOrderValue}</h4>
     </div>
   );
 };

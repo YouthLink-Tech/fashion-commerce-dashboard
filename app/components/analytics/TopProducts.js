@@ -19,6 +19,7 @@ const TopProducts = () => {
           <tr>
             <th key="product" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Product</th>
             <th key="revenue" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Revenue</th>
+            <th key="discount" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Discount</th>
             <th key="profit" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Profit</th>
             <th key="marginPercent" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-end">Margin</th>
           </tr>
@@ -40,6 +41,9 @@ const TopProducts = () => {
                   </td>
                   <td key="revenue" className={`text-xs p-3 text-neutral-800 text-center`}>
                     ৳ {product?.revenue}
+                  </td>
+                  <td key="discount" className={`text-xs p-3 text-neutral-800 text-center`}>
+                    ৳ {product?.discount}
                   </td>
                   <td key="profit" className={`text-xs p-3 text-neutral-800 text-center`}>
                     ৳ {product?.profit}
