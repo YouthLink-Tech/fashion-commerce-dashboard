@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MarketingROI = () => {
+const CostToGetCustomer = () => {
   return (
     <div>
 
@@ -8,4 +8,4 @@ const MarketingROI = () => {
   );
 };
 
-export default MarketingROI;
+export default CostToGetCustomer;
