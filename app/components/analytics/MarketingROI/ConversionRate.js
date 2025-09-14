@@ -13,12 +13,33 @@ const ConversionRate = ({ conversionRate, loading, error }) => {
     );
   };
 
+  // Determine progress bar color based on rate
+  const progressColor =
+    conversionRate >= 70
+      ? "bg-green-500"
+      : conversionRate >= 40
+        ? "bg-yellow-500"
+        : "bg-red-500";
+
   return (
-    <div className='border p-8 rounded-lg bg-white'>
-      <div className='flex justify-start items-center gap-2 mb-4'>
-        <h1 className='font-semibold text-neutral-700 text-2xl'>Conversion Rate</h1>
+    <div className="border p-8 rounded-2xl bg-white transition-all">
+      {/* Header */}
+      <div className="mb-4">
+        <h1 className="font-semibold text-neutral-700 text-lg">Conversion Rate</h1>
       </div>
-      <h4 className='font-semibold text-3xl text-neutral-800'>{conversionRate} %</h4>
+
+      {/* Value */}
+      <div className="flex items-end gap-2">
+        <h4 className="font-bold text-4xl text-neutral-900">{conversionRate}%</h4>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full bg-neutral-100 rounded-full h-2 mt-4">
+        <div
+          className={`h-2 rounded-full ${progressColor} transition-all`}
+          style={{ width: `${conversionRate}%` }}
+        ></div>
+      </div>
     </div>
   );
 };

@@ -79,8 +79,6 @@ const MarketingROI = () => {
     setRange("weekly");
   };
 
-  // console.log(marketingData, "marketingData");
-
   return (
     <>
       {/* Controls */}
