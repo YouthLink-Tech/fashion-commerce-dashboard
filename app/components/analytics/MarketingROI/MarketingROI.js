@@ -8,6 +8,7 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 import ConversionRate from './ConversionRate';
 import ROAS from './ROAS';
 import CostToGetCustomer from './CostToGetCustomer';
+import { FaArrowsRotate } from "react-icons/fa6";
 
 const MarketingROI = () => {
 
@@ -81,6 +82,9 @@ const MarketingROI = () => {
 
   return (
     <>
+      <h2 className="text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-3"> <FaArrowsRotate className='text-green-600' /> Marketing ROI</h2>
+      <p className='pt-2 text-start font-semibold text-sm text-neutral-500 mb-4'>Measuring the return on marketing investments</p>
+
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
         <div className="flex gap-2">

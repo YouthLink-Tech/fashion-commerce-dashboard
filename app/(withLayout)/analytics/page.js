@@ -68,13 +68,13 @@ const AnalyticsPage = () => {
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="h-full">
             <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-
+              <MarketingROI />
             </div>
           </div>
           <div className="h-full">
-            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-              <MarketingROI />
-            </div>
+            {/* <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+
+            </div> */}
           </div>
         </div>
 
