@@ -1,14 +1,17 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
-import TotalRevenue from './TotalRevenue';
-import GrossProfit from './GrossProfit';
-import GrossMargin from './GrossMargin';
-import AverageOrderValue from './AverageOrderValue';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import { IoMdClose } from 'react-icons/io';
 import { DateRangePicker } from '@nextui-org/react';
 import { today, getLocalTimeZone } from "@internationalized/date";
+import DashboardCard from './DashboardCard';
+import { CiDollar } from "react-icons/ci";
+import { BsGraphUpArrow } from "react-icons/bs";
+import { CiPercent } from 'react-icons/ci';
+import { GoCheckCircle } from "react-icons/go";
+import { IoCartOutline } from "react-icons/io5";
+import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 
 const Header = () => {
 
@@ -80,11 +83,69 @@ const Header = () => {
     setRange("weekly");
   };
 
+  const cards = [
+    {
+      title: "Revenue",
+      value: headerData?.totalRevenue || 0,
+      icon: CiDollar,
+      unit: "taka",
+      formula: "Total Revenue = SUM(Sales Amount - Shipping Charge)",
+      loading,
+      error,
+    },
+    {
+      title: "Gross Profit",
+      value: headerData?.grossProfit || 0,
+      icon: BsGraphUpArrow,
+      unit: "taka",
+      formula: `Gross Profit = Revenue – COGS
+COGS = SUM(Unit Cost × Units Sold)`,
+      loading,
+      error,
+    },
+    {
+      title: "Gross Margin",
+      value: headerData?.grossMarginPercent || 0,
+      icon: CiPercent,
+      unit: "percent",
+      formula: "Gross Margin = (Gross Profit / Revenue) × 100",
+      loading,
+      error,
+    },
+    {
+      title: "Net Profit",
+      value: headerData?.netProfit || 0,
+      icon: FaBangladeshiTakaSign,
+      unit: "taka",
+      formula: "Net Profit = Revenue – (COGS + Expenses)",
+      loading,
+      error,
+    },
+    {
+      title: "ROAS",
+      value: headerData?.adSpend || 0,
+      icon: GoCheckCircle,
+      unit: "",
+      formula: "Return On Advertising Spend = Ad Revenue / Ad Spend",
+      loading,
+      error,
+    },
+    {
+      title: "AOV",
+      value: headerData?.averageOrderValue || 0,
+      icon: IoCartOutline,
+      unit: "taka",
+      formula: "Average Order Value = Total Revenue / Orders",
+      loading,
+      error,
+    },
+  ];
+
   return (
     <>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row items-start md:items-center justify-start gap-3 mb-4">
         <div className="flex gap-2">
           {["daily", "weekly", "monthly"].map((r) => (
             <button
@@ -119,35 +180,21 @@ const Header = () => {
         </div>
       </div>
 
-      <div className='flex flex-col md:flex-row flex-wrap justify-start items-center gap-6'>
-        <TotalRevenue
-          totalRevenue={headerData?.totalRevenue}
-          loading={loading}
-          error={error}
-        />
-        <GrossProfit
-          grossProfit={headerData?.grossProfit}
-          loading={loading}
-          error={error}
-        />
-        <GrossMargin
-          grossMarginPercent={headerData?.grossMarginPercent}
-          loading={loading}
-          error={error}
-        />
-        {/* <NetProfit 
-        loading={loading}
-          error={error}
-        /> */}
-        {/* <ReturnOnAdvertisingSpend 
-        loading={loading}
-          error={error}
-        /> */}
-        <AverageOrderValue
-          averageOrderValue={headerData?.averageOrderValue}
-          loading={loading}
-          error={error}
-        />
+      <div className='overflow-x-auto custom-scrollbar'>
+        <div className="flex 2xl:grid 2xl:grid-cols-6 gap-4 px-2 sm:px-0">
+          {cards.map((card, i) => (
+            <DashboardCard
+              key={i}
+              title={card.title}
+              value={card.value}
+              icon={card.icon}
+              unit={card.unit}
+              formula={card.formula}
+              loading={card.loading}
+              error={card.error}
+            />
+          ))}
+        </div>
       </div>
 
     </>
