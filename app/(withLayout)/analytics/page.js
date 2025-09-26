@@ -37,7 +37,7 @@ const AnalyticsPage = () => {
       <div className='relative mx-auto px-6 pb-4'>
 
         <div className='w-full mb-6'>
-          <h3 className='text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Financial Analytics</h3>
+          <h3 className='text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Analytics</h3>
           <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Your Analytics Details & performance overview</p>
         </div>
 
