@@ -1,6 +1,6 @@
 import React from 'react';
 import AnalyticsCard from '../../shared/Loading/AnalyticsCard';
-import { TiInfoOutline } from "react-icons/ti";
+import { FaCircleInfo } from "react-icons/fa6";
 import { Button, Tooltip } from '@nextui-org/react';
 
 const DashboardCard = ({ icon: Icon, title, unit, formula, value, loading, error }) => {
@@ -29,7 +29,7 @@ const DashboardCard = ({ icon: Icon, title, unit, formula, value, loading, error
               </div>
             }
           >
-            <Button color='foreground' className="p-0 m-0 w-auto h-auto min-w-0 min-h-0 border-none"><TiInfoOutline size={16} className="text-red-500 cursor-pointer" /></Button>
+            <Button color='foreground' className="p-0 m-0 w-auto h-auto min-w-0 min-h-0 border-none"><FaCircleInfo size={16} className="text-gray-700 cursor-pointer" /></Button>
           </Tooltip>
         </div>
       )}

@@ -151,6 +151,7 @@ export default function EditSeason() {
               placeholder="Add Season Name"
               {...register('seasonName', { required: 'Season is required' })}
               className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+              disabled
             />
             {errors.seasonName && (
               <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.seasonName.message}</p>
