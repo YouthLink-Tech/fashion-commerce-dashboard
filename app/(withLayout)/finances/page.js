@@ -7,6 +7,7 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import PaymentMethods from './payment-methods/page';
+import Expenses from '@/app/components/finances/expenses/Expenses';
 
 const Finances = () => {
 
@@ -82,9 +83,14 @@ const Finances = () => {
             Refunded
           </button>
 
-          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'payment methods' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'payment methods' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-      `} onClick={() => setActiveTab('payment methods')}>
+          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'payment methods' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'payment methods' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('payment methods')}>
             Payment methods
+          </button>
+
+          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'expenses' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'expenses' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('expenses')}>
+            Expenses
           </button>
 
         </div>
@@ -106,6 +112,12 @@ const Finances = () => {
         <h1 className='font-bold'>Payment Methods</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all payment methods.</p>
         <PaymentMethods />
+      </div>}
+
+      {activeTab === "expenses" && <div className='pt-4'>
+        <h1 className='font-bold'>Expenses</h1>
+        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all expenses.</p>
+        <Expenses />
       </div>}
 
       <div className='mt-12 md:mt-16'>
