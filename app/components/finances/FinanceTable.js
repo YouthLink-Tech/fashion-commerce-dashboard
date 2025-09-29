@@ -332,12 +332,12 @@ const FinanceTable = () => {
               (paginatedOrders?.map((order, index) => {
 
                 return (
-                  <>
+                  <React.Fragment key={index}>
                     <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
                       {columnOrder.map(
                         (column) =>
                           selectedColumns.includes(column) && (
-                            <>
+                            <React.Fragment key={`${order?._id || index}-${column}`}>
                               {column === 'Date & Time' && (
                                 <td key="dateTime" className="text-xs p-3 text-gray-700">
                                   {order?.dateTime}
@@ -387,11 +387,11 @@ const FinanceTable = () => {
                                   {order?.paymentInfo?.paymentStatus}
                                 </td>
                               )}
-                            </>
+                            </React.Fragment>
                           )
                       )}
                     </tr>
-                  </>
+                  </React.Fragment>
                 )
               }))
             }

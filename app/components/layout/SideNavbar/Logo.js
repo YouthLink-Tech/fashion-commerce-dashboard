@@ -44,6 +44,7 @@ const Logo = ({ isCollapsed }) => {
               height={600}
               width={600}
               alt={WEBSITE_NAME}
+              priority
             />
             : <Image
               className="h-9 md:h-10 w-auto"
@@ -51,6 +52,7 @@ const Logo = ({ isCollapsed }) => {
               height={600}
               width={600}
               alt={WEBSITE_NAME}
+              priority
             />}
         </Link>
       }
