@@ -3,6 +3,7 @@ import ExpenseActions from './ExpenseActions';
 import { useAuth } from '@/app/contexts/auth';
 import Loading from '../../shared/Loading/Loading';
 import useExpenseCategories from '@/app/hooks/useExpenseCategories';
+import ExpenseCard from './ExpenseCard';
 
 const currentModule = "Finances";
 
@@ -19,14 +20,17 @@ const Expenses = () => {
 
   if (isUserLoading || isExpenseCategoryPending) return <Loading />;
 
-  console.log(expenseCategoryList, "expenseCategoryList");
-
   return (
     <div className="space-y-5 relative">
 
       {isAuthorized &&
         <ExpenseActions />
       }
+
+      <ExpenseCard
+        expenseCategoryList={expenseCategoryList}
+        isOwner={isOwner}
+      />
 
     </div>
   );
