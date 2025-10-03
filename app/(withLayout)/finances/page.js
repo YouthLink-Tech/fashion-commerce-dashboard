@@ -100,12 +100,26 @@ const Finances = () => {
         <h1 className='font-bold'>Performance</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all Pending, Paid, Canceled, or Refunded transactions.</p>
         <FinancePerformance />
+
+        <div>
+          <h1 className='font-bold'>Recent Transactions</h1>
+          <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
+          <FinanceTable />
+        </div>
+
       </div>}
 
       {activeTab === "refunded" && <div className='pt-4'>
         <h1 className='font-bold'>Performance</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all Pending, Paid, Canceled, or Refunded transactions.</p>
         <RefundedPayments />
+
+        <div>
+          <h1 className='font-bold'>Recent Transactions</h1>
+          <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
+          <FinanceTable />
+        </div>
+
       </div>}
 
       {activeTab === "payment methods" && <div className='pt-4'>
@@ -119,12 +133,6 @@ const Finances = () => {
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all expenses.</p>
         <Expenses />
       </div>}
-
-      <div className='mt-12 md:mt-16'>
-        <h1 className='font-bold'>Recent Transactions</h1>
-        <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
-        <FinanceTable />
-      </div>
 
     </div >
   );

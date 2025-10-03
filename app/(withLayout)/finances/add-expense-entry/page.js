@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import useExpenseCategories from "@/app/hooks/useExpenseCategories";
 import { useForm } from "react-hook-form";
-import { Button, DatePicker } from "@nextui-org/react";
+import { Button, DatePicker, Tab, Tabs } from "@nextui-org/react";
 import Loading from "@/app/components/shared/Loading/Loading";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
@@ -27,6 +27,7 @@ const AddExpenseEntry = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [dateError, setDateError] = useState(false);
   const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
@@ -34,6 +35,8 @@ const AddExpenseEntry = () => {
   const [paidToInput, setPaidToInput] = useState("");
   const [filteredPaidTo, setFilteredPaidTo] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeTab, setActiveTab] = useState("attachment");
+  const [link, setLink] = useState("");
 
   // Get available sub-categories for selected category
   const availableSubCategories = selectedCategory?.subCategories || [];
@@ -51,9 +54,25 @@ const AddExpenseEntry = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+    if (!selectedFile) return;
+
+    setError(""); // reset error
+
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setError("Only JPG, PNG, and PDF files are allowed.");
+      e.target.value = "";
+      return;
     }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (selectedFile.size > maxSize) {
+      setError("File size must be less than 10MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setFile(selectedFile);
   };
 
   const uploadFile = async (file) => {
@@ -135,15 +154,22 @@ const AddExpenseEntry = () => {
     setIsSubmitting(true);
     const { expenseCategory, subCategory, subSubCategory, amount, dateOfExpense, paymentMethod, paidTo, notes, invoiceId } = data;
 
-    let fileUrl = '';
-    if (file) {
-      fileUrl = await uploadFile(file);
-      if (!fileUrl) {
+    let attachmentUrl = "";
+
+    if (activeTab === "link") {
+      // ✅ Use link directly
+      if (link) {
+        attachmentUrl = link;
+      }
+    } else if (activeTab === "attachment" && file) {
+      // ✅ Upload file
+      attachmentUrl = await uploadFile(file);
+      if (!attachmentUrl) {
         setIsSubmitting(false);
-        toast.error('Upload failed, cannot proceed.');
+        toast.error("Upload failed, cannot proceed.");
         return;
       }
-    }
+    };
 
     // Check if expiryDate is selected
     if (!dateOfExpense) {
@@ -164,10 +190,10 @@ const AddExpenseEntry = () => {
       amount: parseFloat(amount) || 0,
       dateOfExpense: formattedDateOfExpense,
       paymentMethod,
-      paidTo: formatPaidTo(data.paidTo),
+      paidTo: formatPaidTo(paidTo),
       notes,
       invoiceId,
-      attachment: fileUrl,
+      attachment: attachmentUrl,
     };
 
     try {
@@ -209,7 +235,7 @@ const AddExpenseEntry = () => {
         router.push("/finances");
       }
     } catch (error) {
-      toast.error('Failed to add purchase order. Please try again!');
+      toast.error('Failed to add expense entry. Please try again!');
     } finally {
       setIsSubmitting(false); // Reset submit state at the end of submission
     }
@@ -323,66 +349,6 @@ const AddExpenseEntry = () => {
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
 
-              {/* Amount */}
-              <div className="flex-1 w-full">
-                <label htmlFor='amount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Amount ৳<span className="text-red-600 pl-1">*</span></label>
-                <input
-                  id='amount'
-                  {...register('amount', { required: "Amount is required" })}
-                  className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-                  placeholder='Enter Expense Amount'
-                  type="number"
-                />
-                {errors.amount && <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.amount.message}</p>}
-              </div>
-
-              {/* Date of expense */}
-              <div className='flex-1 w-full'>
-                <label htmlFor='dateOfExpense' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Date of expense <span className="text-red-600 pl-1">*</span></label>
-                <DatePicker
-                  id='dateOfExpense'
-                  placeholder="Select expense date"
-                  aria-label="Select expense date"
-                  onChange={(date) => {
-                    handleShowDateError(date);
-                    if (date instanceof Date && !isNaN(date)) {
-                      setValue('dateOfExpense', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
-                    } else {
-                      setValue('dateOfExpense', date); // If DatePicker returns something else, handle it here
-                    }
-                  }}
-                  className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
-                />
-                {dateError && (
-                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select estimated arrival date.</p>
-                )}
-              </div>
-
-            </div>
-
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
-
-              {/* Payment Method */}
-              <div className="flex-1 w-full">
-                <label htmlFor='paymentMethod' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Payment Method <span className="text-red-600 pl-1">*</span></label>
-                <div className="flex gap-3 flex-wrap">
-                  {["Cash", "Mobile Banking", "Bank Transfer", "Credit Card"].map((method) => (
-                    <Button
-                      key={method}
-                      size="sm"
-                      variant={watch("paymentMethod") === method ? "solid" : "bordered"}
-                      color={watch("paymentMethod") === method ? "primary" : "default"}
-                      onPress={() => setValue("paymentMethod", method)}
-                    >
-                      {method}
-                    </Button>
-                  ))}
-                </div>
-                {errors.paymentMethod && (
-                  <p className="text-xs text-red-500 pt-1">{errors.paymentMethod.message}</p>
-                )}
-              </div>
-
               {/* Paid To */}
               <div className="flex-1 w-full relative" ref={inputRef}>
                 <label
@@ -428,27 +394,94 @@ const AddExpenseEntry = () => {
                 )}
               </div>
 
+              {/* Amount */}
+              <div className="flex-1 w-full">
+                <label htmlFor='amount' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Amount ৳<span className="text-red-600 pl-1">*</span></label>
+                <input
+                  id='amount'
+                  {...register('amount', { required: "Amount is required" })}
+                  className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                  placeholder='Enter Expense Amount'
+                  type="number"
+                />
+                {errors.amount && <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.amount.message}</p>}
+              </div>
+
+              {/* Date of expense */}
+              <div className='flex-1 w-full'>
+                <label htmlFor='dateOfExpense' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Date of expense <span className="text-red-600 pl-1">*</span></label>
+                <DatePicker
+                  id='dateOfExpense'
+                  placeholder="Select expense date"
+                  aria-label="Select expense date"
+                  onChange={(date) => {
+                    handleShowDateError(date);
+                    if (date instanceof Date && !isNaN(date)) {
+                      setValue('dateOfExpense', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
+                    } else {
+                      setValue('dateOfExpense', date); // If DatePicker returns something else, handle it here
+                    }
+                  }}
+                  className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
+                />
+                {dateError && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">Please select estimated arrival date.</p>
+                )}
+              </div>
+
             </div>
 
-            {/* Notes */}
-            <div>
-              <label htmlFor='notes' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Notes <span className="text-red-600 pl-1">*</span></label>
-              <textarea
-                id="notes"
-                {...register("notes", { required: "Notes is required" })}
-                className="w-full p-3 border-2 border-[#ededed] outline-none focus:border-[#F4D3BA] focus:bg-white transition-colors duration-1000 rounded-md"
-                placeholder="Write any additional information here..."
-                rows={5} // Set the number of rows for height adjustment
-              />
-              {errors.notes && <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.notes.message}</p>}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+
+              {/* Payment Method */}
+              <div className="flex-1 w-full">
+                <label htmlFor='paymentMethod' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Payment Method <span className="text-red-600 pl-1">*</span></label>
+
+                {/* Hidden input to connect paymentMethod to RHF */}
+                <input
+                  type="hidden"
+                  {...register("paymentMethod", { required: "Payment method is required" })}
+                />
+
+                <div className="flex gap-3 flex-wrap">
+                  {["Cash", "Mobile Wallet", "Bank Transfer", "Credit Card"].map((method) => (
+                    <Button
+                      key={method}
+                      size="sm"
+                      variant={watch("paymentMethod") === method ? "solid" : "bordered"}
+                      color={watch("paymentMethod") === method ? "primary" : "default"}
+                      onPress={() => setValue("paymentMethod", method)}
+                    >
+                      {method}
+                    </Button>
+                  ))}
+                </div>
+                {errors.paymentMethod && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.paymentMethod.message}</p>
+                )}
+              </div>
+
+              {/* Notes */}
+              <div className="flex-1 w-full">
+                <label htmlFor='notes' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Notes <span className="text-red-600 pl-1">*</span></label>
+                <input
+                  id="notes"
+                  {...register("notes", { required: "Notes is required" })}
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                  placeholder="Write any additional information here..."
+                />
+                {errors.notes && <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.notes.message}</p>}
+              </div>
+
             </div>
 
           </div>
 
-          <div className='flex flex-col md:flex-row items-center justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+          {/* Optional Fields */}
+          <div className='flex flex-col md:flex-row items-start justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
 
             <div className="flex-1 w-full">
-              <label htmlFor='invoiceId' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Invoice ID / Transaction ID</label>
+              <label htmlFor='invoiceId' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2 mt-6">Invoice ID / Transaction ID</label>
               <input
                 id={`invoiceId`}
                 {...register(`invoiceId`)}
@@ -458,30 +491,58 @@ const AddExpenseEntry = () => {
               />
             </div>
 
-            {/* Optional Fields */}
-            <div className="flex-1 w-full">
-              <label htmlFor='attachment' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Attachment</label>
-              <div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                <label
-                  htmlFor="attachment"
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Choose File
-                </label>
-                <span className="ml-4 text-gray-600 truncate">
-                  {file?.name || "No file chosen"}
-                </span>
-                <input
-                  id="attachment"
-                  ref={fileInputRef}
-                  className="hidden"
-                  type="file"
-                  accept=".jpg, .jpeg, .png, .gif, .pdf"
-                  onChange={handleFileChange}
-                />
-              </div>
+            <div className="flex-1 w-full flex-col">
+              <Tabs
+                aria-label="Attachment Options"
+                selectedKey={activeTab}
+                onSelectionChange={setActiveTab}>
 
+                <Tab key="attachment" title="Attachment">
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                      <label
+                        htmlFor="attachment"
+                        className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Choose File
+                      </label>
+                      <span className="ml-4 text-gray-600 truncate">
+                        {file?.name || "No file chosen"}
+                      </span>
+                      <input
+                        id="attachment"
+                        ref={fileInputRef}
+                        className="hidden"
+                        type="file"
+                        accept=".jpg, .png, .pdf"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+
+                    {/* ✅ Allowed file types and size message */}
+                    <p className="mt-2 text-xs text-gray-500">
+                      Allowed formats: <span className="font-medium">JPG, PNG, PDF</span> (max 10MB)
+                    </p>
+
+                    {/* ❌ Error message when validation fails */}
+                    {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+                  </div>
+                </Tab>
+
+                {/* 🔗 Link Upload Tab */}
+                <Tab key="link" title="Link">
+                  <input
+                    type="url"
+                    placeholder="https://example.com"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value)}
+                    className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                  />
+                </Tab>
+
+              </Tabs>
             </div>
 
           </div>

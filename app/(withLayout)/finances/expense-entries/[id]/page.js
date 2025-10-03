@@ -5,9 +5,9 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import { Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import CustomPagination from "@/app/components/shared/pagination/CustomPagination";
 import PaginationSelect from "@/app/components/shared/pagination/PaginationSelect";
@@ -17,6 +17,7 @@ import { FaArrowLeft, FaFileAlt } from "react-icons/fa";
 import TruncatedText from "@/app/components/finances/expenses/TruncateText";
 import { IoMdClose } from "react-icons/io";
 import { today, getLocalTimeZone } from "@internationalized/date";
+import toast from "react-hot-toast";
 
 const initialColumns = ['Expense Category', 'Sub-Category', 'Sub-Sub-Category', 'Amount', 'Date of Expense', 'Payment Method', 'Paid To', 'Notes', 'Invoice ID / Transaction ID', 'Attachment'];
 
@@ -35,6 +36,13 @@ const ExpenseEntries = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [openModal, setOpenModal] = useState(false);
+  const [modalType, setModalType] = useState(null); // "invoice" or "attachment"
+  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [modalError, setModalError] = useState("");
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
@@ -129,6 +137,50 @@ const ExpenseEntries = () => {
     }
 
     return date;
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    setError(""); // reset error
+    setModalError(""); // reset error
+
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setError("Only JPG, PNG, and PDF files are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (selectedFile.size > maxSize) {
+      setError("File size must be less than 10MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setFile(selectedFile);
+    setSelectedEntry((prev) => ({ ...prev, attachment: selectedFile })); // sync with modal entry
+  };
+
+  const uploadFile = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file); // Append the file to FormData
+
+      const response = await axiosSecure.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl; // Return the file URL or path from the response
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
   };
 
   const { startDate, adjustedEndDate } = useMemo(() => {
@@ -368,7 +420,20 @@ const ExpenseEntries = () => {
                               )}
                               {column === 'Invoice ID / Transaction ID' && (
                                 <td key="Invoice ID / Transaction ID" className="text-sm p-3 text-neutral-500 font-semibold text-center">
-                                  {entries?.invoiceId || "--"}
+                                  {
+                                    entries?.invoiceId ?
+                                      entries?.invoiceId :
+                                      <button
+                                        className="text-blue-600 hover:text-blue-800 underline"
+                                        onClick={() => {
+                                          setModalType("invoice");
+                                          setSelectedEntry(entries);
+                                          setOpenModal(true);
+                                        }}
+                                      >
+                                        Add
+                                      </button>
+                                  }
                                 </td>
                               )}
                               {column === 'Attachment' && (
@@ -384,12 +449,16 @@ const ExpenseEntries = () => {
                                       <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Download</span>
                                     </div>
                                   ) : (
-                                    <div className="group relative">
-                                      <button className='hover:cursor-not-allowed'>
-                                        <FaFileAlt size={20} />
-                                      </button>
-                                      <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Unavailable</span>
-                                    </div>
+                                    <button
+                                      className="text-blue-600 hover:text-blue-800 underline"
+                                      onClick={() => {
+                                        setModalType("attachment");
+                                        setSelectedEntry(entries);
+                                        setOpenModal(true);
+                                      }}
+                                    >
+                                      Add
+                                    </button>
                                   )}
                                 </td>
                               )}
@@ -477,6 +546,130 @@ const ExpenseEntries = () => {
               Save
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isDismissable={false} hideCloseButton={true} isOpen={openModal} onClose={() => setOpenModal(false)} size="xl">
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader className='bg-gray-200 mb-3'>
+                {modalType === "invoice" ? "Add Invoice / Transaction ID" : "Add Attachment"}
+              </ModalHeader>
+              <ModalBody>
+                {modalType === "invoice" && (
+                  <Input
+                    placeholder="Enter Invoice or Transaction ID"
+                    value={selectedEntry?.invoiceId || ""}
+                    onChange={(e) =>
+                      setSelectedEntry((prev) => ({ ...prev, invoiceId: e.target.value }))
+                    }
+                  />
+                )}
+
+                {modalType === "attachment" && (
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef?.current?.click()}>
+                      <label
+                        htmlFor="attachment"
+                        className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200 min-w-[110px] max-w-[110px]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Choose File
+                      </label>
+                      <span className="ml-4 text-gray-600 truncate">
+                        {file?.name || "No file chosen"}
+                      </span>
+                      <input
+                        id="attachment"
+                        ref={fileInputRef}
+                        className="hidden"
+                        type="file"
+                        accept=".jpg, .png, .pdf"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+
+                    {/* ✅ Allowed file types and size message */}
+                    <p className="mt-2 text-xs text-gray-500">
+                      Allowed formats: <span className="font-medium">JPG, PNG, PDF</span> (max 10MB)
+                    </p>
+
+                    {/* ❌ Error message when validation fails */}
+                    {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+                  </div>
+                )}
+                {modalError && <p className="text-left text-red-500 font-semibold text-xs">{modalError}</p>}
+              </ModalBody>
+              <ModalFooter className="border-t mt-2">
+                <Button color="danger" variant="light" onPress={() => {
+                  setModalError("");  // Clear any previous error
+                  setError(""); // Clear any previous error
+                  setOpenModal(false); // Close modal
+                  setFile(null);
+                  setSelectedEntry(null);
+                }}>
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={async () => {
+                    // Validation
+                    if (modalType === "invoice" && !selectedEntry?.invoiceId?.trim()) {
+                      setModalError("Invoice/Transaction ID is required.");
+                      return;
+                    }
+
+                    if (modalType === "attachment" && !selectedEntry?.attachment) {
+                      setModalError("Attachment file is required.");
+                      return;
+                    }
+
+                    setModalError(""); // Clear error if valid
+
+                    try {
+                      let payload = {};
+
+                      if (modalType === "invoice") {
+                        payload = { invoiceId: selectedEntry.invoiceId };
+                      } else if (modalType === "attachment") {
+                        // If you need to upload file first
+                        const attachmentUrl = await uploadFile(file);
+                        if (!attachmentUrl) {
+                          setModalError("File upload failed, please try again.");
+                          return;
+                        }
+                        payload = { attachment: attachmentUrl };
+                      }
+
+                      // ✅ API call here
+                      const response = await axiosSecure.patch(`/update-expense-entry/${selectedEntry._id}`, payload);
+
+                      if (response.status === 200) {
+                        setExpenseEntries((prevEntries) =>
+                          prevEntries.map((entry) =>
+                            entry._id === selectedEntry._id
+                              ? { ...entry, ...payload } // merge updated fields
+                              : entry
+                          )
+                        );
+                        toast.success(`${modalType === "invoice" ? "Invoice ID" : "Attachment"} updated successfully!`);
+                        setOpenModal(false);
+                        setFile(null);
+                        setSelectedEntry(null);
+                      }
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Failed to update. Please try again.");
+                    }
+                  }}
+                >
+                  Save
+                </Button>
+              </ModalFooter>
+            </>
+          )}
         </ModalContent>
       </Modal>
 

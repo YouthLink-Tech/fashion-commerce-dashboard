@@ -11,11 +11,11 @@ const ExpenseActions = () => {
       <div className="flex items-center justify-center gap-2">
 
         <button onClick={() => router.push('/finances/add-expense-entry')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] hover:bg-[#bdf6b4] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-semibold text-[12px] lg:text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add Expense Entry
+          <FaPlus size={15} className='text-neutral-700' /> Expense Entry
         </button>
 
         <button onClick={() => router.push('/finances/add-expense-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[12px] lg:text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add Expense Category
+          <FaPlus size={15} className='text-neutral-700' /> Expense Category
         </button>
 
       </div>
