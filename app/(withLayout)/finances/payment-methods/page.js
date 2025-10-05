@@ -224,15 +224,17 @@ const PaymentMethods = () => {
             </div>
           ))
         }
-        {isAuthorized && <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+        {isAuthorized && <div className="flex-1 overflow-hidden rounded-2xl shadow transition hover:shadow-lg flex flex-col">
           <Link
             href="/finances/payment-methods/add-payment-method"
-            className="relative w-full h-60 xl:h-[450px] px-6 2xl:px-14 xl:px-8 border-2 border-dashed border-gray-600 bg-white text-gray-600 font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-transparent hover:shadow-xl"
+            className="relative w-full h-60 xl:h-[420px] px-8 border-2 border-dashed border-gray-400 bg-white text-gray-600 font-bold rounded-2xl flex items-center justify-center transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:shadow-xl"
           >
-            <FaPlusCircle className="transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse text-3xl" />
-            <span className="relative transition-transform xl:text-xl 2xl:text-2xl duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
-              Add Payment Method
-            </span>
+            <div className="flex items-center justify-center gap-3 whitespace-nowrap">
+              <FaPlusCircle className="transition-transform transform group-hover:scale-110 text-2xl group-hover:text-gray-800 animate-pulse" />
+              <span className="text-lg xl:text-xl 2xl:text-2xl transition-all duration-300 group-hover:translate-x-1">
+                Payment Method
+              </span>
+            </div>
           </Link>
         </div>}
       </div>

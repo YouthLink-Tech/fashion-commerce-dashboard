@@ -57,43 +57,57 @@ const Finances = () => {
       <div className="bg-gray-50 sticky top-0 z-10">
         <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-gray-50">FINANCES</h1>
 
-        <div className="flex items-center gap-3 bg-gray-50">
-
+        <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded-xl">
+          {/* Order-related tabs (filled style) */}
           <button
-            className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'completed' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
-        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
-        ${activeTab === 'completed' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-      `}
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300
+      ${activeTab === 'completed'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+              }`}
             onClick={() => setActiveTab('completed')}
           >
             Completed
           </button>
 
           <button
-            className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'refunded' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
-        ${activeTab === 'refunded' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-      `}
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300
+      ${activeTab === 'refunded'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+              }`}
             onClick={() => setActiveTab('refunded')}
           >
             Refunded
           </button>
 
-          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'payment methods' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'payment methods' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
-            onClick={() => setActiveTab('payment methods')}>
-            Payment methods
+          {/* Divider */}
+          <div className="w-px h-6 bg-neutral-300 mx-2"></div>
+
+          {/* Finance-related tabs (outlined style) */}
+          <button
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl border text-sm font-medium transition-all duration-300
+      ${activeTab === 'payment methods'
+                ? 'border-purple-600 text-purple-700 bg-purple-50'
+                : 'border-neutral-300 text-neutral-600 hover:bg-neutral-50'
+              }`}
+            onClick={() => setActiveTab('payment methods')}
+          >
+            Payment Methods
           </button>
 
-          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'expenses' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'expenses' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
-            onClick={() => setActiveTab('expenses')}>
+          <button
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl border text-sm font-medium transition-all duration-300
+      ${activeTab === 'expenses'
+                ? 'border-orange-600 text-orange-700 bg-orange-50'
+                : 'border-neutral-300 text-neutral-600 hover:bg-neutral-50'
+              }`}
+            onClick={() => setActiveTab('expenses')}
+          >
             Expenses
           </button>
-
         </div>
+
       </div>
 
       {activeTab === "completed" && <div className='pt-4'>

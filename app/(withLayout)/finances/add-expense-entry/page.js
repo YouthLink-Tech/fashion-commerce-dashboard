@@ -502,7 +502,7 @@ const AddExpenseEntry = () => {
                     <div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                       <label
                         htmlFor="attachment"
-                        className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200"
+                        className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200 min-w-[110px] max-w-[110px]"
                         onClick={(e) => e.stopPropagation()}
                       >
                         Choose File
