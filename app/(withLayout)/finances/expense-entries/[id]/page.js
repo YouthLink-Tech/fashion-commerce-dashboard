@@ -13,7 +13,7 @@ import CustomPagination from "@/app/components/shared/pagination/CustomPaginatio
 import PaginationSelect from "@/app/components/shared/pagination/PaginationSelect";
 import { TbColumnInsertRight } from "react-icons/tb";
 import Link from "next/link";
-import { FaArrowLeft, FaFileAlt } from "react-icons/fa";
+import { FaArrowLeft, FaFileAlt, FaPlusCircle } from "react-icons/fa";
 import TruncatedText from "@/app/components/finances/expenses/TruncateText";
 import { IoMdClose } from "react-icons/io";
 import { today, getLocalTimeZone } from "@internationalized/date";
@@ -424,14 +424,15 @@ const ExpenseEntries = () => {
                                     entries?.invoiceId ?
                                       entries?.invoiceId :
                                       <button
-                                        className="text-blue-600 hover:text-blue-800 underline"
+                                        className="text-blue-600 hover:text-blue-800"
                                         onClick={() => {
                                           setModalType("invoice");
                                           setSelectedEntry(entries);
                                           setOpenModal(true);
                                         }}
+                                        title="Add Invoice / Transaction ID"
                                       >
-                                        Add
+                                        <FaPlusCircle size={20} />
                                       </button>
                                   }
                                 </td>
@@ -456,8 +457,9 @@ const ExpenseEntries = () => {
                                         setSelectedEntry(entries);
                                         setOpenModal(true);
                                       }}
+                                      title="Add Attachment"
                                     >
-                                      Add
+                                      <FaPlusCircle size={20} />
                                     </button>
                                   )}
                                 </td>
@@ -557,13 +559,15 @@ const ExpenseEntries = () => {
                 {modalType === "invoice" ? "Add Invoice / Transaction ID" : "Add Attachment"}
               </ModalHeader>
               <ModalBody>
+
                 {modalType === "invoice" && (
-                  <Input
+                  <input
                     placeholder="Enter Invoice or Transaction ID"
                     value={selectedEntry?.invoiceId || ""}
                     onChange={(e) =>
                       setSelectedEntry((prev) => ({ ...prev, invoiceId: e.target.value }))
                     }
+                    className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
                   />
                 )}
 
@@ -600,10 +604,12 @@ const ExpenseEntries = () => {
 
                   </div>
                 )}
+
                 {modalError && <p className="text-left text-red-500 font-semibold text-xs">{modalError}</p>}
+
               </ModalBody>
               <ModalFooter className="border-t mt-2">
-                <Button color="danger" variant="light" onPress={() => {
+                <Button size="sm" color="danger" variant="light" onPress={() => {
                   setModalError("");  // Clear any previous error
                   setError(""); // Clear any previous error
                   setOpenModal(false); // Close modal
@@ -614,6 +620,7 @@ const ExpenseEntries = () => {
                 </Button>
                 <Button
                   color="primary"
+                  size="sm"
                   onPress={async () => {
                     // Validation
                     if (modalType === "invoice" && !selectedEntry?.invoiceId?.trim()) {
