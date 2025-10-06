@@ -216,6 +216,15 @@ const AddExpenseEntry = () => {
 
     const formattedDateOfExpense = formatDate(dateOfExpense);
 
+    // validate tags
+    if (selectedSubCategory) {
+      if (selectedTags.length === 0) {
+        setTagsError("Please add at least one tags.");
+        setIsSubmitting(false);
+        return;
+      };
+    }
+
     const expenseEntryData = {
       expenseCategory,
       subCategory,

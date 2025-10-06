@@ -18,6 +18,9 @@ import TruncatedText from "@/app/components/finances/expenses/TruncateText";
 import { IoMdClose } from "react-icons/io";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import toast from "react-hot-toast";
+import { HiOutlineDownload } from "react-icons/hi";
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 const initialColumns = ['Expense Category', 'Sub-Category', 'Tags', 'Amount', 'Date of Expense', 'Payment Method', 'Paid To', 'Notes', 'Invoice ID / Transaction ID', 'Attachment'];
 
@@ -43,6 +46,10 @@ const ExpenseEntries = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
+  const dropdownRefDownload = useRef(null);
+  const dropdownRef = useRef(null);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [openDropdown2, setOpenDropdown2] = useState(false);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
@@ -81,6 +88,23 @@ const ExpenseEntries = () => {
       // Set to default column order if no saved order exists
       setColumnOrder(initialColumns);
     }
+  }, []);
+
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRefDownload.current && !dropdownRefDownload.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown2(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleColumnChange = (selected) => {
@@ -261,6 +285,249 @@ const ExpenseEntries = () => {
     saveAs(fileUrl, filename);
   };
 
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
+
+  const toggleDropdown2 = (dropdown) => {
+    setOpenDropdown2((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
+
+  const exportToCSV = async () => {
+    let dataToExport = [];
+
+    // Check if a search query is applied (i.e., if `filteredEntries` is not empty)
+    if (searchQuery) {
+      dataToExport = filteredEntries;
+    }
+    // If date range is applied, filter orders based on date range
+    else if (startDate && adjustedEndDate) {
+      dataToExport = filteredEntries.filter(entry => {
+        const expenseDate = parseDate(entry.dateOfExpense);
+        return expenseDate >= startDate && expenseDate <= adjustedEndDate;
+      });
+    }
+    // Otherwise, apply tab-based filtering
+    else {
+      dataToExport = filteredEntries;
+    }
+
+    // Extract only the order-level details for the export
+    const filteredData = dataToExport.map(row => {
+      const data = {};
+
+      // Loop through columnOrder and include only the selected columns in the correct order
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case 'Expense Category':
+              data["Expense Category"] = row?.expenseCategory || "";
+              break;
+            case 'Sub-Category':
+              data['Sub-Category'] = row?.subCategory || "";
+              break;
+            case 'Tags':
+              data['Tags'] = row?.tags?.join(", ") || "";
+              break;
+            case 'Amount':
+              data['Amount'] = row?.amount || 0;
+              break;
+            case 'Date of Expense':
+              data['Date of Expense'] = row?.dateOfExpense || "";
+              break;
+            case 'Payment Method':
+              data['Payment Method'] = row?.paymentMethod || "";
+              break;
+            case 'Paid To':
+              data['Paid To'] = row?.paidTo || "";
+              break;
+            case 'Notes':
+              data['Notes'] = row?.notes || "";
+              break;
+            case 'Invoice ID / Transaction ID':
+              data['Invoice ID / Transaction ID'] = row?.invoiceId || "";
+              break;
+            case 'Attachment':
+              data['Attachment'] = row?.attachment || "";
+              break;
+            default:
+              break;
+          }
+        }
+      });
+
+      return data;
+    });
+
+    // Create the filename dynamically based on applied filters
+    let fileName = 'expense_entry_data';
+    if (searchQuery) fileName += `_searched`;
+    else if (startDate && adjustedEndDate) fileName += `_from_${formatDate(startDate)}_to_${formatDate(adjustedEndDate)}`;
+
+    // Convert to CSV and trigger download
+    const csv = Papa.unparse(filteredData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}.csv`;
+    link.click();
+  };
+
+  const exportToPDF = async () => {
+    const { jsPDF } = await import("jspdf");  // Dynamically import jsPDF
+    const autoTable = (await import("jspdf-autotable")).default;  // Import jsPDF-AutoTable
+
+    // Create a new document in landscape mode
+    const doc = new jsPDF('landscape'); // 'landscape' mode
+
+    // Define the columns based on columnOrder
+    const columns = columnOrder
+      .filter((col) => selectedColumns.includes(col))  // Ensure only selected columns are included
+      .map((col) => ({
+        header: col,
+        dataKey: col,
+      }));
+
+    // Map filtered orders to the correct data format based on columnOrder
+    const rows = filteredEntries?.map((entry) => {
+      const rowData = {};
+
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case 'Expense Category':
+              rowData["Expense Category"] = entry?.expenseCategory || "";
+              break;
+            case 'Sub-Category':
+              rowData['Sub-Category'] = entry?.subCategory || "";
+              break;
+            case 'Tags':
+              rowData['Tags'] = entry?.tags?.join(", ") || "";
+              break;
+            case 'Amount':
+              rowData['Amount'] = entry?.amount || 0;
+              break;
+            case 'Date of Expense':
+              rowData['Date of Expense'] = entry?.dateOfExpense || "";
+              break;
+            case 'Payment Method':
+              rowData['Payment Method'] = entry?.paymentMethod || "";
+              break;
+            case 'Paid To':
+              rowData['Paid To'] = entry?.paidTo || "";
+              break;
+            case 'Notes':
+              rowData['Notes'] = entry?.notes || "";
+              break;
+            case 'Invoice ID / Transaction ID':
+              rowData['Invoice ID / Transaction ID'] = entry?.invoiceId || "";
+              break;
+            case 'Attachment':
+              rowData['Attachment'] = entry?.attachment || "";
+              break;
+            default:
+              break;
+          }
+        }
+      });
+
+      return rowData;
+    });
+
+    // Use jsPDF-AutoTable to create the table
+    autoTable(doc, {
+      columns: columns,  // Column headers
+      body: rows,        // Order data
+      startY: 10,        // Start position for the table
+      styles: { fontSize: 8, halign: 'center', valign: 'middle' },  // Center-align data
+      headStyles: { halign: 'center', valign: 'middle' },           // Center-align headers
+      theme: "striped",  // Optional: customize the look of the table
+    });
+
+    // Save the PDF document
+    doc.save("Filtered_Expense_Entries.pdf");
+  };
+
+  const exportToXLS = async () => {
+    let dataToExport = [];
+
+    // Check if a search query is applied (i.e., if `filteredEntries` is not empty)
+    if (searchQuery) {
+      dataToExport = filteredEntries;
+    }
+    // If date range is applied, filter orders based on date range
+    else if (startDate && adjustedEndDate) {
+      dataToExport = filteredEntries.filter(entry => {
+        const expenseDate = parseDate(entry.dateOfExpense);
+        return expenseDate >= startDate && expenseDate <= adjustedEndDate;
+      });
+    }
+    // Otherwise, apply tab-based filtering
+    else {
+      dataToExport = filteredEntries;
+    }
+
+    // Extract only the order-level details for the export
+    const filteredData = dataToExport.map(row => {
+      const data = {};
+
+      // Include all selected columns, even if empty
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case 'Expense Category':
+              data["Expense Category"] = row?.expenseCategory || "";
+              break;
+            case 'Sub-Category':
+              data['Sub-Category'] = row?.subCategory || "";
+              break;
+            case 'Tags':
+              data['Tags'] = row?.tags?.join(", ") || "";
+              break;
+            case 'Amount':
+              data['Amount'] = row?.amount || 0;
+              break;
+            case 'Date of Expense':
+              data['Date of Expense'] = row?.dateOfExpense || "";
+              break;
+            case 'Payment Method':
+              data['Payment Method'] = row?.paymentMethod || "";
+              break;
+            case 'Paid To':
+              data['Paid To'] = row?.paidTo || "";
+              break;
+            case 'Notes':
+              data['Notes'] = row?.notes || "";
+              break;
+            case 'Invoice ID / Transaction ID':
+              data['Invoice ID / Transaction ID'] = row?.invoiceId || "";
+              break;
+            case 'Attachment':
+              data['Attachment'] = row?.attachment || "";
+              break;
+            default:
+              break;
+          }
+        }
+      });
+
+      return data;
+    });
+
+    // Create the filename dynamically based on applied filters
+    let fileName = 'expense_entry_data';
+    if (searchQuery) fileName += `_searched`;
+    else if (startDate && adjustedEndDate) fileName += `_from_${formatDate(startDate)}_to_${formatDate(adjustedEndDate)}`;
+
+    // Prepare the worksheet and workbook for XLSX export
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);  // Convert JSON data to sheet format
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Expenses');
+
+    // Export the file as XLSX
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
   useEffect(() => {
     if (paginatedEntries?.length === 0) {
       setPage(0); // Reset to the first page if no data
@@ -324,23 +591,118 @@ const ExpenseEntries = () => {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[18px] py-3 transition-colors duration-300 ease-in-out hover:bg-[#bdf6b4] font-semibold text-[14px] text-neutral-700">
-              Choose Columns <TbColumnInsertRight size={20} />
-            </button>
 
-            <div className='flex items-center gap-2'>
-              <DateRangePicker
-                label="Date of expense Duration"
-                visibleMonths={1}
-                onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
-                value={selectedDateRange} // Ensure this matches the expected format
-                maxValue={currentDate}
-              />
+            <div ref={dropdownRef} className="relative inline-block text-left z-10">
 
-              {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
-                <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-                  <IoMdClose size={20} />
-                </button>
+              <button onClick={() => toggleDropdown2('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] p-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                CUSTOMIZE
+                <svg
+                  className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown2 === "other" ? 'rotate-180' : ''}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {openDropdown2 === 'other' && (
+                <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+
+                  <div className="p-1">
+
+                    <div className='flex items-center gap-2 mb-2'>
+                      <DateRangePicker
+                        label="Date of expense Duration"
+                        visibleMonths={1}
+                        onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                        value={selectedDateRange} // Ensure this matches the expected format
+                        maxValue={currentDate}
+                      />
+
+                      {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                        <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                          <IoMdClose size={20} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Choose Columns Button */}
+                    <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }}>
+                      Choose Columns <TbColumnInsertRight size={20} />
+                    </button>
+
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
+              <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#d4ffce] px-3 md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                EXPORT AS
+                <svg
+                  className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {openDropdown === 'download' && (
+                <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="p-2 flex flex-col gap-2">
+
+                    {/* Button to export to CSV */}
+                    <button
+                      onClick={exportToCSV}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                            md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                            md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT CSV
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                            md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
+                      </span>
+                    </button>
+
+                    {/* Button to export to XLSX */}
+                    <button
+                      onClick={exportToXLS}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                            md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                            md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT XLSX
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                            md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={exportToPDF}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                            md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                            md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT PDF
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                            md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
+                      </span>
+                    </button>
+
+                  </div>
+                </div>
               )}
             </div>
 
