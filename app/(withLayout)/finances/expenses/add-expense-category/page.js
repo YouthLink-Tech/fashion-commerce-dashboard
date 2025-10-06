@@ -23,12 +23,6 @@ const AddExpenseCategory = () => {
   const [subCategoryError, setSubCategoryError] = useState("");
   const inputRefSubCategory = useRef(null);
 
-  const [wantsSubSubCategory, setWantsSubSubCategory] = useState(null); // null | true | false
-  const [subSubCategoriesMap, setSubSubCategoriesMap] = useState({});
-  const [subSubCategoryInputs, setSubSubCategoryInputs] = useState({});
-  const [subSubCategoryError, setSubSubCategoryError] = useState({});
-  const inputRefSubSubCategory = useRef(null);
-
   // Handle input change for sub-categories
   const handleSubCategoryInputChange = (value) => {
     setSubCategoryInput(value);
@@ -62,38 +56,6 @@ const AddExpenseCategory = () => {
     setSelectedSubCategories(prev => prev.filter((_, i) => i !== indexToRemove));
   };
 
-  // Handle typing in a specific sub-category input
-  const handleSubSubCategoryInputChange = (subCategory, value) => {
-    setSubSubCategoryInputs((prev) => ({
-      ...prev,
-      [subCategory]: value
-    }));
-  };
-
-  const handleAddSubSubCategory = (subCategory) => {
-    const inputValue = (subSubCategoryInputs[subCategory] || "").trim();
-    if (!inputValue) return;
-
-    // Check for duplicate (case-insensitive)
-    if ((subSubCategoriesMap[subCategory] || []).some(ssc => ssc.toLowerCase() === inputValue.toLowerCase())) {
-      setSubSubCategoryError(prev => ({
-        ...prev,
-        [subCategory]: `"${inputValue}" already exists for "${subCategory}"`
-      }));
-      return;
-    }
-
-    // Add sub-sub-category
-    setSubSubCategoriesMap(prev => ({
-      ...prev,
-      [subCategory]: [...(prev[subCategory] || []), inputValue]
-    }));
-
-    // Clear input and error
-    setSubSubCategoryInputs(prev => ({ ...prev, [subCategory]: "" }));
-    setSubSubCategoryError(prev => ({ ...prev, [subCategory]: "" }));
-  };
-
   const onSubmit = async (data) => {
     setIsSubmitting(true);
 
@@ -106,28 +68,9 @@ const AddExpenseCategory = () => {
       };
     }
 
-    // Validate sub-sub-categories for each sub-category if the user wants to add them
-    if (wantsSubCategory && wantsSubSubCategory) {
-      for (let subCat of selectedSubCategories) {
-        if (!subSubCategoriesMap[subCat] || subSubCategoriesMap[subCat].length === 0) {
-          setSubSubCategoryError(prev => ({
-            ...prev,
-            [subCat]: `Please add at least one sub-sub-category for "${subCat}"`
-          }));
-          setIsSubmitting(false);
-          return;
-        }
-      }
-    };
-
     const expenseCategoryData = {
       expenseCategory: data.expenseCategory,
-      subCategories: wantsSubCategory
-        ? selectedSubCategories.map(subCat => ({
-          name: subCat,
-          subSubCategories: wantsSubSubCategory ? (subSubCategoriesMap[subCat] || []) : []
-        }))
-        : []
+      subCategories: wantsSubCategory ? selectedSubCategories : []
     };
 
     try {
@@ -170,7 +113,7 @@ const AddExpenseCategory = () => {
         });
 
         // Redirect after successful submission
-        router.push("/finances");
+        router.push("/finances/expenses");
       } else {
         throw new Error('Failed to add expense category');
       }
@@ -187,7 +130,7 @@ const AddExpenseCategory = () => {
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Expense Category Configuration</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances/expenses"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
@@ -223,7 +166,7 @@ const AddExpenseCategory = () => {
                   <div className="flex gap-2 items-center">
                     <input
                       type="text"
-                      placeholder="Add or Search Sub-Category"
+                      placeholder="Add Sub-Category"
                       value={subCategoryInput}
                       onChange={(e) => {
                         handleSubCategoryInputChange(e.target.value);
@@ -266,77 +209,6 @@ const AddExpenseCategory = () => {
               </div>
             }
           </div>
-
-          {wantsSubCategory && selectedSubCategories.length > 0 && (
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-              <Button
-                type="button"
-                onPress={() => setWantsSubSubCategory((prev) => !prev)}
-                className="px-4 py-2 bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 font-semibold rounded-lg w-fit"
-              >
-                {wantsSubSubCategory ? "Hide Sub-Sub-Categories" : "+ Add Sub-Sub-Category"}
-              </Button>
-              {wantsSubCategory && wantsSubSubCategory && selectedSubCategories?.map((subCategory) => (
-                <div key={subCategory} className='flex flex-col gap-4'>
-
-                  <div className="w-full" ref={inputRefSubSubCategory}>
-                    <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">
-                      Add Sub-Sub-Categories for <span className="text-neutral-700 pl-1">{subCategory}</span>
-                    </label>
-                    <div className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        placeholder={`Add Sub-Sub-Category under ${subCategory}`}
-                        value={subSubCategoryInputs[subCategory] || ""}
-                        onChange={(e) => {
-                          handleSubSubCategoryInputChange(subCategory, e.target.value);
-                          setSubSubCategoryError(prev => ({ ...prev, [subCategory]: "" })); // clear error for this sub-category only
-                        }}
-                        className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-                      />
-                      <Button
-                        type="button"
-                        onPress={() => handleAddSubSubCategory(subCategory)}
-                        disabled={!subSubCategoryInputs[subCategory]}
-                        className={`px-5 py-3 rounded-md font-semibold ${subSubCategoryInputs[subCategory] ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                      >
-                        Add Sub-Sub-Category
-                      </Button>
-                    </div>
-
-                    {subSubCategoryError[subCategory] && (
-                      <p className="text-left pt-1 text-red-500 font-semibold text-xs">
-                        {subSubCategoryError[subCategory]}
-                      </p>
-                    )}
-
-                  </div>
-
-                  {/* Selected sub-sub-categories */}
-                  <div className="selected-subCategories flex flex-wrap gap-3">
-                    {subSubCategoriesMap[subCategory]?.map((subSubCategory, i) => (
-                      <div key={i} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700 mb-8">
-                        <span>{subSubCategory}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSubCategoriesMap((prev) => ({
-                              ...prev,
-                              [subCategory]: prev[subCategory].filter((_, idx) => idx !== i)
-                            }));
-                          }}
-                          className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
-                        >
-                          <RxCross2 size={19} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          )}
 
           <div className='flex justify-end pt-4 pb-8'>
 

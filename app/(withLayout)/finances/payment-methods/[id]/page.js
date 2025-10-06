@@ -52,7 +52,7 @@ const EditPaymentMethod = () => {
       } catch (error) {
         // console.error(error);
         // toast.error("Failed to load payment method details.");
-        router.push('/finances');
+        router.push('/finances/payment-methods');
       }
     };
 
@@ -132,7 +132,7 @@ const EditPaymentMethod = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push('/finances');
+        router.push('/finances/payment-methods');
       } else {
         toast.error('No changes detected.');
       }
@@ -152,7 +152,7 @@ const EditPaymentMethod = () => {
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Payment Settings</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances/payment-methods"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 

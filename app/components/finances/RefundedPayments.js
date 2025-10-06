@@ -1,3 +1,4 @@
+"use client";
 import useOrders from '@/app/hooks/useOrders';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';

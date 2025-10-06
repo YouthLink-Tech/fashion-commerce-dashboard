@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import ExpenseActions from './ExpenseActions';
 import { useAuth } from '@/app/contexts/auth';
@@ -16,7 +17,6 @@ const Expenses = () => {
     (group) => group.modules?.[currentModule]?.access === true
   )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
 
   if (isUserLoading || isExpenseCategoryPending) return <Loading />;
 
@@ -29,7 +29,6 @@ const Expenses = () => {
 
       <ExpenseCard
         expenseCategoryList={expenseCategoryList}
-        isOwner={isOwner}
       />
 
     </div>

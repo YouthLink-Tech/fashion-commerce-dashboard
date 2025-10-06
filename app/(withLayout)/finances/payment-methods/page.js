@@ -150,9 +150,14 @@ const PaymentMethods = () => {
   }
 
   return (
-    <div className='bg-gray-50 relative'>
+    <div className='bg-gray-50 relative mx-auto px-6 pb-4'>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 justify-center gap-6 my-6 relative">
+      <div className='w-full mb-6'>
+        <h3 className='text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Payment Methods</h3>
+        <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>View, add, and manage different payment options used across your platform.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 my-6 relative">
         {
           paymentMethodList?.map((payment, index) => (
             <div key={index} className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col bg-white">

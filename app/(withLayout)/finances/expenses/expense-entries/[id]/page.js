@@ -19,7 +19,7 @@ import { IoMdClose } from "react-icons/io";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import toast from "react-hot-toast";
 
-const initialColumns = ['Expense Category', 'Sub-Category', 'Sub-Sub-Category', 'Amount', 'Date of Expense', 'Payment Method', 'Paid To', 'Notes', 'Invoice ID / Transaction ID', 'Attachment'];
+const initialColumns = ['Expense Category', 'Sub-Category', 'Tags', 'Amount', 'Date of Expense', 'Payment Method', 'Paid To', 'Notes', 'Invoice ID / Transaction ID', 'Attachment'];
 
 const ExpenseEntries = () => {
 
@@ -57,7 +57,7 @@ const ExpenseEntries = () => {
       } catch (error) {
         // console.error(error);
         // toast.error("Failed to load payment method details.");
-        router.push('/finances');
+        router.push('/finances/expenses');
       }
     };
 
@@ -299,7 +299,7 @@ const ExpenseEntries = () => {
             </h3>
           )}
 
-          <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/finances"> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/finances/expenses"> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
 
         </div>
 
@@ -384,9 +384,9 @@ const ExpenseEntries = () => {
                                   {entries?.subCategory || "--"}
                                 </td>
                               )}
-                              {column === 'Sub-Sub-Category' && (
-                                <td key="Sub-Sub-Category" className="text-sm p-3 text-neutral-500 font-semibold text-center">
-                                  {entries?.subSubCategory || "--"}
+                              {column === 'Tags' && (
+                                <td key="Tags" className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                                  {entries?.tags && entries.tags.length > 0 ? entries.tags.join(", ") : "--"}
                                 </td>
                               )}
                               {column === 'Amount' && (

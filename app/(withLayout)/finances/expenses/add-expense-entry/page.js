@@ -31,6 +31,10 @@ const AddExpenseEntry = () => {
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
+  const inputRefTags = useRef(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [tagsInput, setTagsInput] = useState('');
+  const [tagsError, setTagsError] = useState("");
 
   const [paidToInput, setPaidToInput] = useState("");
   const [filteredPaidTo, setFilteredPaidTo] = useState([]);
@@ -40,9 +44,6 @@ const AddExpenseEntry = () => {
 
   // Get available sub-categories for selected category
   const availableSubCategories = selectedCategory?.subCategories || [];
-
-  // Get available sub-sub-categories for selected sub-category
-  const availableSubSubCategories = availableSubCategories.find(sc => sc.name === selectedSubCategory)?.subSubCategories || [];
 
   const handleShowDateError = (date) => {
     if (date) {
@@ -95,8 +96,7 @@ const AddExpenseEntry = () => {
   };
 
   // Capitalize first letter, lowercase the rest
-  const formatPaidTo = (str) =>
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  const formatPaidTo = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
   // Build unique list (case-insensitive)
   const pastPaidToValues = Array.from(
@@ -150,9 +150,42 @@ const AddExpenseEntry = () => {
     };
   }, []);
 
+  // Handle input change for sub-categories
+  const handleTagsInputChange = (value) => {
+    setTagsInput(value);
+  };
+
+  // Add sub-category
+  const addTags = (tags) => {
+    if (!tags || !tags.trim()) return;
+
+    const trimmed = tags.trim();
+
+    // Check for duplicate (case-insensitive)
+    if (selectedTags.some(sc => sc.toLowerCase() === trimmed.toLowerCase())) {
+      setTagsError(`"${trimmed}" already exists`);
+      return;
+    }
+
+    // Add new tags
+    setSelectedTags((prev) => [...prev, trimmed]);
+    setTagsInput('');
+    setTagsError('');
+  };
+
+  // Add sub-category manually
+  const handleAddTags = () => {
+    addTags(tagsInput);
+  };
+
+  // Remove sub-category
+  const handleTagsRemove = (indexToRemove) => {
+    setSelectedTags(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    const { expenseCategory, subCategory, subSubCategory, amount, dateOfExpense, paymentMethod, paidTo, notes, invoiceId } = data;
+    const { expenseCategory, subCategory, amount, dateOfExpense, paymentMethod, paidTo, notes, invoiceId } = data;
 
     let attachmentUrl = "";
 
@@ -186,7 +219,7 @@ const AddExpenseEntry = () => {
     const expenseEntryData = {
       expenseCategory,
       subCategory,
-      subSubCategory,
+      tags: selectedSubCategory ? selectedTags : [],
       amount: parseFloat(amount) || 0,
       dateOfExpense: formattedDateOfExpense,
       paymentMethod,
@@ -232,7 +265,7 @@ const AddExpenseEntry = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push("/finances");
+        router.push("/finances/expenses");
       }
     } catch (error) {
       toast.error('Failed to add expense entry. Please try again!');
@@ -250,7 +283,7 @@ const AddExpenseEntry = () => {
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-lg lg:text-2xl text-neutral-600'>Expense Entry Configuration</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/finances/expenses"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
@@ -306,9 +339,9 @@ const AddExpenseEntry = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-neutral-700 bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#F4D3BA] focus:border-[#F4D3BA] text-sm cursor-pointer"
                 >
                   <option value="" disabled className='bg-white'>Select Sub-Category</option>
-                  {availableSubCategories.map(sc => (
-                    <option key={sc.name} value={sc.name}>
-                      {sc.name}
+                  {availableSubCategories.map((sc, index) => (
+                    <option key={index} value={sc}>
+                      {sc}
                     </option>
                   ))}
                 </select>
@@ -318,28 +351,55 @@ const AddExpenseEntry = () => {
               </div>
             )}
 
-            {/* Sub-Sub-Category */}
-            {selectedSubCategory && availableSubSubCategories.length > 0 && (
-              <div>
-                <label htmlFor="subSubCategory" className="block font-semibold text-neutral-600 mb-2 text-sm">
-                  Sub-Sub-Category <span className="text-red-600">*</span>
-                </label>
-                <select
-                  id="subSubCategory"
-                  {...register("subSubCategory", { required: "Sub-Sub-category is required" })}
-                  disabled={!selectedSubCategory}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-neutral-700 bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#F4D3BA] focus:border-[#F4D3BA] text-sm cursor-pointer"
-                >
-                  <option value="" className='bg-white' disabled>Select Sub-Sub-Category</option>
-                  {availableSubSubCategories.map(ssc => (
-                    <option key={ssc} value={ssc}>
-                      {ssc}
-                    </option>
+            {/* Tags */}
+            {selectedSubCategory && (
+              <div className='flex flex-col gap-4'>
+
+                <div className="w-full" ref={inputRefTags}>
+                  <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Tags <span className="text-red-600 pl-1">*</span></label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Add Tags"
+                      value={tagsInput}
+                      onChange={(e) => {
+                        handleTagsInputChange(e.target.value);
+                        setTagsError(''); // clear error while typing
+                      }}
+                      className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                    />
+                    <Button
+                      type="button"
+                      onPress={handleAddTags}
+                      disabled={!tagsInput}
+                      className={`px-5 py-3 rounded-md font-semibold ${tagsInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                    >
+                      Add Tags
+                    </Button>
+                  </div>
+
+                  {tagsError && (
+                    <p className="text-left pt-1 text-red-500 font-semibold text-xs">{tagsError}</p>
+                  )}
+
+                </div>
+
+                {/* Selected tags */}
+                <div className="selected-subCategories flex flex-wrap gap-3">
+                  {selectedTags?.map((tag, index) => (
+                    <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700 mb-8">
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleTagsRemove(index)}
+                        className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                      >
+                        <RxCross2 size={19} />
+                      </button>
+                    </div>
                   ))}
-                </select>
-                {errors.subSubCategory && (
-                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.subSubCategory.message}</p>
-                )}
+                </div>
+
               </div>
             )}
 

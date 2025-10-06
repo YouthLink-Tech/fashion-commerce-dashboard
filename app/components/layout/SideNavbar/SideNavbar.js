@@ -12,7 +12,7 @@ import { IoColorPaletteOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuWarehouse, LuNewspaper } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
 import { CiDeliveryTruck } from "react-icons/ci";
-import { FiShoppingBag, FiBox } from "react-icons/fi";
+import { FiShoppingBag, FiBox, FiShoppingCart, FiTrendingDown, FiCreditCard } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
@@ -141,6 +141,23 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
       icon: <TbBuildingBank />,
       path: "/finances",
       permission: checkPermission("Finances"),
+      links: [
+        {
+          label: "Sales",
+          link: "/finances/sales",
+          icon: <FiShoppingCart />,
+        },
+        {
+          label: "Expenses",
+          link: "/finances/expenses",
+          icon: <FiTrendingDown />,
+        },
+        {
+          label: "Payment Methods",
+          link: "/finances/payment-methods",
+          icon: <FiCreditCard />,
+        }
+      ]
     },
     {
       name: "Analytics",
