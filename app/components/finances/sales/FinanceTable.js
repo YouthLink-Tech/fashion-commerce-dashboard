@@ -1,16 +1,16 @@
 "use client";
 import useOrders from '@/app/hooks/useOrders';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
-import CustomPagination from '../shared/pagination/CustomPagination';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { TbColumnInsertRight } from 'react-icons/tb';
-import PaginationSelect from '../shared/pagination/PaginationSelect';
+import SmallHeightLoading from '../../shared/Loading/SmallHeightLoading';
+import CustomPagination from '../../shared/pagination/CustomPagination';
+import PaginationSelect from '../../shared/pagination/PaginationSelect';
 
-const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Order Amount', 'Refund Status', 'Refunded Amount', 'Payment Status'];
+const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Transaction ID', 'Order Amount', 'Refund Status', 'Refunded Amount', 'Refunded Items', 'Payment Status'];
 
 const FinanceTable = () => {
 
@@ -132,13 +132,26 @@ const FinanceTable = () => {
     // Payment status filtering
     const isStatusMatch = selectedPaymentStatus === 'All' || order?.paymentInfo?.paymentStatus === selectedPaymentStatus;
 
+    // --- Refund logic for search ---
+    let refundAmount = 0;
+    let refundSku = 0;
+    if (order.orderStatus === "Refunded" && order.returnInfo) {
+      for (const product of order.returnInfo.products || []) {
+        if (product.status === "Accepted") {
+          refundAmount += (product.finalUnitPrice || 0) * (product.sku || 0);
+          refundSku += (product.sku || 0);
+        }
+      }
+    }
+
     // Check if order details match the search query
     const orderMatch = (
       (order.orderNumber || '').toLowerCase().includes(query) ||
       (order.customerInfo.customerName || '').toLowerCase().includes(query) || // Added customerName search
-      (order.paymentInfo.paymentMethod || '').toLowerCase().includes(query) ||
       (order.paymentInfo.transactionId || '').toLowerCase().includes(query) ||
-      (order.paymentInfo.paymentStatus || '').toLowerCase().includes(query)
+      (order.paymentInfo.paymentStatus || '').toLowerCase().includes(query) ||
+      refundAmount.toString().includes(query) || // ✅ Search refund amount
+      refundSku.toString().includes(query)       // ✅ Search refund SKU count
     );
 
     // Check if query matches date in specific format
@@ -353,11 +366,6 @@ const FinanceTable = () => {
                                   {order?.customerInfo?.customerName}
                                 </td>
                               )}
-                              {column === 'Payment Method' && (
-                                <td key="paymentMethod" className="text-xs p-3 text-gray-700">
-                                  {order?.paymentInfo?.paymentMethod}
-                                </td>
-                              )}
                               {column === 'Transaction ID' && (
                                 <td key="transactionId" className="text-xs p-3 text-gray-700">
                                   {order?.paymentInfo?.transactionId ? order?.paymentInfo?.transactionId : '--'}
@@ -377,9 +385,22 @@ const FinanceTable = () => {
                               )}
                               {column === 'Refunded Amount' && (
                                 <td key="refundedAmount" className="text-xs p-3 text-gray-700">
-                                  {order?.orderStatus === "Refunded"
-                                    ? Number(order?.returnInfo?.refundAmount) || 0
-                                    : 0}
+                                  {order?.orderStatus === "Refunded" && order?.returnInfo?.products
+                                    ? order.returnInfo.products
+                                      .filter(p => p.status === "Accepted")
+                                      .reduce((sum, p) => sum + ((p.finalUnitPrice || 0) * (p.sku || 0)), 0)
+                                    : 0
+                                  }
+                                </td>
+                              )}
+                              {column === 'Refunded Items' && (
+                                <td key="refundedItems" className="text-xs p-3 text-gray-700">
+                                  {order?.orderStatus === "Refunded" && order?.returnInfo?.products
+                                    ? order.returnInfo.products
+                                      .filter(p => p.status === "Accepted")
+                                      .reduce((sum, p) => sum + (p.sku || 0), 0) // use quantity instead of sku
+                                    : 0
+                                  }
                                 </td>
                               )}
                               {column === 'Payment Status' && (

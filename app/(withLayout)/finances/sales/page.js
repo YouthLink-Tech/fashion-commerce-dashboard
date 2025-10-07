@@ -1,6 +1,5 @@
-import FinancePerformance from '@/app/components/finances/FinancePerformance';
-import FinanceTable from '@/app/components/finances/FinanceTable';
-import RefundedPayments from '@/app/components/finances/RefundedPayments';
+import FinancesSalesChart from '@/app/components/finances/sales/FinancesSalesChart';
+import FinanceTable from '@/app/components/finances/sales/FinanceTable';
 import React from 'react';
 
 const FinancesSales = () => {
@@ -12,13 +11,14 @@ const FinancesSales = () => {
         <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Monitor your total orders, revenue, and refunds with real-time analytics, detailed graphs, and recent transaction insights.</p>
       </div>
 
-      <FinancePerformance />
-      <RefundedPayments />
+      <FinancesSalesChart />
+
       <div>
-        <h1 className='font-bold'>Recent Transactions</h1>
-        <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
+        <h1 className='font-bold text-base lg:text-xl'>Recent Transactions</h1>
+        <p className='pt-1 pb-6 text-neutral-500 text-sm font-semibold'>Please use the following table to view your transactions.</p>
         <FinanceTable />
       </div>
+
     </div>
   );
 };
