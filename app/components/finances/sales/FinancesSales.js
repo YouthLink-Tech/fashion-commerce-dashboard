@@ -3,17 +3,8 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { Checkbox, CheckboxGroup, DateRangePicker, Spinner } from '@nextui-org/react';
+import { DateRangePicker, Spinner } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
 import SummaryCards from './SummaryCards';
 import FinanceBarChart from './FinanceBarChart';
 
