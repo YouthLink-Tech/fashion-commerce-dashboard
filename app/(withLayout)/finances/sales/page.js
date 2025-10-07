@@ -1,8 +1,8 @@
-import FinancesSalesChart from '@/app/components/finances/sales/FinancesSalesChart';
+import FinancesSales from '@/app/components/finances/sales/FinancesSales';
 import FinanceTable from '@/app/components/finances/sales/FinanceTable';
 import React from 'react';
 
-const FinancesSales = () => {
+const FinancesSalesSubModule = () => {
   return (
     <div className='bg-gray-50 relative mx-auto px-6 pb-4'>
 
@@ -11,7 +11,7 @@ const FinancesSales = () => {
         <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Monitor your total orders, revenue, and refunds with real-time analytics, detailed graphs, and recent transaction insights.</p>
       </div>
 
-      <FinancesSalesChart />
+      <FinancesSales />
 
       <div>
         <h1 className='font-bold text-base lg:text-xl'>Recent Transactions</h1>
@@ -23,4 +23,4 @@ const FinancesSales = () => {
   );
 };
 
-export default FinancesSales;
+export default FinancesSalesSubModule;
