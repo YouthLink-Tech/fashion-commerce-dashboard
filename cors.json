@@ -4,7 +4,7 @@
       "http://localhost:3000",
       "https://poshax.shop",
       "https://px-portal-025.poshax.shop",
-      "https://poshax-backend-664306765395.asia-southeast1.run.app"
+      "https://fashion-commerce-backend-664306765395.asia-southeast1.run.app"
     ],
     "responseHeader": ["Content-Type"],
     "method": ["PUT", "GET", "POST", "DELETE", "HEAD"],
