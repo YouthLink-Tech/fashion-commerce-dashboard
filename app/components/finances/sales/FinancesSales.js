@@ -5,24 +5,27 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { DateRangePicker, Spinner } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
-import SummaryCards from './SummaryCards';
-import FinanceBarChart from './FinanceBarChart';
+import Profitability from '../../dashboard/charts/Profitability';
+import SalesPerformance from '../../dashboard/charts/SalesPerformance';
+// import SummaryCards from './SummaryCards';
 
 const FinancesSales = () => {
 
   const axiosSecure = useAxiosSecure();
   const [selectedDateRange, setSelectedDateRange] = useState(null);
-  const [range, setRange] = useState("today"); // default today
+  const [range, setRange] = useState("weekly"); // default today
   const [salesData, setSalesData] = useState([]);
-  const [cardsData, setCardsData] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalRefund: 0,
-  });
+  const [salesData2, setSalesData2] = useState([]);
+  // const [cardsData, setCardsData] = useState({
+  //   totalOrders: 0,
+  //   totalRevenue: 0,
+  //   totalRefund: 0,
+  // });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { data: session, status } = useSession();
   const [selectedBars, setSelectedBars] = useState(['Total Orders', 'Total Revenue', 'Total Refunds']);
+  const [selectedBars2, setSelectedBars2] = useState(['Total Revenue', 'COGS', 'Expenses']);
 
   // Format for API
   const formatDate = (dateObj) => {
@@ -43,7 +46,7 @@ const FinancesSales = () => {
     };
   }, [selectedDateRange]);
 
-  // Fetch sales trend
+  // Fetch dashboard data
   useEffect(() => {
 
     if (status !== "authenticated" || !session?.user?.accessToken) return;
@@ -71,15 +74,26 @@ const FinancesSales = () => {
             totalOrders: item.totalOrders ?? undefined,
             totalRevenue: item.totalRevenue ?? undefined,
             totalRefund: item.totalRefund ?? undefined,
+            totalExpenses: item.totalExpenses ?? undefined,
+            totalCOGS: item.totalCOGS ?? undefined
+          }))
+        );
+
+        setSalesData2(
+          data?.summaryData?.map((item) => ({
+            date: item.period,
+            totalRevenue: item.totalRevenue ?? undefined,
+            totalExpenses: item.totalExpenses ?? undefined,
+            totalCOGS: item.totalCOGS ?? undefined
           }))
         );
 
         // Set cards data
-        setCardsData({
-          totalOrders: data.totalOrders,
-          totalRevenue: data.totalRevenue,
-          totalRefund: data.totalRefund,
-        });
+        // setCardsData({
+        //   totalOrders: data.totalOrders,
+        //   totalRevenue: data.totalRevenue,
+        //   totalRefund: data.totalRefund,
+        // });
 
       } catch (err) {
         console.error("Error fetching sales trend:", err);
@@ -94,53 +108,14 @@ const FinancesSales = () => {
   // Reset
   const handleReset = () => {
     setSelectedDateRange(null);
-    setRange("today");
-  };
-
-  // Compute dynamic Y-axis domains
-  const yAxisDomains = useMemo(() => {
-    if (!salesData || salesData.length === 0) return { left: [0, 'auto'], right: [0, 'auto'] };
-
-    let leftValues = [], rightValues = [];
-
-    salesData.forEach(item => {
-      if (selectedBars.includes('Total Orders')) leftValues.push(item.totalOrders);
-      if (selectedBars.includes('Total Revenue')) rightValues.push(item.totalRevenue);
-      if (selectedBars.includes('Total Refunds')) rightValues.push(item.totalRefund);
-    });
-
-    const computeDomain = (values) => {
-      if (!values.length) return [0, 1]; // default
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const padding = (max - min) * 0.2 || max * 0.2; // 50% padding or half max if min=max
-      return [Math.max(0, min - padding), max + padding];
-    };
-
-    return {
-      left: computeDomain(leftValues),
-      right: computeDomain(rightValues),
-    };
-  }, [salesData, selectedBars]);
-
-  // Dynamic formatter: if daily → show hours, else show dates
-  const formatXAxis = (value) => {
-    if ((range === "today" || range === "yesterday") && !startDate && !endDate) {
-      // value like "2025-09-09 13:00"
-      return value.split(" ")[1]; // HH:00
-    }
-    // value like "2025-09-09"
-    return new Date(value).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
+    setRange("weekly");
   };
 
   return (
-    <div className="space-y-5 relative mb-10">
+    <div className="space-y-5 relative my-10">
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-end gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row items-center justify-start gap-3 mb-4">
         <div className="flex gap-2">
           {["today", "yesterday", "weekly", "monthly"].map((r) => (
             <button
@@ -191,15 +166,22 @@ const FinancesSales = () => {
         <div className="flex flex-col xl:flex-row gap-8 w-full">
 
           {/* Summary Section */}
-          <SummaryCards cardsData={cardsData} />
+          {/* <SummaryCards cardsData={cardsData} /> */}
 
-          <FinanceBarChart
+          <SalesPerformance
             salesData={salesData}
-            formatXAxis={formatXAxis}
-            yAxisDomains={yAxisDomains}
+            range={range}
             selectedBars={selectedBars}
             setSelectedBars={setSelectedBars}
           />
+
+          <Profitability
+            salesData2={salesData2}
+            range={range}
+            selectedBars2={selectedBars2}
+            setSelectedBars2={setSelectedBars2}
+          />
+
         </div>
 
       )}

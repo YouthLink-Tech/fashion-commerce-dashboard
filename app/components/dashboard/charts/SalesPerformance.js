@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   XAxis,
   YAxis,
@@ -9,12 +9,51 @@ import {
 } from "recharts";
 import { Checkbox, CheckboxGroup } from '@nextui-org/react';
 
-const FinanceBarChart = ({ salesData, formatXAxis, yAxisDomains, selectedBars, setSelectedBars }) => {
+const SalesPerformance = ({ salesData, range, selectedBars, setSelectedBars }) => {
 
   const handleBarChange = (values) => {
     // Ensure at least one checkbox is always selected
     if (values.length === 0) return;
     setSelectedBars(values);
+  };
+
+  // Compute dynamic Y-axis domains
+  const yAxisDomains = useMemo(() => {
+    if (!salesData || salesData.length === 0) return { left: [0, 'auto'], right: [0, 'auto'] };
+
+    let leftValues = [], rightValues = [];
+
+    salesData.forEach(item => {
+      if (selectedBars.includes('Total Orders')) leftValues.push(item.totalOrders);
+      if (selectedBars.includes('Total Revenue')) rightValues.push(item.totalRevenue);
+      if (selectedBars.includes('Total Refunds')) rightValues.push(item.totalRefund);
+    });
+
+    const computeDomain = (values) => {
+      if (!values.length) return [0, 1]; // default
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const padding = (max - min) * 0.2 || max * 0.2; // 50% padding or half max if min=max
+      return [Math.max(0, min - padding), max + padding];
+    };
+
+    return {
+      left: computeDomain(leftValues),
+      right: computeDomain(rightValues),
+    };
+  }, [salesData, selectedBars]);
+
+  // Dynamic formatter: if daily → show hours, else show dates
+  const formatXAxis = (value) => {
+    if ((range === "today" || range === "yesterday") && !startDate && !endDate) {
+      // value like "2025-09-09 13:00"
+      return value.split(" ")[1]; // HH:00
+    }
+    // value like "2025-09-09"
+    return new Date(value).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -55,7 +94,7 @@ const FinanceBarChart = ({ salesData, formatXAxis, yAxisDomains, selectedBars, s
 
   return (
     <div className="flex flex-col w-full bg-white border border-gray-200 drop-shadow-sm rounded-2xl py-8 px-0">
-      <h2 className="text-lg md:text-xl font-bold text-gray-800 pl-16">Sales Performance Overview</h2>
+      <h2 className="text-lg md:text-xl font-bold text-gray-800 pl-16">Sales Performance</h2>
 
       <div className="w-full h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -170,4 +209,4 @@ const FinanceBarChart = ({ salesData, formatXAxis, yAxisDomains, selectedBars, s
   );
 };
 
-export default FinanceBarChart;
+export default SalesPerformance;

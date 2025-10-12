@@ -6,9 +6,9 @@ import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { TbColumnInsertRight } from 'react-icons/tb';
-import SmallHeightLoading from '../../shared/Loading/SmallHeightLoading';
 import CustomPagination from '../../shared/pagination/CustomPagination';
 import PaginationSelect from '../../shared/pagination/PaginationSelect';
+import Loading from '../../shared/Loading/Loading';
 
 const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Transaction ID', 'Order Amount', 'Refund Status', 'Refunded Amount', 'Refunded Items', 'Payment Status'];
 
@@ -175,153 +175,102 @@ const FinanceTable = () => {
   }, [paginatedOrders]);
 
   if (isOrderPending) {
-    return <SmallHeightLoading />
+    return <Loading />
   }
 
   return (
     <div className='relative'>
 
-      <div className='flex flex-col lg:flex-row items-center justify-evenly gap-6'>
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6 w-full">
 
-        <div className='w-full'>
-          <li className="flex items-center relative group flex-1">
-            <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-              <g>
-                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-              </g>
-            </svg>
-            <input
-              type="search"
-              placeholder="Search By Order Details..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-sm h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white transition-[border-color,background-color] font-semibold text-neutral-600 duration-300 ease-in-out focus:outline-none focus:border-[#F4D3BA] hover:shadow-none focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base shadow placeholder:text-neutral-400"
-            />
-          </li>
+        <div className='flex-1 w-full'>
+          <h3 className='text-start font-semibold text-lg md:text-xl lg:text-2xl 2xl:text-3xl text-neutral-800'>Recent Sales</h3>
+          <p className='pt-2 text-start font-semibold text-xs 2xl:text-sm text-neutral-500'>Please use the following table to view your transactions.</p>
         </div>
 
-        <div className="flex items-center gap-6 flex-wrap w-full">
-          <select
-            id="paymentStatusFilter"
-            value={selectedPaymentStatus}
-            onChange={(e) => setSelectedPaymentStatus(e.target.value)}
-            className="border border-gray-300 py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#9f511681] focus:border-transparent bg-white transition-all duration-200 ease-in-out w-full lg:w-1/2"
-          >
-            <option value="All">All</option>
-            <option value="Paid">Paid</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Refunded">Refunded</option>
-          </select>
-        </div>
+        <div className="flex items-center justify-end gap-3 lg:gap-4 flex-wrap lg:flex-nowrap w-full lg:w-auto">
 
-        <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] px-3 py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
-            CUSTOMIZE
-            <svg
-              className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className='w-full lg:max-w-lg'>
+            <li className="flex items-center relative group flex-1">
+              <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+                <g>
+                  <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                </g>
+              </svg>
+              <input
+                type="search"
+                placeholder="Search By Sales Details..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full text-sm h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white transition-[border-color,background-color] font-semibold text-neutral-600 duration-300 ease-in-out focus:outline-none focus:border-[#F4D3BA] hover:shadow-none focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base shadow placeholder:text-neutral-400"
+              />
+            </li>
+          </div>
+
+          <div className="flex items-center gap-6 flex-wrap w-full lg:min-w-[350px] lg:max-w-sm">
+            <select
+              id="paymentStatusFilter"
+              value={selectedPaymentStatus}
+              onChange={(e) => setSelectedPaymentStatus(e.target.value)}
+              className="border border-gray-300 py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#9f511681] focus:border-transparent bg-white transition-all duration-200 ease-in-out w-full lg:w-1/2"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+              <option value="All">All</option>
+              <option value="Paid">Paid</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Refunded">Refunded</option>
+            </select>
+          </div>
 
-          {openDropdown === 'other' && (
-            <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div ref={dropdownRef} className="relative inline-block text-left z-50">
+            <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] px-3 py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+              CUSTOMIZE
+              <svg
+                className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-              <div className='p-1'>
+            {openDropdown === 'other' && (
+              <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 
-                <div className='flex items-center gap-2 mb-2'>
+                <div className='p-1'>
 
-                  <DateRangePicker
-                    label="Order Duration"
-                    visibleMonths={1}
-                    onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
-                    value={selectedDateRange} // Ensure this matches the expected format
-                    maxValue={currentDate}
-                  />
+                  <div className='flex items-center gap-2 mb-2'>
 
-                  {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
-                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-                      <IoMdClose size={20} />
-                    </button>
-                  )}
+                    <DateRangePicker
+                      label="Order Duration"
+                      visibleMonths={1}
+                      onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                      value={selectedDateRange} // Ensure this matches the expected format
+                      maxValue={currentDate}
+                    />
+
+                    {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                      <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                        <IoMdClose size={20} />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Choose Columns Button */}
+                  <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); }}>
+                    Choose Columns <TbColumnInsertRight size={20} />
+                  </button>
+
                 </div>
 
-                {/* Choose Columns Button */}
-                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); }}>
-                  Choose Columns <TbColumnInsertRight size={20} />
-                </button>
-
               </div>
+            )}
+          </div>
 
-            </div>
-          )}
         </div>
 
       </div>
-
-      {/* Column Selection Modal */}
-      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
-          <ModalBody className="modal-body-scroll">
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-                      {columnOrder.map((column, index) => (
-                        <Draggable key={column} draggableId={column} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="flex items-center justify-between p-2 border-b"
-                            >
-                              <Checkbox
-                                value={column}
-                                isChecked={selectedColumns.includes(column)}
-                                onChange={() => {
-                                  // Toggle column selection
-                                  if (selectedColumns.includes(column)) {
-                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
-                                  } else {
-                                    setSelectedColumns([...selectedColumns, column]);
-                                  }
-                                }}
-                              >
-                                {column}
-                              </Checkbox>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </CheckboxGroup>
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </ModalBody>
-          <ModalFooter className='flex justify-between items-center'>
-            <div className='flex items-center gap-2'>
-              <Button onPress={handleDeselectAll} size="sm" color="default" variant="flat">
-                Deselect All
-              </Button>
-              <Button onPress={handleSelectAll} size="sm" color="primary" variant="flat">
-                Select All
-              </Button>
-            </div>
-            <Button variant="solid" color="primary" size='sm' onPress={handleSave}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       {/* TABLE */}
       <div className="custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
@@ -337,7 +286,7 @@ const FinanceTable = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedOrders?.length === 0 ?
               <tr>
-                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-48 xl:pt-56 2xl:py-60">
+                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:py-40 py-32 lg:py-48 xl:py-56 2xl:py-[310px]">
                   No orders found matching your criteria. Please adjust your filters or check back later.
                 </td>
               </tr>
@@ -422,8 +371,68 @@ const FinanceTable = () => {
 
       </div>
 
+      {/* Column Selection Modal */}
+      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
+          <ModalBody className="modal-body-scroll">
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                      {columnOrder.map((column, index) => (
+                        <Draggable key={column} draggableId={column} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="flex items-center justify-between p-2 border-b"
+                            >
+                              <Checkbox
+                                value={column}
+                                isChecked={selectedColumns.includes(column)}
+                                onChange={() => {
+                                  // Toggle column selection
+                                  if (selectedColumns.includes(column)) {
+                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                  } else {
+                                    setSelectedColumns([...selectedColumns, column]);
+                                  }
+                                }}
+                              >
+                                {column}
+                              </Checkbox>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </CheckboxGroup>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </ModalBody>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onPress={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onPress={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
+            <Button variant="solid" color="primary" size='sm' onPress={handleSave}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       {/* Pagination Button */}
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center py-3">
+      <div className="flex flex-col md:flex-row gap-4 justify-center items-center pt-3">
         <CustomPagination
           totalPages={totalPages}
           currentPage={page}

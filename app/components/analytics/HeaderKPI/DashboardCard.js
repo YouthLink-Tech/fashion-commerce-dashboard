@@ -36,7 +36,7 @@ const DashboardCard = ({ icon: Icon, title, unit, formula, value, loading, error
 
       <div className="flex items-center gap-1 2xl:gap-2">
         <p className="inline-flex items-center justify-center border rounded-full p-2 bg-gray-200 shrink-0">
-          <Icon className="text-gray-700" size={18} strokeWidth={0.5} />
+          <Icon className="text-blue-700" size={18} strokeWidth={1} />
         </p>
         <h1 className="font-semibold text-neutral-700 text-sm xl:text-base 2xl:text-lg whitespace-nowrap">
           {title}

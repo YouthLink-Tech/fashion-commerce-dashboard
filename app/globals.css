@@ -553,24 +553,24 @@
 
 /* Base styles for small screens (mobile) */
 .custom-max-discount {
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
+  min-height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-discount {
-    min-height: calc(100vh - 150px);
-    max-height: calc(100vh - 150px);
+    min-height: calc(100vh - 170px);
+    max-height: calc(100vh - 170px);
   }
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 1024px) {
   .custom-max-discount {
-    min-height: calc(100vh - 200px);
-    max-height: calc(100vh - 200px);
+    min-height: calc(100vh - 220px);
+    max-height: calc(100vh - 220px);
   }
 }
 

@@ -4,10 +4,6 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
 import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
-import TopProducts from '@/app/components/analytics/TopProducts';
-import LowStock from '@/app/components/analytics/LowStock';
-import Header from '@/app/components/analytics/HeaderKPI/Header';
-import MarketingROI from '@/app/components/analytics/MarketingROI/MarketingROI';
 
 const AnalyticsPage = () => {
   return (
@@ -41,40 +37,12 @@ const AnalyticsPage = () => {
           <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Your Analytics Details & performance overview</p>
         </div>
 
-        <Header />
-
         <div className="flex flex-col md:flex-row flex-wrap justify-start items-center gap-6 mt-6">
           <div className="flex-1 w-full md:w-auto">
             <SalesTrendChart />
           </div>
           <div className="flex-1 w-full md:w-auto">
             <ProfitabilityBreakdown />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <div className="h-full">
-            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-              <LowStock />
-            </div>
-          </div>
-          <div className="h-full">
-            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-              <TopProducts />
-            </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <div className="h-full">
-            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-              <MarketingROI />
-            </div>
-          </div>
-          <div className="h-full">
-            {/* <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
-
-            </div> */}
           </div>
         </div>
 

@@ -6,12 +6,12 @@ import { IoMdClose } from 'react-icons/io';
 import { DateRangePicker } from '@nextui-org/react';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import DashboardCard from './DashboardCard';
-import { CiDollar } from "react-icons/ci";
+import { CiDollar, CiPercent, CiReceipt } from "react-icons/ci";
 import { BsGraphUpArrow } from "react-icons/bs";
-import { CiPercent } from 'react-icons/ci';
 import { GoCheckCircle } from "react-icons/go";
 import { IoCartOutline } from "react-icons/io5";
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
+import { FcUndo } from "react-icons/fc";
 
 const Header = () => {
 
@@ -57,7 +57,7 @@ const Header = () => {
           // Custom range
           params = { startDate, endDate };
         } else if (range) {
-          // Predefined range: daily / weekly / monthly
+          // Predefined range: today / yesterday / weekly / monthly
           params = { range };
         }
 
@@ -90,6 +90,25 @@ const Header = () => {
       icon: CiDollar,
       unit: "taka",
       formula: "Total Revenue = SUM(Sales Amount - Shipping Charge)",
+      loading,
+      error,
+    },
+    {
+      title: "Total Orders",
+      value: headerData?.totalOrders || 0,
+      icon: CiReceipt,
+      unit: "",
+      formula: "Total Orders = Count(Unique Order IDs)",
+      loading,
+      error,
+    },
+    {
+      title: "Total Refunded",
+      value: headerData?.totalRefunded || 0,
+      icon: FcUndo,
+      unit: "taka",
+      formula: `Total Refunded = SUM(FinalUnitPrice × Quantity) 
+for Accepted Products in Refunded Orders`,
       loading,
       error,
     },
@@ -147,7 +166,7 @@ COGS = SUM(Unit Cost × Units Sold)`,
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-start md:items-center justify-start gap-3 mb-4">
         <div className="flex gap-2">
-          {["daily", "weekly", "monthly"].map((r) => (
+          {["today", "yesterday", "weekly", "monthly"].map((r) => (
             <button
               key={r}
               onClick={() => {
@@ -159,7 +178,7 @@ COGS = SUM(Unit Cost × Units Sold)`,
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
             >
-              {r === "daily" ? "Today" : r === "weekly" ? "Last 7 Days" : "Last Month"}
+              {r === "today" ? "Today" : r === "yesterday" ? "Yesterday" : r === "weekly" ? "Last 7 Days" : "Last Month"}
             </button>
           ))}
         </div>
@@ -181,7 +200,7 @@ COGS = SUM(Unit Cost × Units Sold)`,
       </div>
 
       <div className='overflow-x-auto custom-scrollbar'>
-        <div className="flex 2xl:grid 2xl:grid-cols-6 gap-4 px-2 sm:px-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-2 sm:px-0">
           {cards.map((card, i) => (
             <DashboardCard
               key={i}

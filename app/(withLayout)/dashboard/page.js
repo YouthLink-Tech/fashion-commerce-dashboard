@@ -2,7 +2,12 @@ import React from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
+// import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
+import Header from '@/app/components/analytics/HeaderKPI/Header';
+import MarketingROI from '@/app/components/analytics/MarketingROI/MarketingROI';
+import TopProducts from '@/app/components/analytics/TopProducts';
+import LowStock from '@/app/components/analytics/LowStock';
+import FinancesSales from '@/app/components/finances/sales/FinancesSales';
 
 const Dashboard = () => {
 
@@ -30,16 +35,39 @@ const Dashboard = () => {
 
       <div className='relative mx-auto px-6'>
 
-        <div className='w-full'>
-          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>OVERVIEW</h3>
+        <div className='w-full mb-6'>
+          <h3 className='text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-800'>Dashboard Overview</h3>
+          <p className='pt-2 text-start font-semibold text-sm text-neutral-500'>Track performance, revenue, and engagement in one view.</p>
         </div>
 
-        <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
+        {/* <TodaySummaryTabs /> */}
+        <Header />
 
-          <TodaySummaryTabs />
+        <FinancesSales />
 
-          <div className='mt-6 border'>
-            {/* <h1 className='font-semibold text-neutral-700'>Todays orders</h1> */}
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <div className="h-full">
+            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+              <LowStock />
+            </div>
+          </div>
+          <div className="h-full">
+            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+              <TopProducts />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <div className="h-full">
+            <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+              <MarketingROI />
+            </div>
+          </div>
+          <div className="h-full">
+            {/* <div className="p-8 bg-white rounded-lg drop-shadow overflow-x-auto h-full">
+
+            </div> */}
           </div>
         </div>
 
