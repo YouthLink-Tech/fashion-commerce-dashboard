@@ -45,7 +45,7 @@ const EditPaymentMethod = () => {
 
     const fetchShipmentHandler = async () => {
       try {
-        const { data } = await axiosSecure.get(`/getSinglePaymentMethod/${id}`);
+        const { data } = await axiosSecure.get(`/api/payment-method/single/${id}`);
         setValue('paymentMethodName', data?.paymentMethodName);
         setPaymentDetails(data?.paymentDetails);
         setImage(data?.imageUrl);
@@ -97,7 +97,7 @@ const EditPaymentMethod = () => {
         imageUrl: image || DEFAULT_IMAGE_URL,
       };
 
-      const res = await axiosSecure.put(`/editPaymentMethod/${id}`, updatedPaymentMethod);
+      const res = await axiosSecure.put(`/api/payment-method/edit/${id}`, updatedPaymentMethod);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

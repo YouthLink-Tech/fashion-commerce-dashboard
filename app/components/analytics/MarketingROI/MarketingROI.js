@@ -58,7 +58,7 @@ const MarketingROI = () => {
           params = { range };
         }
 
-        const { data } = await axiosSecure.get("/analytics/marketing", { params });
+        const { data } = await axiosSecure.get("/api/dashboard/marketingROI", { params });
 
         // Transform: backend returns { trendData: [{ period, revenue }] }
         setMarketingData(

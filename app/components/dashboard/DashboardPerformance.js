@@ -9,7 +9,7 @@ import Profitability from '../../components/dashboard/charts/Profitability';
 import SalesPerformance from '../../components/dashboard/charts/SalesPerformance';
 // import SummaryCards from './SummaryCards';
 
-const FinancesOverview = () => {
+const DashboardPerformance = () => {
 
   const axiosSecure = useAxiosSecure();
   const [selectedDateRange, setSelectedDateRange] = useState(null);
@@ -46,12 +46,12 @@ const FinancesOverview = () => {
     };
   }, [selectedDateRange]);
 
-  // Fetch dashboard data
+  // Fetch dashboard performance data
   useEffect(() => {
 
     if (status !== "authenticated" || !session?.user?.accessToken) return;
 
-    const fetchFinancesOverview = async () => {
+    const fetchDashboardPerformance = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -65,7 +65,7 @@ const FinancesOverview = () => {
           params = { range };
         }
 
-        const { data } = await axiosSecure.get("/finances/sales", { params });
+        const { data } = await axiosSecure.get("/api/dashboard/performance", { params });
 
         // Transform: backend returns { trendData: [{ period, revenue }] }
         setSalesData(
@@ -100,7 +100,7 @@ const FinancesOverview = () => {
         setLoading(false);
       }
     };
-    fetchFinancesOverview();
+    fetchDashboardPerformance();
   }, [startDate, endDate, range, axiosSecure, session?.user?.accessToken, status,]);
 
   // Reset
@@ -198,4 +198,4 @@ const FinancesOverview = () => {
   );
 };
 
-export default FinancesOverview;
+export default DashboardPerformance;

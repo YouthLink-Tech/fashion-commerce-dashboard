@@ -8,7 +8,7 @@ const useAnalyticsLowStock = () => {
   const { data: analyticsLowStock, isPending: isAnalyticsLowStockPending, refetch } = useQuery({
     queryKey: ["analyticsLowStock"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/analytics/low-stock");
+      const res = await axiosSecure.get("/api/dashboard/low-stock");
       return res?.data?.lowStockProducts;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

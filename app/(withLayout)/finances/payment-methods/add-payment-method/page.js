@@ -69,7 +69,7 @@ const AddPaymentMethod = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addPaymentMethod', paymentData);
+      const response = await axiosSecure.post('/api/payment-method/add', paymentData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

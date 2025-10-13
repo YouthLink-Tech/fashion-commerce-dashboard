@@ -64,7 +64,7 @@ const SalesTrendChart = () => {
           params = { range };
         }
 
-        const { data } = await axiosSecure.get("/analytics/sales-trend", { params });
+        const { data } = await axiosSecure.get("/api/analytics/sales-trend", { params });
 
         // Transform: backend returns { trendData: [{ period, revenue }] }
         setSalesData(

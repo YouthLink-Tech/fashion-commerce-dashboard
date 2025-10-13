@@ -8,7 +8,7 @@ const useTopProducts = () => {
   const { data: topProducts, isPending: isTopProductsPending, refetch } = useQuery({
     queryKey: ["topProductsList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/analytics/top-products");
+      const res = await axiosSecure.get("/api/dashboard/top-products");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

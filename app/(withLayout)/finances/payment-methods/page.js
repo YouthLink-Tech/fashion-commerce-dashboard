@@ -44,7 +44,7 @@ const PaymentMethods = () => {
       const paymentMethodData = { ...rest, status: !currentStatus };
 
       // Send the update request
-      const res = await axiosSecure.put(`/editPaymentMethod/${id}`, paymentMethodData);
+      const res = await axiosSecure.put(`/api/payment-method/edit/${id}`, paymentMethodData);
       if (res.data.modifiedCount > 0) {
         refetch(); // Refetch the promo list to get the updated data
         toast.custom((t) => (
@@ -101,7 +101,7 @@ const PaymentMethods = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deletePaymentMethod/${id}`);
+          const res = await axiosSecure.delete(`/api/payment-method/delete/${id}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (

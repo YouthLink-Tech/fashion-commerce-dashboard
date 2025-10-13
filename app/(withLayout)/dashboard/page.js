@@ -6,7 +6,7 @@ import Header from '@/app/components/analytics/HeaderKPI/Header';
 import MarketingROI from '@/app/components/analytics/MarketingROI/MarketingROI';
 import TopProducts from '@/app/components/analytics/TopProducts';
 import LowStock from '@/app/components/analytics/LowStock';
-import FinancesOverview from '@/app/components/dashboard/FinancesOverview';
+import DashboardPerformance from '@/app/components/dashboard/DashboardPerformance';
 // import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
 
 const Dashboard = () => {
@@ -43,7 +43,7 @@ const Dashboard = () => {
         {/* <TodaySummaryTabs /> */}
         <Header />
 
-        <FinancesOverview />
+        <DashboardPerformance />
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="h-full">

@@ -3,7 +3,6 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import SalesTrendChart from '@/app/components/analytics/SalesTrendChart';
-import ProfitabilityBreakdown from '@/app/components/analytics/ProfitabilityBreakdown';
 
 const AnalyticsPage = () => {
   return (
@@ -42,7 +41,7 @@ const AnalyticsPage = () => {
             <SalesTrendChart />
           </div>
           <div className="flex-1 w-full md:w-auto">
-            <ProfitabilityBreakdown />
+
           </div>
         </div>
 

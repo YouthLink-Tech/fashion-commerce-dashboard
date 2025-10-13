@@ -8,7 +8,7 @@ const usePaymentMethods = () => {
   const { data: paymentMethodList, isPending: isPaymentMethodPending, refetch } = useQuery({
     queryKey: ["paymentMethodList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allPaymentMethods");
+      const res = await axiosSecure.get("/api/payment-method/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

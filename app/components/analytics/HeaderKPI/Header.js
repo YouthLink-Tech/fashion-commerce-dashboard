@@ -61,15 +61,15 @@ const Header = () => {
           params = { range };
         }
 
-        const { data } = await axiosSecure.get("/analytics/profitability", { params });
+        const { data } = await axiosSecure.get("/api/dashboard/summary", { params });
 
         // Transform: backend returns { trendData: [{ period, revenue }] }
         setHeaderData(
           data
         );
       } catch (err) {
-        console.error("Error fetching sales trend:", err);
-        setError("Failed to load sales data.");
+        console.error("Error fetching header data:", err);
+        setError("Failed to load header data.");
       } finally {
         setLoading(false);
       }
