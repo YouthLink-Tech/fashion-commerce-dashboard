@@ -206,7 +206,7 @@ const EditShipmentHandler = () => {
   if (status === "loading") return <Loading />;
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
@@ -221,118 +221,130 @@ const EditShipmentHandler = () => {
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-            {/* Shipment handler name Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Shipment Handler Name <span className="text-red-600 pl-1">*</span></label>
-              <input
-                type="text"
-                placeholder="Add Shipment Handler Name"
-                {...register('shipmentHandlerName', { required: 'Shipment handler Name is required' })}
-                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-              />
-              {errors.shipmentHandlerName && (
-                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.shipmentHandlerName.message}</p>
-              )}
-            </div>
+            <div className='flex flex-col md:flex-row justify-between items-center w-full gap-4 2xl:gap-6'>
 
-            {/* Contact person name of the Shipment handler Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Name <span className="text-red-600 pl-1">*</span></label>
-              <input
-                type="text"
-                placeholder="Add Contact Person Name"
-                {...register('contactPersonName', { required: 'Contact Person Name is required' })}
-                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-              />
-              {errors.contactPersonName && (
-                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonName.message}</p>
-              )}
-            </div>
-
-            {/* Contact person number of the Shipment handler Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Number <span className="text-red-600 pl-1">*</span></label>
-              <input
-                type="number"
-                placeholder="Add Contact Person Number"
-                {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
-                className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-              />
-              {errors.contactPersonNumber && (
-                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonNumber.message}</p>
-              )}
-            </div>
-
-            {/* Office Address of the Shipment handler Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Office Address</label>
-              <input
-                type="text"
-                placeholder="Add Office Address"
-                {...register('officeAddress')}
-                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-              />
-            </div>
-
-            {/* Tracking URL of the Shipment handler Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Tracking URL</label>
-              <input
-                type="text"
-                placeholder="Add tracking url"
-                {...register('trackingUrl')}
-                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-              />
-            </div>
-
-            {/* Delivery type of the Shipment handler Input */}
-            <div className="flex flex-col w-full gap-4">
-              <label className="flex justify-start font-semibold text-neutral-500 text-sm">Select Delivery Type <span className="text-red-600 pl-1">*</span></label>
-              {/* Standard Option */}
-              <div className='flex items-center gap-4'>
-                <div
-                  onClick={() => handleDeliveryType('STANDARD')}
-                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('STANDARD') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
-                    }`}
-                >
-                  <Image
-                    className="object-contain h-12 w-12 rounded-lg"
-                    src={standardImage}
-                    alt="standard image"
-                    height={400}
-                    width={400}
-                  />
-                  <h1 className="font-bold">STANDARD</h1>
-                </div>
-
-                {/* Express Option */}
-                <div
-                  onClick={() => handleDeliveryType('EXPRESS')}
-                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('EXPRESS') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
-                    }`}
-                >
-                  <Image
-                    className="object-contain h-12 w-12 rounded-lg"
-                    src={expressImage}
-                    alt="express image"
-                    height={400}
-                    width={400}
-                  />
-                  <h1 className="font-bold">EXPRESS</h1>
-                </div>
+              {/* Shipment handler name Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Shipment Handler Name <span className="text-red-600 pl-1">*</span></label>
+                <input
+                  type="text"
+                  placeholder="Add Shipment Handler Name"
+                  {...register('shipmentHandlerName', { required: 'Shipment handler Name is required' })}
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
+                {errors.shipmentHandlerName && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.shipmentHandlerName.message}</p>
+                )}
               </div>
+
+              {/* Contact person name of the Shipment handler Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Name <span className="text-red-600 pl-1">*</span></label>
+                <input
+                  type="text"
+                  placeholder="Add Contact Person Name"
+                  {...register('contactPersonName', { required: 'Contact Person Name is required' })}
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
+                {errors.contactPersonName && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonName.message}</p>
+                )}
+              </div>
+
+              {/* Contact person number of the Shipment handler Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Contact Person Number <span className="text-red-600 pl-1">*</span></label>
+                <input
+                  type="number"
+                  placeholder="Add Contact Person Number"
+                  {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
+                  className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
+                {errors.contactPersonNumber && (
+                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.contactPersonNumber.message}</p>
+                )}
+              </div>
+
             </div>
 
-            {/* Error Message of delivery type */}
-            {errors.deliveryType && (
-              <p className="text-left text-red-500 font-semibold text-xs">Please Select at least One Delivery Type.</p>
-            )}
+            <div className='flex flex-col md:flex-row flex-wrap lg:flex-nowrap justify-between items-center w-full gap-4 2xl:gap-6'>
 
-            {/* Hidden Input for Validation */}
-            <input
-              type="hidden"
-              {...register('deliveryType', { validate: (value) => value.length > 0 })}
-            />
+              {/* Office Address of the Shipment handler Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Office Address</label>
+                <input
+                  type="text"
+                  placeholder="Add Office Address"
+                  {...register('officeAddress')}
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
+              </div>
+
+              {/* Tracking URL of the Shipment handler Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-semibold text-neutral-500 pb-2 text-sm">Tracking URL</label>
+                <input
+                  type="text"
+                  placeholder="Add tracking url"
+                  {...register('trackingUrl')}
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                />
+              </div>
+
+              <div className='w-full'>
+
+                {/* Delivery type of the Shipment handler Input */}
+                <div className="flex flex-col w-full gap-2">
+                  <label className="flex justify-start font-semibold text-neutral-500 text-sm">Select Delivery Type <span className="text-red-600 pl-1">*</span></label>
+                  {/* Standard Option */}
+                  <div className='flex items-center gap-4'>
+                    <div
+                      onClick={() => handleDeliveryType('STANDARD')}
+                      className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('STANDARD') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+                        }`}
+                    >
+                      <Image
+                        className="object-contain h-11 w-11 rounded-lg"
+                        src={standardImage}
+                        alt="standard image"
+                        height={400}
+                        width={400}
+                      />
+                      <h1 className="font-bold text-sm">STANDARD</h1>
+                    </div>
+
+                    {/* Express Option */}
+                    <div
+                      onClick={() => handleDeliveryType('EXPRESS')}
+                      className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('EXPRESS') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+                        }`}
+                    >
+                      <Image
+                        className="object-contain h-11 w-11 rounded-lg"
+                        src={expressImage}
+                        alt="express image"
+                        height={400}
+                        width={400}
+                      />
+                      <h1 className="font-bold text-sm">EXPRESS</h1>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Error Message of delivery type */}
+                {errors.deliveryType && (
+                  <p className="text-left text-red-500 font-semibold text-xs pt-2">Please Select at least One Delivery Type.</p>
+                )}
+
+                {/* Hidden Input for Validation */}
+                <input
+                  type="hidden"
+                  {...register('deliveryType', { validate: (value) => value.length > 0 })}
+                />
+
+              </div>
+
+            </div>
 
           </div>
 
