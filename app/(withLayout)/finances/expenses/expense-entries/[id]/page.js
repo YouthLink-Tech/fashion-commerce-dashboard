@@ -58,7 +58,7 @@ const ExpenseEntries = () => {
 
     const fetchExpenseEntries = async () => {
       try {
-        const { data } = await axiosSecure.get(`/expense-entries/${id}`);
+        const { data } = await axiosSecure.get(`/api/expenses/entry/category/${id}`);
         setExpenseCategoryName(data?.expenseCategoryName);
         setExpenseEntries(data?.expenseEntries);
       } catch (error) {
@@ -1013,7 +1013,7 @@ const ExpenseEntries = () => {
                       }
 
                       // ✅ API call here
-                      const response = await axiosSecure.patch(`/update-expense-entry/${selectedEntry._id}`, payload);
+                      const response = await axiosSecure.patch(`/api/expenses/entry/${selectedEntry._id}`, payload);
 
                       if (response.status === 200) {
                         setExpenseEntries((prevEntries) =>

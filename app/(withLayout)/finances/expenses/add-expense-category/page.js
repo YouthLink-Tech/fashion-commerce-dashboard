@@ -75,7 +75,7 @@ const AddExpenseCategory = () => {
 
     try {
       // Submit expense category data
-      const response = await axiosSecure.post('/add-expense-category', expenseCategoryData);
+      const response = await axiosSecure.post('/api/expenses/category', expenseCategoryData);
 
       if (response.status === 201) {
         toast.custom((t) => (

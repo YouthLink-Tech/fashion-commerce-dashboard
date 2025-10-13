@@ -239,7 +239,7 @@ const AddExpenseEntry = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/add-expense-entry', expenseEntryData);
+      const response = await axiosSecure.post('/api/expenses/entry', expenseEntryData);
       if (response.status === 201) {
         toast.custom((t) => (
           <div

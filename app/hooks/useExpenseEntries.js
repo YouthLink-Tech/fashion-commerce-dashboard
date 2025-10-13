@@ -9,7 +9,7 @@ const useExpenseEntries = () => {
   const { data: expenseEntryList, isPending: isExpenseEntryPending, refetch } = useQuery({
     queryKey: ["expenseEntryList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/all-expense-entries");
+      const res = await axiosSecure.get("/api/expenses/entry");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds
