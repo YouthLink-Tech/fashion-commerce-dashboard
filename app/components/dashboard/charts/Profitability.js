@@ -9,7 +9,8 @@ import {
 } from "recharts";
 import { Checkbox, CheckboxGroup } from '@nextui-org/react';
 
-const Profitability = ({ salesData2, range, selectedBars2, setSelectedBars2 }) => {
+const Profitability = ({ salesData2, range, selectedBars2, setSelectedBars2, startDate,
+  endDate }) => {
 
   const handleBarChange = (values) => {
     // Ensure at least one checkbox is always selected

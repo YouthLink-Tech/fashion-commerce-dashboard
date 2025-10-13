@@ -5,11 +5,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { DateRangePicker, Spinner } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
-import Profitability from '../../dashboard/charts/Profitability';
-import SalesPerformance from '../../dashboard/charts/SalesPerformance';
+import Profitability from '../../components/dashboard/charts/Profitability';
+import SalesPerformance from '../../components/dashboard/charts/SalesPerformance';
 // import SummaryCards from './SummaryCards';
 
-const FinancesSales = () => {
+const FinancesOverview = () => {
 
   const axiosSecure = useAxiosSecure();
   const [selectedDateRange, setSelectedDateRange] = useState(null);
@@ -51,7 +51,7 @@ const FinancesSales = () => {
 
     if (status !== "authenticated" || !session?.user?.accessToken) return;
 
-    const fetchFinancesSales = async () => {
+    const fetchFinancesOverview = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -102,7 +102,7 @@ const FinancesSales = () => {
         setLoading(false);
       }
     };
-    fetchFinancesSales();
+    fetchFinancesOverview();
   }, [startDate, endDate, range, axiosSecure, session?.user?.accessToken, status,]);
 
   // Reset
@@ -173,6 +173,8 @@ const FinancesSales = () => {
             range={range}
             selectedBars={selectedBars}
             setSelectedBars={setSelectedBars}
+            startDate={startDate}
+            endDate={endDate}
           />
 
           <Profitability
@@ -180,6 +182,8 @@ const FinancesSales = () => {
             range={range}
             selectedBars2={selectedBars2}
             setSelectedBars2={setSelectedBars2}
+            startDate={startDate}
+            endDate={endDate}
           />
 
         </div>
@@ -196,4 +200,4 @@ const FinancesSales = () => {
   );
 };
 
-export default FinancesSales;
+export default FinancesOverview;

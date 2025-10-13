@@ -2,12 +2,12 @@ import React from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-// import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
 import Header from '@/app/components/analytics/HeaderKPI/Header';
 import MarketingROI from '@/app/components/analytics/MarketingROI/MarketingROI';
 import TopProducts from '@/app/components/analytics/TopProducts';
 import LowStock from '@/app/components/analytics/LowStock';
-import FinancesSales from '@/app/components/finances/sales/FinancesSales';
+import FinancesOverview from '@/app/components/dashboard/FinancesOverview';
+// import TodaySummaryTabs from '@/app/components/dashboard/TodaySummaryTabs';
 
 const Dashboard = () => {
 
@@ -43,7 +43,7 @@ const Dashboard = () => {
         {/* <TodaySummaryTabs /> */}
         <Header />
 
-        <FinancesSales />
+        <FinancesOverview />
 
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="h-full">

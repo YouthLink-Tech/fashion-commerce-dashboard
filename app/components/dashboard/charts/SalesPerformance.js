@@ -9,7 +9,8 @@ import {
 } from "recharts";
 import { Checkbox, CheckboxGroup } from '@nextui-org/react';
 
-const SalesPerformance = ({ salesData, range, selectedBars, setSelectedBars }) => {
+const SalesPerformance = ({ salesData, range, selectedBars, setSelectedBars, startDate,
+  endDate }) => {
 
   const handleBarChange = (values) => {
     // Ensure at least one checkbox is always selected
