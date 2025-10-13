@@ -9,7 +9,7 @@ const useTodaysOrders = () => {
   const { data: todaysOrders, isPending: isTodaysOrdersPending } = useQuery({
     queryKey: ["todaysOrders"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/dashboard/get-todays-orders");
+      const res = await axiosSecure.get("/api/dashboard/get-today-orders");
       return res?.data;
     },
     onError: (err) => {
