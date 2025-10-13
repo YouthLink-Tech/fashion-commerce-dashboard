@@ -74,8 +74,6 @@ const FinancesOverview = () => {
             totalOrders: item.totalOrders ?? undefined,
             totalRevenue: item.totalRevenue ?? undefined,
             totalRefund: item.totalRefund ?? undefined,
-            totalExpenses: item.totalExpenses ?? undefined,
-            totalCOGS: item.totalCOGS ?? undefined
           }))
         );
 
