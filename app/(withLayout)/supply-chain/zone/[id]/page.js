@@ -42,7 +42,7 @@ export default function EditShippingZone() {
 
     const fetchShippingZone = async () => {
       try {
-        const { data } = await axiosSecure.get(`/getSingleShippingZone/${params.id}`);
+        const { data } = await axiosSecure.get(`/api/shipping-zone/single/${params.id}`);
 
         setValue('shippingZone', data?.shippingZone);
         setSelectedCities(data?.selectedCity);
@@ -194,7 +194,7 @@ export default function EditShippingZone() {
         selectedCity: selectedCities
       };
 
-      const res = await axiosSecure.put(`/editShippingZone/${params.id}`, updatedShippingZone);
+      const res = await axiosSecure.put(`/api/shipping-zone/edit/${params.id}`, updatedShippingZone);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

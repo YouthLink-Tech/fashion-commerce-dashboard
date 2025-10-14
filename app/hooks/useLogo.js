@@ -8,7 +8,7 @@ const useLogo = () => {
   const { data: logoList, isPending: isLogoPending, refetch } = useQuery({
     queryKey: ["logoList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/get-all-logo");
+      const res = await axiosPublic.get("/api/logo/all");
       return res?.data;
     },
     onError: (err) => {

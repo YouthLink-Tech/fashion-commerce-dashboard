@@ -9,7 +9,7 @@ const useTopHeader = () => {
   const { data: topHeaderList, isPending: isTopHeaderPending, refetch } = useQuery({
     queryKey: ["topHeaderList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/get-all-header-collection");
+      const res = await axiosPublic.get("/api/top-header/all");
       return res?.data;
     },
     onError: (err) => {

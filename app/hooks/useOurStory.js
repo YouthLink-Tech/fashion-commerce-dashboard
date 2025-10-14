@@ -9,7 +9,7 @@ const useOurStory = () => {
   const { data: ourStoryList, isPending: isOurStoryPending, refetch } = useQuery({
     queryKey: ["ourStoryList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/get-all-story-collection-backend");
+      const res = await axiosSecure.get("/api/story/all-backend");
       return res?.data;
     },
     onError: (err) => {

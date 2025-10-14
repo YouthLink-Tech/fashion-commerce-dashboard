@@ -53,7 +53,7 @@ const AddFAQPage = () => {
         return;
       }
 
-      const res = await axiosSecure.post(`/add-faq`, faqData);
+      const res = await axiosSecure.post(`/api/faq/add`, faqData);
       if (res.data.insertedId) {
         toast.custom((t) => (
           <div

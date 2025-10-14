@@ -8,7 +8,7 @@ const useShippingZones = () => {
   const { data: shippingList, isPending: isShippingPending, refetch } = useQuery({
     queryKey: ["shippingList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allShippingZones");
+      const res = await axiosSecure.get("/api/shipping-zone/all");
       return res?.data;
     },
     onError: (err) => {

@@ -86,7 +86,7 @@ const HomepageSettings = () => {
           slides: slideEnabled ? data.slides : [],
         }
 
-        const response = await axiosSecure.put(`/update-top-header/${topHeaderId}`, topHeaderInformation);
+        const response = await axiosSecure.put(`/api/top-header/edit/${topHeaderId}`, topHeaderInformation);
 
         if (response.data.modifiedCount > 0) {
 

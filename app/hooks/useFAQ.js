@@ -9,7 +9,7 @@ const useFAQ = () => {
   const { data: faqList, isPending: isFAQPending } = useQuery({
     queryKey: ["faqList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/all-faqs");
+      const res = await axiosPublic.get("/api/faq/all");
       return res?.data;
     },
     onError: (err) => {

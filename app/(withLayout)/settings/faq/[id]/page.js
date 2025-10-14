@@ -36,7 +36,7 @@ const EditFAQPage = () => {
 
     const fetchFAQDetails = async () => {
       try {
-        const { data } = await axiosSecure.get(`/get-single-faq/${id}`);
+        const { data } = await axiosSecure.get(`/api/faq/single/${id}`);
 
         setValue('pageTitle', data?.pageTitle);
         setValue('faqDescription', data?.faqDescription);
@@ -72,7 +72,7 @@ const EditFAQPage = () => {
         faqs: data?.faqs
       }
 
-      const res = await axiosSecure.put(`/update-faqs/${id}`, faqData);
+      const res = await axiosSecure.put(`/api/faq/edit/${id}`, faqData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

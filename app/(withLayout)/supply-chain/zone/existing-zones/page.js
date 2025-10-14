@@ -77,7 +77,7 @@ const ExistingZones = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteShippingZone/${zoneId}`);
+          const res = await axiosSecure.delete(`/api/shipping-zone/delete/${zoneId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

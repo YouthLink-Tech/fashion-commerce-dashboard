@@ -54,7 +54,7 @@ const OurStories = () => {
       if (!selectedStoryId) return;
 
       try {
-        const { data } = await axiosSecure.get(`/get-single-story/${selectedStoryId}`);
+        const { data } = await axiosSecure.get(`/api/story/single/${selectedStoryId}`);
 
         if (data) {
           const fetchedStoryPublishDate = formatDate(data.storyPublishDate);
@@ -96,7 +96,7 @@ const OurStories = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/delete-story/${storyId}`);
+          const res = await axiosSecure.delete(`/api/story/delete/${storyId}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (
@@ -321,7 +321,7 @@ const OurStories = () => {
         contents: mergedStoryInformation
       };
 
-      const response = await axiosSecure.put(`/update-our-story/${selectedStoryId}`, editStoryInformation);
+      const response = await axiosSecure.put(`/api/story/edit/${selectedStoryId}`, editStoryInformation);
 
       if (response.data.modifiedCount > 0) {
         toast.custom((t) => (

@@ -34,7 +34,7 @@ const AddLocation = () => {
     }
 
     try {
-      const response = await axiosSecure.post('/addLocation', locationData);
+      const response = await axiosSecure.post('/api/location/add', locationData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div
@@ -98,7 +98,8 @@ const AddLocation = () => {
 
         <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='flex flex-col md:flex-row gap-4 md:gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
             {/* Location name Input */}
             <div className="w-full">
               <label htmlFor='locationName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Location Name <span className="text-red-600 pl-1">*</span></label>
@@ -143,7 +144,7 @@ const AddLocation = () => {
 
           </div>
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='flex flex-col md:flex-row gap-4 md:gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             {/* Location Address of the Location Input */}
             <div className="w-full">
@@ -159,31 +160,30 @@ const AddLocation = () => {
               )}
             </div>
 
-            <div className='flex items-center gap-6'>
-              <div className="w-full">
-                <label htmlFor='cityName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">City <span className="text-red-600 pl-1">*</span></label>
-                <input
-                  type="text"
-                  placeholder="Add City"
-                  {...register('cityName', { required: 'City is required' })}
-                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-                />
-                {errors.cityName && (
-                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.cityName.message}</p>
-                )}
-              </div>
-              <div className="w-full">
-                <label htmlFor='postalCode' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Postal Code <span className="text-red-600 pl-1">*</span></label>
-                <input
-                  type="number"
-                  placeholder="Add Postal Code"
-                  {...register('postalCode', { required: 'Postal Code is required' })}
-                  className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
-                />
-                {errors.postalCode && (
-                  <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.postalCode.message}</p>
-                )}
-              </div>
+            <div className="w-full">
+              <label htmlFor='cityName' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">City <span className="text-red-600 pl-1">*</span></label>
+              <input
+                type="text"
+                placeholder="Add City"
+                {...register('cityName', { required: 'City is required' })}
+                className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+              />
+              {errors.cityName && (
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.cityName.message}</p>
+              )}
+            </div>
+
+            <div className="w-full">
+              <label htmlFor='postalCode' className="flex justify-start font-semibold text-neutral-500 text-sm pb-2">Postal Code <span className="text-red-600 pl-1">*</span></label>
+              <input
+                type="number"
+                placeholder="Add Postal Code"
+                {...register('postalCode', { required: 'Postal Code is required' })}
+                className="custom-number-input h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+              />
+              {errors.postalCode && (
+                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.postalCode.message}</p>
+              )}
             </div>
 
           </div>

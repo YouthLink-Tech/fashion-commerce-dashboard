@@ -49,7 +49,7 @@ const EditShipmentHandler = () => {
 
     const fetchShipmentHandler = async () => {
       try {
-        const { data } = await axiosSecure.get(`/getSingleShipmentHandler/${id}`);
+        const { data } = await axiosSecure.get(`/api/shipment-handler/single/${id}`);
         setValue('shipmentHandlerName', data?.shipmentHandlerName);
         setValue('contactPersonName', data?.contactPersonName);
         setValue('contactPersonNumber', data?.contactPersonNumber);
@@ -158,7 +158,7 @@ const EditShipmentHandler = () => {
         deliveryType
       };
 
-      const res = await axiosSecure.put(`/editShipmentHandler/${id}`, updatedShipmentHandler);
+      const res = await axiosSecure.put(`/api/shipment-handler/edit/${id}`, updatedShipmentHandler);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

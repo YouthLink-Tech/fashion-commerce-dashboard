@@ -165,7 +165,7 @@ const LogoSettings = () => {
       };
 
       try {
-        const response = await axiosSecure.put(`/update-logo/${logoId}`, logoData);
+        const response = await axiosSecure.put(`/api/logo/edit/${logoId}`, logoData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div

@@ -8,7 +8,7 @@ const useLocations = () => {
   const { data: locationList, isPending: isLocationPending, refetch } = useQuery({
     queryKey: ["locationList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allLocations");
+      const res = await axiosSecure.get("/api/location/all");
       return res?.data;
     },
     onError: (err) => {

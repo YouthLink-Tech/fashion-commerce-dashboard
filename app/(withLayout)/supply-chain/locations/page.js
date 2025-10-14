@@ -45,7 +45,7 @@ const LocationsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteLocation/${locationId}`);
+          const res = await axiosSecure.delete(`/api/location/delete/${locationId}`);
           if (res?.data?.deleteResult?.deletedCount > 0) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (
@@ -118,7 +118,7 @@ const LocationsPage = () => {
       const locationData = { ...rest, status: !currentStatus };
 
       // Send the update request
-      const res = await axiosSecure.put(`/updateLocation/${id}`, locationData);
+      const res = await axiosSecure.put(`/api/location/edit/${id}`, locationData);
       if (res.data.modifiedCount > 0) {
         await refetch(); // Refetch the promo list to get the updated data
         toast.custom((t) => (

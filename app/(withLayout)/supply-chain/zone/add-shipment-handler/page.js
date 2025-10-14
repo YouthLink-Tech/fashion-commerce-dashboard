@@ -121,7 +121,7 @@ const AddShipmentHandler = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addShipmentHandler', shipmentData);
+      const response = await axiosSecure.post('/api/shipment-handler/add', shipmentData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

@@ -8,7 +8,7 @@ const useShipmentHandlers = () => {
   const { data: shipmentHandlerList, isPending: isShipmentHandlerPending, refetch } = useQuery({
     queryKey: ["shipmentHandlerList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allShipmentHandlers");
+      const res = await axiosSecure.get("/api/shipment-handler/all");
       return res?.data;
     },
     onError: (err) => {

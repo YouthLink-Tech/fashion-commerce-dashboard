@@ -244,7 +244,7 @@ const OurStoryNavbar = () => {
         contents: mergedStoryInformation
       };
 
-      const response = await axiosSecure.post('/add-our-story-information', storyInformation);
+      const response = await axiosSecure.post('/api/story/add', storyInformation);
 
       if (response.data.insertedId) {
         toast.custom((t) => (

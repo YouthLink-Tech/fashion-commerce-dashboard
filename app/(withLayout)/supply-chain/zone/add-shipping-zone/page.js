@@ -53,7 +53,7 @@ const AddShippingZone = () => {
 
     const fetchShipmentHandlerData = async () => {
       try {
-        const { data } = await axiosSecure.get(`/getSingleShipmentHandler/${selectedShipmentHandlerId}`);
+        const { data } = await axiosSecure.get(`/api/shipment-handler/single/${selectedShipmentHandlerId}`);
         setSelectedShipmentHandler(data); // Store fetched data in state
       } catch (error) {
         console.error(error);
@@ -170,7 +170,7 @@ const AddShippingZone = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteShipmentHandler/${id}`);
+          const res = await axiosSecure.delete(`/api/shipment-handler/delete/${id}`);
           if (res?.data?.deletedCount) {
             refetch();
             toast.custom((t) => (
@@ -281,7 +281,7 @@ const AddShippingZone = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addShippingZone', shippingData);
+      const response = await axiosSecure.post('/api/shipping-zone/add', shippingData);
       if (response?.data?.insertedId) {
 
         // Remove saved values after success
