@@ -93,7 +93,7 @@ const HomepageContent = () => {
       };
 
       try {
-        const response = await axiosSecure.put(`/editHeroBannerImageUrls/${bannerId}`, bannerData);
+        const response = await axiosSecure.put(`/api/hero-banner/edit/${bannerId}`, bannerData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div

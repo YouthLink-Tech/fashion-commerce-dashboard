@@ -12,7 +12,7 @@ const useHeroBannerImages = () => {
   } = useQuery({
     queryKey: ["heroBannerImageList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allHeroBannerImageUrls");
+      const res = await axiosPublic.get("/api/hero-banner/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds
