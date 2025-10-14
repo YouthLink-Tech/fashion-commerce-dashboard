@@ -9,7 +9,7 @@ const useLoginRegisterSlides = () => {
   const { data: loginRegisterImageList, isPending: isLoginRegisterImagePending, refetch } = useQuery({
     queryKey: ["loginRegisterImageList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allLoginRegisterImageUrls");
+      const res = await axiosPublic.get("/api/login-register-images/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

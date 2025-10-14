@@ -9,7 +9,7 @@ const useMarketingBanners = () => {
   const { data: marketingBannerList, isPending: isMarketingBannerPending, refetch } = useQuery({
     queryKey: ["marketingBannerList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allMarketingBanners");
+      const res = await axiosPublic.get("/api/marketing-banner/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

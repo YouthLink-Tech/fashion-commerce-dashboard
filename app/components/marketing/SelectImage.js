@@ -21,7 +21,7 @@ const SelectImage = ({ previousImages, setImage, isOpen, onOpen, onOpenChange, a
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete("/deleteMarketingBannerImage", {
+          const res = await axiosSecure.delete("/api/marketing-banner/delete", {
             data: { imageUrl: imgUrl },
           });
           if (res.data.success) {

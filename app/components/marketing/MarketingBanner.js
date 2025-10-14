@@ -153,7 +153,7 @@ const MarketingBanner = () => {
 
       try {
 
-        const response = await axiosSecure.put(`/editMarketingBanner/${bannerId}`, bannerData);
+        const response = await axiosSecure.put(`/api/marketing-banner/edit/${bannerId}`, bannerData);
         if (response.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div

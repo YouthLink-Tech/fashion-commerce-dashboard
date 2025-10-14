@@ -165,7 +165,7 @@ const LoginRegisterSlides = () => {
     try {
       const loginRegisterImageUrls = { urls: uploadedImageUrls };
       if (loginRegisterImageList?.[0]?._id) {
-        const res = await axiosSecure.put(`/editLoginRegisterImageUrls/${loginRegisterImageList[0]._id}`, loginRegisterImageUrls);
+        const res = await axiosSecure.put(`/api/login-register-images/edit/${loginRegisterImageList[0]._id}`, loginRegisterImageUrls);
         if (res.data.modifiedCount > 0) {
           toast.custom((t) => (
             <div
@@ -205,7 +205,7 @@ const LoginRegisterSlides = () => {
           toast.error('No changes detected!');
         }
       } else {
-        const response = await axiosSecure.post('/addLoginRegisterImageUrls', loginRegisterImageUrls);
+        const response = await axiosSecure.post('/api/login-register-images/add', loginRegisterImageUrls);
         if (response.data.insertedId) {
           toast.custom((t) => (
             <div
