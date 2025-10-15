@@ -9,7 +9,7 @@ const useVendors = () => {
   const { data: vendorList, isPending: isVendorPending, refetch } = useQuery({
     queryKey: ["vendorList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allVendors");
+      const res = await axiosSecure.get("/api/vendor/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

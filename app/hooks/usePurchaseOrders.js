@@ -8,7 +8,7 @@ const usePurchaseOrders = () => {
   const { data: purchaseOrderList, isPending: isPurchaseOrderPending, refetch } = useQuery({
     queryKey: ["purchaseOrderList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allPurchaseOrders");
+      const res = await axiosSecure.get("/api/purchase-order/all");
       return res?.data;
     },
     onError: (err) => {

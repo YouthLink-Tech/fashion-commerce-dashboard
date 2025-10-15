@@ -9,7 +9,7 @@ const useTags = () => {
   const { data: tagList, isPending: isTagPending, refetch } = useQuery({
     queryKey: ["tagList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allTags");
+      const res = await axiosSecure.get("/api/tag/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

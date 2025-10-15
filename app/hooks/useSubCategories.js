@@ -9,7 +9,7 @@ const useSubCategories = () => {
   const { data: subCategoryList, isPending: isSubCategoryPending, refetch } = useQuery({
     queryKey: ["subCategoryList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allSubCategories");
+      const res = await axiosSecure.get("/api/category/all-sub-categories");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

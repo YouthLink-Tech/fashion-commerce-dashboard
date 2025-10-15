@@ -93,7 +93,7 @@ export default function EditCategory() {
 
     const fetchCategory = async () => {
       try {
-        const res = await axiosSecure.get(`/allCategories/${params.id}`);
+        const res = await axiosSecure.get(`/api/category/single/${params.id}`);
         const category = res.data;
         setValue('category', category?.label);
         setCategoryKey(category?.key);
@@ -416,7 +416,7 @@ export default function EditCategory() {
         imageUrl
       };
 
-      const res = await axiosSecure.put(`/editCategory/${params.id}`, updatedCategory);
+      const res = await axiosSecure.put(`/api/category/edit/${params.id}`, updatedCategory);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

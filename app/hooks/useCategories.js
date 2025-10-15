@@ -9,7 +9,7 @@ const useCategories = () => {
   const { data: categoryList, isPending: isCategoryPending, refetch } = useQuery({
     queryKey: ["categoryList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allCategories");
+      const res = await axiosPublic.get("/api/category/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

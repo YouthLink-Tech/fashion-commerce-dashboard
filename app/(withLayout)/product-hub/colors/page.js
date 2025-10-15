@@ -39,7 +39,7 @@ const ColorsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteColor/${colorId}`);
+          const res = await axiosSecure.delete(`/api/color/delete/${colorId}`);
           if (res?.data?.deletedCount) {
             refetchColors(); // Call your refetch function to refresh data
             toast.custom((t) => (

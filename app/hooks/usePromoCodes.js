@@ -8,7 +8,7 @@ const usePromoCodes = () => {
   const { data: promoList, isPending: isPromoPending, refetch } = useQuery({
     queryKey: ["promoList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allPromoCodes");
+      const res = await axiosSecure.get("/api/promo-code/all");
       return res?.data;
     },
     onError: (err) => {

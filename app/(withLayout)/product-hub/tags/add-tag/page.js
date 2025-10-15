@@ -34,7 +34,7 @@ const AddTag = () => {
     }));
 
     try {
-      const response = await axiosSecure.post('/addTag', tagData);
+      const response = await axiosSecure.post('/api/tag/add', tagData);
       if (response.status === 201) {
         toast.custom((t) => (
           <div
@@ -101,14 +101,14 @@ const AddTag = () => {
                   type="text"
                   placeholder="Add Tag"
                   {...register(`tag.${index}.tag`, { required: 'Tag is required' })}
-                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold"
+                  className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px] font-semibold my-2"
                 />
                 <Button type='button' color="danger" onPress={() => removeTag(index)} variant="light">
                   Remove
                 </Button>
               </div>
               {errors.tag?.[index]?.tag && (
-                <p className="text-left pt-2 text-red-500 font-semibold text-xs">{errors.tag[index].tag.message}</p>
+                <p className="text-left text-red-500 font-semibold text-xs">{errors.tag[index].tag.message}</p>
               )}
             </div>
           ))}

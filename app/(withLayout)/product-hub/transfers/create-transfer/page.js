@@ -478,7 +478,7 @@ const CreateTransfer = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addTransferOrder', transferOrderData);
+      const response = await axiosSecure.post('/api/transfer-order/add', transferOrderData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

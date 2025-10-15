@@ -36,7 +36,7 @@ const ReceiveTransferOrder = () => {
     if (status !== "authenticated" || !session?.user?.accessToken) return;
     const fetchTransferOrderData = async () => {
       try {
-        const response = await axiosSecure.get(`/getSingleTransferOrder/${id}`);
+        const response = await axiosSecure.get(`/api/transfer-order/single/${id}`);
         const order = response?.data;
 
         setSelectedProducts(order?.selectedProducts);
@@ -170,7 +170,7 @@ const ReceiveTransferOrder = () => {
       };
 
       // Update product details in the database
-      const response1 = await axiosSecure.put(`/editTransferOrder/${id}`, receivedOrderData);
+      const response1 = await axiosSecure.put(`/api/transfer-order/edit/${id}`, receivedOrderData);
 
       // Show single toast message based on the update results
       if (response1.data.modifiedCount > 0) {

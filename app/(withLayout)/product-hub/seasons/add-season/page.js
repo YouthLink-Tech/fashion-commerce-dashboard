@@ -79,7 +79,7 @@ const AddSeason = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addSeason', seasonData);
+      const response = await axiosSecure.post('/api/season/add', seasonData);
 
       if (response.status === 201) {
         toast.custom((t) => (

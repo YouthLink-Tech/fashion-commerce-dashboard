@@ -8,7 +8,7 @@ const useTransferOrders = () => {
   const { data: transferOrderList, isPending: isTransferOrderPending, refetch } = useQuery({
     queryKey: ["transferOrderList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allTransferOrders");
+      const res = await axiosSecure.get("/api/transfer-order/all");
       return res?.data;
     },
     onError: (err) => {

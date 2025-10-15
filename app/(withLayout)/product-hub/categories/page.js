@@ -55,7 +55,7 @@ const CategoriesOverview = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteCategory/${categoryId}`);
+          const res = await axiosSecure.delete(`/api/category/delete/${categoryId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (
@@ -139,7 +139,7 @@ const CategoriesOverview = () => {
         };
       });
 
-      const response = await axiosSecure.patch("/updateFeaturedCategories", categoriesToUpdate);
+      const response = await axiosSecure.patch("/api/category/featured", categoriesToUpdate);
 
       if (response?.data?.modifiedCount > 0) {
         toast.success("Featured category selected successfully!");

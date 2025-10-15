@@ -328,7 +328,7 @@ const RecentPromotions = () => {
       const discountData = { ...rest, promoStatus: !currentStatus };
 
       // Send the update request
-      const res = await axiosSecure.put(`/updatePromo/${id}`, discountData);
+      const res = await axiosSecure.put(`/api/promo-code/edit/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         await refetchPromo(); // Refetch the promo list to get the updated data
         toast.custom((t) => (
@@ -387,7 +387,7 @@ const RecentPromotions = () => {
       const discountData = { ...rest, offerStatus: !currentStatus };
 
       // Send the update request
-      const res = await axiosSecure.put(`/updateOffer/${id}`, discountData);
+      const res = await axiosSecure.put(`/api/special-offer/edit/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         refetchOffer(); // Refetch the promo list to get the updated data
         toast.custom((t) => (

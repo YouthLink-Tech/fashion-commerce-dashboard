@@ -36,7 +36,7 @@ const EditReceiveInventory = () => {
 
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await axiosSecure.get(`/getSinglePurchaseOrder/${id}`);
+        const response = await axiosSecure.get(`/api/purchase-order/single/${id}`);
         const order = response?.data;
 
         setSelectedProducts(order?.selectedProducts);
@@ -177,7 +177,7 @@ const EditReceiveInventory = () => {
       };
 
       // API call for updating purchase order
-      const response1 = await axiosSecure.put(`/editPurchaseOrder/${id}`, receivedOrderData);
+      const response1 = await axiosSecure.put(`/api/purchase-order/edit/${id}`, receivedOrderData);
 
       // Show single toast message based on the update results
       if (response1.data.modifiedCount > 0) {

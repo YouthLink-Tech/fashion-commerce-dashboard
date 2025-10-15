@@ -479,7 +479,7 @@ const CreatePurchaseOrder = () => {
 		}
 
 		try {
-			const response = await axiosSecure.post('/addPurchaseOrder', purchaseOrderData);
+			const response = await axiosSecure.post('/api/purchase-order/add', purchaseOrderData);
 			if (response?.data?.insertedId) {
 				toast.custom((t) => (
 					<div

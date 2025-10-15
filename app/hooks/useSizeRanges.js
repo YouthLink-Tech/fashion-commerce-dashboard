@@ -9,7 +9,7 @@ const useSizeRanges = () => {
   const { data: sizeRangeList, isPending: isSizeRangePending, refetch } = useQuery({
     queryKey: ["sizeRangeList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allSizeRanges");
+      const res = await axiosSecure.get("/api/category/all-sizes");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

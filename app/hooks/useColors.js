@@ -9,7 +9,7 @@ const useColors = () => {
   const { data: colorList, isPending: isColorPending, refetch } = useQuery({
     queryKey: ["colorList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allColors");
+      const res = await axiosSecure.get("/api/color/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

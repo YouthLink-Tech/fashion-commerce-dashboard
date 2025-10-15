@@ -99,7 +99,7 @@ const EditOffer = () => {
 
     const fetchOfferData = async () => {
       try {
-        const response = await axiosSecure.get(`/getSingleOffer/${id}`);
+        const response = await axiosSecure.get(`/api/special-offer/single/${id}`);
         const offer = response.data;
 
         // Ensure the expiry date is set to midnight to avoid timezone issues
@@ -488,7 +488,7 @@ const EditOffer = () => {
         selectedProductIds
       };
 
-      const res = await axiosSecure.put(`/updateOffer/${id}`, updatedDiscount);
+      const res = await axiosSecure.put(`/api/special-offer/edit/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

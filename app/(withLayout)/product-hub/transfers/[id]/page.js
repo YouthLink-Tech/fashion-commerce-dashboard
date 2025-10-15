@@ -71,7 +71,7 @@ const EditTransferOrder = () => {
 
       if (status !== "authenticated" || !session?.user?.accessToken) return;
 
-      const response = await axiosSecure.get(`/getSingleTransferOrder/${id}`);
+      const response = await axiosSecure.get(`/api/transfer-order/single/${id}`);
       const order = response?.data;
       const fetchedEstimatedArrival = formatDateForInput(order?.estimatedArrival);
       setEstimatedArrival(fetchedEstimatedArrival);
@@ -124,7 +124,7 @@ const EditTransferOrder = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteTransferOrder/${id}`);
+          const res = await axiosSecure.delete(`/api/transfer-order/delete/${id}`);
           if (res?.data?.deletedCount) {
             toast.custom((t) => (
               <div
@@ -198,7 +198,7 @@ const EditTransferOrder = () => {
         status: data?.status,
       }
 
-      const res = await axiosSecure.put(`/editTransferOrder/${id}`, updatedTransferOrderData);
+      const res = await axiosSecure.put(`/api/transfer-order/edit/${id}`, updatedTransferOrderData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

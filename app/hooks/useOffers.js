@@ -9,7 +9,7 @@ const useOffers = () => {
   const { data: offerList, isPending: isOfferPending, refetch } = useQuery({
     queryKey: ["offerList"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/allOffers");
+      const res = await axiosPublic.get("/api/special-offer/all");
       return res?.data;
     },
     onError: (err) => {

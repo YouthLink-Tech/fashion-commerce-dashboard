@@ -31,7 +31,7 @@ export default function EditSeason() {
 
     const fetchSeason = async () => {
       try {
-        const res = await axiosSecure.get(`/allSeasons/${params.id}`);
+        const res = await axiosSecure.get(`/api/season/single/${params.id}`);
         const season = res.data;
         setValue('seasonName', season?.seasonName);
         setImage(season?.imageUrl || null);
@@ -82,7 +82,7 @@ export default function EditSeason() {
         imageUrl: image || fallbackImageUrl,
       };
 
-      const res = await axiosSecure.put(`/editSeason/${params.id}`, updatedSeason);
+      const res = await axiosSecure.put(`/api/season/edit/${params.id}`, updatedSeason);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

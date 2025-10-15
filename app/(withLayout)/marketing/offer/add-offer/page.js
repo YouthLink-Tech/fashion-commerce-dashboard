@@ -460,7 +460,7 @@ const AddOffer = () => {
         selectedProductIds
       };
 
-      const response = await axiosSecure.post('/addOffer', offerData);
+      const response = await axiosSecure.post('/api/special-offer/add', offerData);
       if (response.data.insertedId) {
         toast.custom((t) => (
           <div

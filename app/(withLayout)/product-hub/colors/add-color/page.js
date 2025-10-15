@@ -37,7 +37,7 @@ const AddColor = () => {
 
 
     try {
-      const response = await axiosSecure.post('/addColor', colorData);
+      const response = await axiosSecure.post('/api/color/add', colorData);
       if (response.status === 201) {
         toast.custom((t) => (
           <div

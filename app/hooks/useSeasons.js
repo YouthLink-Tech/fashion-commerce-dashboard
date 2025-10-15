@@ -8,7 +8,7 @@ const useSeasons = () => {
   const { data: seasonList, isPending: isSeasonPending, refetch } = useQuery({
     queryKey: ["seasonList"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/allSeasons");
+      const res = await axiosSecure.get("/api/season/all");
       return res?.data;
     },
     onError: (err) => {

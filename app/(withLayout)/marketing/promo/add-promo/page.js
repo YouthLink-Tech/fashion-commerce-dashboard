@@ -181,7 +181,7 @@ const AddPromo = () => {
         isWelcomeEmailPromoCode: isSelected,
       };
 
-      const response = await axiosSecure.post('/addPromoCode', discountData);
+      const response = await axiosSecure.post('/api/promo-code/add', discountData);
       if (response.data.insertedId) {
         toast.custom((t) => (
           <div

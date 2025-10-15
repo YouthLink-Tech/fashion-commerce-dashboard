@@ -35,7 +35,7 @@ const EditVendor = () => {
 
     const fetchVendorDetails = async () => {
       try {
-        const { data } = await axiosSecure.get(`/getSingleVendorDetails/${id}`);
+        const { data } = await axiosSecure.get(`/api/vendor/single/${id}`);
 
         setValue('vendorName', data?.value);
         setValue('contactPersonName', data?.contactPersonName);
@@ -61,7 +61,7 @@ const EditVendor = () => {
         vendorAddress: data?.vendorAddress,
       };
 
-      const res = await axiosSecure.put(`/editVendor/${id}`, updatedVendorList);
+      const res = await axiosSecure.put(`/api/vendor/edit/${id}`, updatedVendorList);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
@@ -122,7 +122,7 @@ const EditVendor = () => {
 
         <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='flex flex-col lg:flex-row gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             {/* Vendor name Input */}
             <div className="w-full">

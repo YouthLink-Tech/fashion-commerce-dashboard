@@ -120,7 +120,7 @@ const EditPurchaseOrderPage = () => {
     if (status !== "authenticated" || !session?.user?.accessToken) return;
 
     try {
-      const response = await axiosSecure.get(`/getSinglePurchaseOrder/${id}`);
+      const response = await axiosSecure.get(`/api/purchase-order/single/${id}`);
       const order = response?.data;
 
       // Reset the form with the new data from the response
@@ -230,7 +230,7 @@ const EditPurchaseOrderPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deletePurchaseOrder/${id}`);
+          const res = await axiosSecure.delete(`/api/purchase-order/delete/${id}`);
           if (res?.data?.deletedCount) {
             toast.custom((t) => (
               <div
@@ -295,7 +295,7 @@ const EditPurchaseOrderPage = () => {
 
   const revertStatusToPending = async () => {
     try {
-      const res = await axiosSecure.put(`/editPurchaseOrder/${id}`, { status: "pending" });
+      const res = await axiosSecure.put(`/api/purchase-order/edit/${id}`, { status: "pending" });
 
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
@@ -419,7 +419,7 @@ const EditPurchaseOrderPage = () => {
         attachment: attachment
       };
 
-      const res = await axiosSecure.put(`/editPurchaseOrder/${id}`, updatedPurchaseOrderData);
+      const res = await axiosSecure.put(`/api/purchase-order/edit/${id}`, updatedPurchaseOrderData);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div

@@ -43,7 +43,7 @@ const VendorsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteVendor/${vendorId}`);
+          const res = await axiosSecure.delete(`/api/vendor/delete/${vendorId}`);
           if (res?.data?.deletedCount) {
             refetchVendors(); // Call your refetch function to refresh data
             toast.custom((t) => (

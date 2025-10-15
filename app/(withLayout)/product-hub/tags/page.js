@@ -39,7 +39,7 @@ const TagsPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteTag/${tagId}`);
+          const res = await axiosSecure.delete(`/api/tag/delete/${tagId}`);
           if (res?.data?.deletedCount) {
             refetchTags(); // Call your refetch function to refresh data
             toast.custom((t) => (

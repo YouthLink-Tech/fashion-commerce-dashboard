@@ -42,7 +42,7 @@ const Seasons = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/deleteSeason/${seasonId}`);
+          const res = await axiosSecure.delete(`/api/season/delete/${seasonId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

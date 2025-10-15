@@ -429,7 +429,7 @@ const AddCategory = () => {
 
     // Submit category data
     try {
-      const response = await axiosSecure.post('/addCategory', categoryData);
+      const response = await axiosSecure.post('/api/category/add', categoryData);
 
       if (response.status === 201) {
         toast.custom((t) => (

@@ -58,7 +58,7 @@ const EditPromo = () => {
 
     const fetchPromoCode = async () => {
       try {
-        const response = await axiosSecure.get(`/getSinglePromo/${id}`);
+        const response = await axiosSecure.get(`/api/promo-code/single-by-id/${id}`);
         const promo = response.data;
 
         // Ensure the expiry date is set to midnight to avoid timezone issues
@@ -192,7 +192,7 @@ const EditPromo = () => {
         isWelcomeEmailPromoCode: isSelected,
       };
 
-      const res = await axiosSecure.put(`/updatePromo/${id}`, updatedDiscount);
+      const res = await axiosSecure.put(`/api/promo-code/edit/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
         toast.custom((t) => (
           <div
