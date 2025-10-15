@@ -29,7 +29,7 @@ export default function SetupPage() {
       if (!token) return;
 
       try {
-        const response = await axiosPublic.post("/validate-token", { token });
+        const response = await axiosPublic.post("/api/user-access/validate-token", { token });
 
         if (response.status === 200 && response.data.message === "Access verified successfully." && response.data.email) {
           setIsValidToken(true); // Token is valid

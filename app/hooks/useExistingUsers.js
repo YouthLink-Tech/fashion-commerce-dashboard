@@ -8,7 +8,7 @@ const useExistingUsers = () => {
   const { data: existingUsers, isPending: isExistingUsersPending, refetch } = useQuery({
     queryKey: ["existingUsers"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/all-existing-users");
+      const res = await axiosSecure.get("/api/user-access/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

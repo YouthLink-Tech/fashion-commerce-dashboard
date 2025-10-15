@@ -15,7 +15,7 @@ const fetchUserPermissions = async (userId, token, retries = 2, delayMs = 300) =
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await fetch(
-        `${BACKEND_URL}/single-existing-user/${userId}`,
+        `${BACKEND_URL}/api/user-access/single/${userId}`,
         {
           method: "GET",
           headers: {

@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         setIsUserLoading(true);
 
         const res = await axiosSecure.get(
-          `/single-existing-user/${session?.user?._id}`,
+          `/api/user-access/single/${session?.user?._id}`,
         );
         setExistingUserData(res.data);
       } catch (error) {

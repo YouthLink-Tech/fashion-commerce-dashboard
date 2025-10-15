@@ -157,7 +157,7 @@ export default function CartDrawer({
         permissions: roleGroups
       };
 
-      const response = await axiosSecure.post('/invite', enrollmentInformation);
+      const response = await axiosSecure.post('/api/user-access/grant', enrollmentInformation);
 
       if (response.data.success) {
 

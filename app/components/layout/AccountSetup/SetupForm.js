@@ -67,7 +67,7 @@ const SetupForm = ({ email, isValidToken }) => {
     };
 
     try {
-      const response = await axiosPublic.patch(`/complete-setup/${email}`, setupInformation);
+      const response = await axiosPublic.patch(`/api/user-access/complete-setup/${email}`, setupInformation);
 
       if (response.data.success) {
 

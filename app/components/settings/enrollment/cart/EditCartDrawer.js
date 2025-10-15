@@ -33,7 +33,7 @@ export default function EditCartDrawer({
       // Fetch user data when drawer opens
       const fetchUser = async () => {
         try {
-          const { data } = await axiosSecure.get(`/single-existing-user/${userId}`);
+          const { data } = await axiosSecure.get(`/api/user-access/single/${userId}`);
           if (data) {
             setValue("email", data?.email || "");
             setRoleGroups(data.permissions || []);
@@ -172,7 +172,7 @@ export default function EditCartDrawer({
         permissions: roleGroups
       };
 
-      const response = await axiosSecure.put(`/update-user-permissions/${userId}`, userEditedPermissions);
+      const response = await axiosSecure.put(`/api/user-access/edit/${userId}`, userEditedPermissions);
 
       if (response.data.success) {
 

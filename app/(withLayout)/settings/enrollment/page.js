@@ -44,7 +44,7 @@ const EnrollmentPage = () => {
             permissions,
           };
 
-          const response = await axiosSecure.post('/invite', resendInformation);
+          const response = await axiosSecure.post('/api/user-access/grant', resendInformation);
 
           if (response.data.success) {
             // ✅ Show success toast if the invitation is successfully sent
