@@ -47,7 +47,7 @@ const PasswordChangePage = () => {
     };
 
     try {
-      const response = await axiosSecure.put('/change-password', passwordData);
+      const response = await axiosSecure.put('/api/user-access/change-password-backend', passwordData);
       if (response.data.success) {
         toast.custom((t) => (
           <div

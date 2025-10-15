@@ -21,7 +21,7 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/logout`, null, {
+      await axios.post(`${BACKEND_URL}/api/user-access/logout`, null, {
         withCredentials: true,
       });
     } catch (err) {

@@ -175,7 +175,7 @@ const EnrollmentPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosSecure.delete(`/delete-existing-user/${userId}`);
+          const res = await axiosSecure.delete(`/api/user-access/delete/${userId}`);
           if (res?.data?.deletedCount) {
             refetch(); // Call your refetch function to refresh data
             toast.custom((t) => (

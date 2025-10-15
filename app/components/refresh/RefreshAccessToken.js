@@ -35,7 +35,7 @@ const RefreshAccessToken = () => {
           return;
         }
 
-        const res = await axios.post(`${BACKEND_URL}/refresh-token-backend`, null, {
+        const res = await axios.post(`${BACKEND_URL}/api/user-access/refresh-token-backend`, null, {
           withCredentials: true,
         });
 

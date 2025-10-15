@@ -52,7 +52,7 @@ export const useAxiosSecure = () => {
           originalRequest._retry = true;
 
           try {
-            const response = await axios.post(`${BACKEND_URL}/refresh-token-backend`, null, {
+            const response = await axios.post(`${BACKEND_URL}/api/user-access/refresh-token-backend`, null, {
               withCredentials: true,
             });
 

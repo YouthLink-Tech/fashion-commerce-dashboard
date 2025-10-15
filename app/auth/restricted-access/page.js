@@ -129,7 +129,7 @@ const RestrictedAccessLoginPage = () => {
 
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/loginForDashboard`,
+        `${BACKEND_URL}/api/user-access/login`,
         {
           emailOrUsername: data.emailOrUsername,
           password: data.password,
@@ -264,7 +264,7 @@ const RestrictedAccessLoginPage = () => {
 
     try {
       const loginRes = await axios.post(
-        `${BACKEND_URL}/loginForDashboard`,
+        `${BACKEND_URL}/api/user-access/login`,
         {
           emailOrUsername: data.emailOrUsername,
           password: data.password,
