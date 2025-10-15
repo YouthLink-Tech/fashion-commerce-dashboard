@@ -8,7 +8,7 @@ const useCustomerSupport = () => {
   const { data: existingCustomerSupport, isPending: isCustomerSupportPending, refetch } = useQuery({
     queryKey: ["allCustomerSupportInformation's"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/all-customer-support-information");
+      const res = await axiosSecure.get("/api/customer-support/all");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

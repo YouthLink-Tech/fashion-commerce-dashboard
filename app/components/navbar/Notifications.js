@@ -45,7 +45,7 @@ const Notifications = () => {
 
   const fetchCustomerSupportNotifications = useCallback(async () => {
     try {
-      const res = await axiosSecure.get(`/assigned-notifications-customer-support/${existingUserData._id}`);
+      const res = await axiosSecure.get(`/api/customer-support/assigned-notifications/${existingUserData._id}`);
       setExistingCustomerSupport(res.data);
     } catch (error) {
       console.error('Error fetching category:', error);
@@ -129,7 +129,7 @@ const Notifications = () => {
 
   const handleNotificationClick2 = async (detail) => {
     try {
-      const res = await axiosSecure.patch(`/mark-support-notification-read/${detail._id}`, {
+      const res = await axiosSecure.patch(`/api/customer-support/mark-notification-read/${detail._id}`, {
         userId: existingUserData?._id,
       });
 

@@ -20,7 +20,7 @@ const AssignUser = ({ messageId, selectedUsers, setSelectedUsers }) => {
     };
 
     try {
-      const res = await axiosSecure.patch(`/assign-customer-support-user/${messageId}`, payload);
+      const res = await axiosSecure.patch(`/api/customer-support/assign-user/${messageId}`, payload);
       if (res.data.success) {
         setSelectedUsers(prev => [...prev, { ...payload, fullName: user.fullName }]);
       }
@@ -31,7 +31,7 @@ const AssignUser = ({ messageId, selectedUsers, setSelectedUsers }) => {
 
   const handleUnassignUser = async (user) => {
     try {
-      const res = await axiosSecure.patch(`/unassign-customer-support-user/${messageId}`, {
+      const res = await axiosSecure.patch(`/api/customer-support/unassign-user/${messageId}`, {
         userId: user?.userId,
       });
 

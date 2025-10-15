@@ -142,7 +142,7 @@ const CustomerSupportComponent = () => {
 
     if (!item.isRead) {
       try {
-        const result = await axiosSecure.patch(`/mark-as-read-customer-support/${item._id}`);
+        const result = await axiosSecure.patch(`/api/customer-support/mark-email-read/${item._id}`);
         if (result.data.success === true) {
           refetch();
         }
@@ -152,7 +152,7 @@ const CustomerSupportComponent = () => {
     }
 
     try {
-      const res = await axiosSecure.get(`/assigned-users/${item._id}`);
+      const res = await axiosSecure.get(`/api/customer-support/assigned-users/${item._id}`);
       if (res.data.success) {
         setSelectedUsers(res.data.assignedUsers);
       }
@@ -165,7 +165,7 @@ const CustomerSupportComponent = () => {
     if (!selectedIds.length) return;
 
     try {
-      const result = await axiosSecure.patch("/mark-as-unread-customer-support", {
+      const result = await axiosSecure.patch("/api/customer-support/mark-emails-unread", {
         ids: selectedIds,
       });
       if (result.data.success === true) {
@@ -185,7 +185,7 @@ const CustomerSupportComponent = () => {
     }
 
     // Call backend API with supportReplyHtml
-    const response = await axiosSecure.post('/send-reply', replyData);
+    const response = await axiosSecure.post('/api/customer-support/reply', replyData);
     if (response.data.success === true) {
       toast.custom((t) => (
         <div

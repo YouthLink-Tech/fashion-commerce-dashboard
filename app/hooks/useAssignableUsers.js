@@ -8,7 +8,7 @@ const useAssignableUsers = () => {
   const { data: assignableUsers, isPending: isAssignableUserPending, refetch } = useQuery({
     queryKey: ["assignableUsers"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/assignable-users");
+      const res = await axiosSecure.get("/api/customer-support/shareable-users");
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds
