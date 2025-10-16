@@ -140,8 +140,8 @@ const Inventory = () => {
       (isNumberQuery && onHandSku === query) // Numeric comparison for SKU
     );
 
-    const isLowStock = showLowStock && product?.sku >= 1 && product.sku <= 9;
-    const isOutOfStock = showOutOfStock && product.sku === 0;
+    const isLowStock = showLowStock && product?.sku >= 1 && product?.sku <= 9;
+    const isOutOfStock = showOutOfStock && product?.sku === 0;
 
     // If any stock filter is active, include both stock and search criteria
     if (showLowStock || showOutOfStock) {
@@ -415,10 +415,10 @@ const Inventory = () => {
     return orderList?.some((order) =>
       order.returnInfo?.products.some(
         (returnProduct) =>
-          returnProduct.productId === product.productId &&
-          returnProduct.size === product.size &&
-          returnProduct.color.color === product.colorCode &&
-          returnProduct.transferStatus === "Transferred"
+          returnProduct?.productId === product?.productId &&
+          returnProduct?.size === product?.size &&
+          returnProduct?.color?.color === product?.colorCode &&
+          returnProduct?.transferStatus === "Transferred"
       )
     );
   };
