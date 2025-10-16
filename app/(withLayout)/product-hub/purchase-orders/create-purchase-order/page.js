@@ -113,7 +113,7 @@ const CreatePurchaseOrder = () => {
 		productList?.forEach((product) => {
 			const skuEntries = [];
 
-			product?.productVariants.forEach((variant) => {
+			product?.productVariants?.forEach((variant) => {
 				const size = variant?.size;
 				const colorCode = variant?.color?.color; // Hex code for the color
 				const colorName = variant?.color?.value; // Name of the color

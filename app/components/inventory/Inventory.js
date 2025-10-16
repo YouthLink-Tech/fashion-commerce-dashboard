@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
@@ -70,52 +70,48 @@ const Inventory = () => {
     }
   }, [productId]);
 
-  useEffect(() => {
-    // Re-filter and update filtered products whenever productList or orderList changes
-    const filteredVariants = productList?.flatMap((product) =>
-      product.productVariants
-        ?.filter((variant) => variant?.location === locationNameForMessage)
-        .map((variant) => ({
+  const computeFilteredProducts = useCallback((products, location) => {
+    const activeProducts = products?.filter((product) => product?.status === "active") || [];
+
+    return activeProducts
+      .flatMap((product) => {
+        const variants = Array.isArray(product?.productVariants) ? product.productVariants : [];
+        const filteredVariants = variants.filter((variant) => variant?.location === location);
+
+        return filteredVariants.map((variant) => ({
           productTitle: product?.productTitle,
           size: variant?.size,
-          color: variant?.color.label, // Display color label
-          colorCode: variant?.color.color, // Display color code for visualization
+          color: variant?.color?.label || 'Unknown',
+          colorCode: variant?.color?.color || '#000000',
           sku: variant?.sku,
+          onHandSku: variant?.onHandSku,
           returnSku: variant?.returnSku,
           forfeitedSku: variant?.forfeitedSku,
-          onHandSku: variant?.onHandSku,
-          imageUrl: variant?.imageUrls[0], // Assuming we want the first image
+          imageUrl: variant?.imageUrls?.[0],
           productId: product?.productId,
-        }))
-    );
-    setFilteredProducts(filteredVariants);
-  }, [productList, orderList, locationNameForMessage]);  // Dependencies trigger re-filtering  
+        }));
+      })
+      .filter((item) => item !== undefined); // Safety net for any stray undefined
+  }, []);
 
-  const handleLocationSelect = (locationName) => {
-    // Set location message to notify the user of the selected inventory location
+  const handleLocationSelect = useCallback((locationName) => {
     setLocationNameForMessage(locationName);
+    setFilteredProducts(computeFilteredProducts(productList, locationName));
+  }, [productList, computeFilteredProducts]); // productList as dep since it's used inside; compute is stable
 
-    // Step 1: Filter product variants by the selected location
-    const filteredVariants = productList?.flatMap((product) =>
-      product.productVariants
-        ?.filter((variant) => variant?.location === locationName)
-        .map((variant) => ({
-          productTitle: product?.productTitle,
-          size: variant?.size,
-          color: variant?.color.label, // Display color label
-          colorCode: variant?.color.color, // Display color code for visualization
-          sku: variant?.sku,
-          onHandSku: variant?.onHandSku,
-          returnSku: variant?.returnSku,
-          forfeitedSku: variant?.forfeitedSku,
-          imageUrl: variant?.imageUrls[0], // Assuming we want the first image
-          productId: product?.productId,
-        }))
-    );
+  useEffect(() => {
+    setFilteredProducts(computeFilteredProducts(productList, locationNameForMessage));
+  }, [productList, locationNameForMessage, computeFilteredProducts]);
 
-    // Step 2: Set the filtered products with unique combinations of size and color
-    setFilteredProducts(filteredVariants);
-  };
+  // new useEffect for initial load (runs once when locations load, sets primary)
+  useEffect(() => {
+    if (locationList?.length > 0 && !locationNameForMessage) {
+      const primaryLocationName = locationList.find((loc) => loc.isPrimaryLocation)?.locationName;
+      if (primaryLocationName) {
+        handleLocationSelect(primaryLocationName);
+      }
+    }
+  }, [locationList, locationNameForMessage, handleLocationSelect]); // locationNameForMessage prevents re-runs after initial
 
   // Filter products based on search query
   const searchedProducts = filteredProducts?.filter(product => {
@@ -493,7 +489,7 @@ const Inventory = () => {
       });
       if (result.isConfirmed) {
         const response = await axiosSecure.post(
-          "/transferReturnSkuToAvailable",
+          "/api/inventory-transfer/available",
           info
         );
         if (response.data.message) {
@@ -541,7 +537,7 @@ const Inventory = () => {
       });
       if (result.isConfirmed) {
         const response = await axiosSecure.post(
-          "/transferReturnSkuToForfeited",
+          "/api/inventory-transfer/forfeited",
           info
         );
         if (response.data.message) {

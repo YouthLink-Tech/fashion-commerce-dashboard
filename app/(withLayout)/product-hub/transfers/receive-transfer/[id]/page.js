@@ -122,7 +122,7 @@ const ReceiveTransferOrder = () => {
       setAcceptError(false);
 
       // Send transfer request to /transferStock
-      const updateResponses = await axiosSecure.patch("/transferStock", {
+      const updateResponses = await axiosSecure.patch("/api/transfer-order/transfer-stock", {
         variants: transferOrderVariants.map((variant) => ({
           productId: variant.productId,
           colorCode: variant.colorCode,

@@ -134,7 +134,7 @@ const EditReceiveInventory = () => {
       setAcceptError(false);
 
       // Instead of multiple calls:
-      const updateResponses = await axiosSecure.patch("/receiveStock", {
+      const updateResponses = await axiosSecure.patch("/api/purchase-order/receive-stock", {
         variants: purchaseOrderVariants
           .filter(variant => variant.accept > 0) // only process valid ones
           .map(variant => ({

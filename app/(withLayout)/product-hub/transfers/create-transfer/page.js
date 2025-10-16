@@ -124,18 +124,18 @@ const CreateTransfer = () => {
 
     const skuByProduct = [];
 
-    productList.forEach((product) => {
+    productList?.forEach((product) => {
       const skuEntries = [];
 
-      product.productVariants.forEach((variant) => {
-        const size = variant.size;
-        const colorCode = variant.color?.color;  // Hex code for the color
-        const colorName = variant.color?.value;  // Name of the color
-        const sku = variant.sku || 0;
+      product?.productVariants?.forEach((variant) => {
+        const size = variant?.size;
+        const colorCode = variant?.color?.color;  // Hex code for the color
+        const colorName = variant?.color?.value;  // Name of the color
+        const sku = variant?.sku || 0;
 
         // Find or create an entry in skuEntries for this specific size and color
-        let entry = skuEntries.find(
-          (e) => e.size === size && e.color.code === colorCode
+        let entry = skuEntries?.find(
+          (e) => e?.size === size && e?.color?.code === colorCode
         );
 
         if (!entry) {
@@ -150,12 +150,12 @@ const CreateTransfer = () => {
         }
 
         // Increment originSku if the location matches selectedOrigin location
-        if (variant.location === selectedOrigin.locationName) {
+        if (variant?.location === selectedOrigin?.locationName) {
           entry.originSku += sku;
         }
 
         // Increment destinationSku if the location matches selectedDestination location
-        if (variant.location === selectedDestination.locationName) {
+        if (variant?.location === selectedDestination?.locationName) {
           entry.destinationSku += sku;
         }
       });
