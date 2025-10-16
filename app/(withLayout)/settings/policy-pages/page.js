@@ -132,7 +132,7 @@ const PolicyPages = () => {
       setUploadedUrls(uploadResults); // Save URLs for preview
 
       try {
-        const response = await axiosSecure.put(`/edit-policy-pdfs/${pdfId}`, uploadResults);
+        const response = await axiosSecure.put(`/api/policy-pdf/edit/${pdfId}`, uploadResults);
         if (response?.data?.modifiedCount > 0) {
           toast.custom((t) => (
             <div
