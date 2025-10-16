@@ -19,7 +19,7 @@ const AddShipmentHandler = () => {
   const [image, setImage] = useState(null);
   const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
-  const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748149508141_default-image.png";
+  const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/media.poshax.shop/1760636556211_1748149508141_default-image.png";
   const [dragging, setDragging] = useState(false);
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
