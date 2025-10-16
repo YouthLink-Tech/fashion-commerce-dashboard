@@ -13,7 +13,7 @@ const useNotifications = () => {
     queryKey: ["notificationList"],
     enabled: !!userEmail,
     queryFn: async () => {
-      const res = await axiosSecure.get(`/get-merged-notifications?email=${userEmail}`);
+      const res = await axiosSecure.get(`/api/notifications/merged-all?email=${userEmail}`);
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

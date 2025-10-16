@@ -102,7 +102,7 @@ const Notifications = () => {
         size: detail.size,
       };
 
-      const response = await axiosSecure.post("/mark-notification-read", notificationDetails)
+      const response = await axiosSecure.post("/api/notifications/mark-read", notificationDetails)
       if (response?.data?.message === "Notification marked as read") {
         refetch();
       }
