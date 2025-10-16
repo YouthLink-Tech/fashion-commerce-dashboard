@@ -154,7 +154,7 @@ const Notifications = () => {
 
         if (!productIds || productIds.length === 0) return;
 
-        const response = await axiosSecure.post('/getProductIds', { ids: productIds });
+        const response = await axiosSecure.post('/api/notifications/product-ids', { ids: productIds });
 
         if (response.status === 200) {
           const productNamesMap = response.data.reduce((acc, product) => {

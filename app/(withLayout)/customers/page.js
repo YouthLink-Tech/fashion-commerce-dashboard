@@ -89,7 +89,7 @@ const Customers = () => {
   const { data: { result, totalCustomerList } = [], isCustomerListPending, refetch } = useQuery({
     queryKey: ["customerList", page, itemsPerPage],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/customerList?page=${page}&itemsPerPage=${itemsPerPage}`);
+      const res = await axiosSecure.get(`/api/customer/list?page=${page}&itemsPerPage=${itemsPerPage}`);
       return res?.data;
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds

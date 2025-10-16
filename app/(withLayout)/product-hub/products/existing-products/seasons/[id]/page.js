@@ -123,7 +123,7 @@ const SeasonPage = () => {
     if (status !== "authenticated" || !session?.user?.accessToken) return;
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosSecure.get(`/productFromSeason/${decodedSeasonName}`);
+        const { data } = await axiosSecure.get(`/api/products/from-season/${decodedSeasonName}`);
         setProductDetails(data);
       } catch (error) {
         toast.error("Failed to load product category details.");

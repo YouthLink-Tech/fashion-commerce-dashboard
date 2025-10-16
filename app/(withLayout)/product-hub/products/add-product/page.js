@@ -739,7 +739,7 @@ const FirstStepOfAddProduct = () => {
     };
 
     try {
-      const response = await axiosSecure.post('/addProduct', productData);
+      const response = await axiosSecure.post('/api/products/add', productData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div

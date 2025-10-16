@@ -206,7 +206,7 @@ const ThirdStepOfAddProduct = () => {
 
     try {
       // Post the entire selectedShipmentHandler array, which contains full shipping details
-      const response = await axiosSecure.post('/addProduct', wholeProductData);
+      const response = await axiosSecure.post('/api/products/add', wholeProductData);
 
       if (response?.data?.insertedId) {
         toast.custom((t) => (

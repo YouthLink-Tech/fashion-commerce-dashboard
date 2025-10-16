@@ -710,7 +710,7 @@ const EditProductContents = () => {
 
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/singleProduct/${id}`);
+        const { data } = await axiosPublic.get(`/api/products/single/${id}`);
 
         setValue('productTitle', data?.productTitle);
         setValue('batchCode', data?.batchCode);
@@ -1076,7 +1076,7 @@ const EditProductContents = () => {
         isInventoryShown: showInventory,
       };
 
-      const res = await axiosSecure.put(`/editProductDetails/${id}`, updatedProductData);
+      const res = await axiosSecure.put(`/api/products/edit/${id}`, updatedProductData);
       if (res.data.success) {
         toast.custom((t) => (
           <div

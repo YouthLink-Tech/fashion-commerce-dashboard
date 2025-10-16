@@ -124,7 +124,7 @@ const ProductPage = () => {
 
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosSecure.get(`/productFromCategory/${decodedCategoryName}`);
+        const { data } = await axiosSecure.get(`/api/products/from-category/${decodedCategoryName}`);
         setProductDetails(data);
       } catch (error) {
         toast.error("Failed to load product category details.");

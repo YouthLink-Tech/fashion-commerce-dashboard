@@ -76,7 +76,7 @@ export async function lookupZoneId(cityId, zoneGuess) {
 
 async function fetchProductById(productId) {
   try {
-    const res = await fetch(`${BACKEND_URL}/singleProduct/${productId}`);
+    const res = await fetch(`${BACKEND_URL}/api/products/single/${productId}`);
     if (!res.ok) {
       throw new Error(`Product ${productId} fetch failed`);
     }
