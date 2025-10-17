@@ -544,7 +544,7 @@ const OrderContents = () => {
         // }
         else if (actionType === "returned") {
           try {
-            const response = await axiosSecure.put("/addReturnSkuToProduct", returnDataToSend);
+            const response = await axiosSecure.put("/api/order/return-sku", returnDataToSend);
 
             // Check the results array from the response
             const updateResults = response?.data?.results;
@@ -659,7 +659,7 @@ const OrderContents = () => {
     };
 
     try {
-      const res = await axiosSecure.patch(`/changeOrderStatus/${id}`, data);
+      const res = await axiosSecure.patch(`/api/order/change-status/${id}`, data);
       if (res?.data?.modifiedCount) {
         refetchOrder(); // Refresh orders list
         if (isUndo) {
@@ -699,7 +699,7 @@ const OrderContents = () => {
         }
         else if (actionType === "shipped") {
           try {
-            const response = await axiosSecure.put("/decreaseOnHandSkuFromProduct", dataToSend);
+            const response = await axiosSecure.put("/api/order/decrease-on-hand-sku", dataToSend);
 
             // Check the results array from the response
             const updateResults = response?.data?.results;
