@@ -144,7 +144,7 @@ const EditOffer = () => {
       const formData = new FormData();
       formData.append('attachment', image);
 
-      const response = await axiosSecure.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/api/gcs-file-upload/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

@@ -155,7 +155,7 @@ const OurStories = () => {
       const formData = new FormData();
       formData.append('attachment', file);
 
-      const response = await axiosSecure.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/api/gcs-file-upload/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -172,7 +172,7 @@ const OurStories = () => {
   const uploadSingleFileToGCS2 = async (file) => {
     try {
       // Step 1: Ask your backend for a signed upload URL
-      const { data } = await axiosSecure.post('/generate-upload-url', {
+      const { data } = await axiosSecure.post('/api/gcs-file-upload/generate-upload-url', {
         fileName: file.name,
         contentType: file.type,
       });

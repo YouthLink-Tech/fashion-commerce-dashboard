@@ -74,7 +74,7 @@ const CenterSlides = ({ image2, setImage2, setSizeError2, sizeError2, axiosSecur
       for (const image of files) {
         formData.append('file', image.file); // ✅ correctly send the File object
       }
-      const response = await axiosSecure.post('/upload-multiple-files', formData, {
+      const response = await axiosSecure.post('/api/gcs-file-upload/upload-multiple-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

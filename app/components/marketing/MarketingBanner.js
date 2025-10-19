@@ -94,7 +94,7 @@ const MarketingBanner = () => {
     formData.append('attachment', image.file);  // assuming image = { file: File }
 
     try {
-      const response = await axiosSecure.post('/upload-single-file', formData, {
+      const response = await axiosSecure.post('/api/gcs-file-upload/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
