@@ -53,9 +53,6 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
     };
   }, [isToggle]);
 
-  // 🔹 Debug: Log session in wrapper
-  console.log("Wrapper - Status:", status, "Email:", session?.user?.email);
-
   // Show loading state if data is not loaded yet
   if (status === "loading") {
     return <DashboardWrapperLoading />;
