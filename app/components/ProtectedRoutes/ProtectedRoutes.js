@@ -51,26 +51,6 @@ export const isEditRoute = (pathname) => {
   return editPatterns.some((pattern) => pattern.test(pathname));
 };
 
-// Maps path segments to permission module names
-// export function getModuleNameFromPath(path) {
-//   const map = {
-//     "dashboard": "Dashboard",
-//     "orders": "Orders",
-//     "product-hub": "Product Hub",
-//     "customers": "Customers",
-//     "finances": "Finances",
-//     "analytics": "Analytics",
-//     "marketing": "Marketing",
-//     "supply-chain": "Supply Chain",
-//     "settings": "Settings",
-//   };
-
-//   const parts = path.split("/").filter(Boolean); // remove empty strings
-//   const moduleSegment = parts[1]; // path like: "/"/**product-hub**/products/...
-
-//   return map[moduleSegment] || null;
-// }
-
 export function getModuleNameFromPath(path) {
   const sorted = Object.keys(protectedRoutes).sort((a, b) => b.length - a.length);
   const match = sorted.find((route) => path.startsWith(route));

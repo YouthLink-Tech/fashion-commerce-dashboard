@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import MarketingBanner from './MarketingBanner';
 import LoginRegisterSlides from './LoginRegisterSlides';
-import { useAuth } from '@/app/contexts/auth';
 import Loading from '../shared/Loading/Loading';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Marketing";
 
 const MarketingContent = () => {
 
   const [activeTab, setActiveTab] = useState('marketing banner');
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   // Ensure the code runs only on the client
   useEffect(() => {

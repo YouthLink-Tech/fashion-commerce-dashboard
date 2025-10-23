@@ -16,7 +16,6 @@ import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from 'react-icons/hi';
-import { useAuth } from '@/app/contexts/auth';
 import CustomSwitch from '../shared/switch/CustomSwitch';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 
@@ -39,13 +38,10 @@ const RecentPromotions = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, getRoleForModule, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const role = getRoleForModule(currentModule);
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   const roleBasedColumnRestrictions = useMemo(() => ({
     Viewer: ["Actions", "Status"],

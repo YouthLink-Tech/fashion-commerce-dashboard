@@ -10,10 +10,10 @@ import specialOffer from "/public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/marketing/RecentPromotions';
 import PromotionPerformance from '@/app/components/marketing/PromotionPerformance';
 import MarketingContent from '@/app/components/marketing/MarketingContent';
-import { useAuth } from "@/app/contexts/auth";
 import Loading from "@/app/components/shared/Loading/Loading";
 import RewardLevel from "../reward-level/page";
 import { WEBSITE_NAME } from "@/app/config/config";
+import { useUserPermissions } from "@/app/hooks/useUserPermissions";
 
 const currentModule = "Marketing";
 
@@ -21,12 +21,8 @@ const Marketing = () => {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('view performance');
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   // Ensure the code runs only on the client
   useEffect(() => {

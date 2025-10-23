@@ -1,22 +1,18 @@
 "use client";
 import React from 'react';
 import ExpenseActions from './ExpenseActions';
-import { useAuth } from '@/app/contexts/auth';
 import Loading from '../../shared/Loading/Loading';
 import useExpenseCategories from '@/app/hooks/useExpenseCategories';
 import ExpenseCard from './ExpenseCard';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Finances";
 
 const Expenses = () => {
 
   const [expenseCategoryList, isExpenseCategoryPending] = useExpenseCategories();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   if (isUserLoading || isExpenseCategoryPending) return <Loading />;
 

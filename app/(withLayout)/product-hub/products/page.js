@@ -4,19 +4,15 @@ import { FaListAlt, FaPlusCircle } from "react-icons/fa";
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import { useAuth } from '@/app/contexts/auth';
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Product Hub";
 
 const Products = () => {
 
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   if (isUserLoading) return <Loading />
 

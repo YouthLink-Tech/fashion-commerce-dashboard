@@ -33,7 +33,6 @@ import useProductsInformation from '@/app/hooks/useProductsInformation';
 import { HiCheckCircle } from 'react-icons/hi2';
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import { useAuth } from '@/app/contexts/auth';
 import DOMPurify from "dompurify";
 import { isValidImageFile } from '../../shared/upload/isValidImageFile';
 import { CustomCheckbox } from '../checkbox/CustomCheckbox';
@@ -42,6 +41,7 @@ import CustomSwitch from '../../shared/switch/CustomSwitch';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 
@@ -117,12 +117,8 @@ const EditProductContents = () => {
   const [dragging, setDragging] = useState(false);
   const [image, setImage] = useState(null);
   const [showInventory, setShowInventory] = useState(false);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isOwner = role === "Owner";
+  const { isUserLoading, isOwnerForModule } = useUserPermissions();
+  const isOwner = isOwnerForModule(currentModule);
   const { data: session, status } = useSession();
 
   // Filter categories based on search input and remove already selected categories

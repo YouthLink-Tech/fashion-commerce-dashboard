@@ -1,70 +1,82 @@
-import axios from "axios";
-import { useSession } from "next-auth/react";
+"use client";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
-import { BACKEND_URL } from "../config/config";
+import { useRefreshToken } from "./useRefreshToken";
+import useAxiosPublic from "./useAxiosPublic";
+import toast from "react-hot-toast";
 
-// Create a single Axios instance
-const axiosSecure = axios.create({
-  baseURL: `${BACKEND_URL}`,
-  withCredentials: true,
-});
+// Shared promise to coordinate concurrent refreshes (module-level, persists across hooks)
+let refreshingPromise = null;
 
 export const useAxiosSecure = () => {
-  const { data: session, status, update } = useSession();
-  const interceptorRef = useRef(null);
+  const { data: session } = useSession();
+  const axiosPublic = useAxiosPublic();
+  const refreshToken = useRefreshToken();
+  const isInterceptorAdded = useRef(false);
 
+  // Dynamically update default Authorization header when session changes
   useEffect(() => {
-    // Clear previous interceptor to avoid duplication
-    if (interceptorRef.current !== null) {
-      axiosSecure.interceptors.request.eject(interceptorRef.current);
+    if (session?.user?.accessToken) {
+      axiosPublic.defaults.headers.common.Authorization = `Bearer ${session.user.accessToken}`;
+    } else {
+      delete axiosPublic.defaults.headers.common.Authorization;
     }
+  }, [session?.user?.accessToken, axiosPublic]);
 
-    // Add interceptor when session is authenticated
-    if (status === "authenticated" && session?.user?.accessToken) {
-      interceptorRef.current = axiosSecure.interceptors.request.use((config) => {
-        config.headers.Authorization = `Bearer ${session.user.accessToken}`;
-        return config;
-      },
-        (error) => Promise.reject(error)
-      );
-    }
-
-    // Clean up on unmount or session change
-    return () => {
-      if (interceptorRef.current !== null) {
-        axiosSecure.interceptors.request.eject(interceptorRef.current);
-      }
-    };
-  }, [session, status]);
-
+  // Adding response interceptor ONLY ONCE (across all uses of this hook)
   useEffect(() => {
-    const responseInterceptor = axiosSecure.interceptors.response.use(
+    if (isInterceptorAdded.current) return;
+
+    isInterceptorAdded.current = true;
+
+    const responseIntercept = axiosPublic.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config;
+        const prevRequest = error?.config;
+        const responseData = error?.response?.data;
 
-        // ✅ Refresh only if token is expired & not retried already
-        if (
-          error?.response?.status === 401 &&
-          !originalRequest._retry &&
-          status === "authenticated"
-        ) {
-          originalRequest._retry = true;
+        // 🔹 Handle account deletion: Notify + Force logout
+        if (error?.response?.status === 401 && responseData?.error === "ACCOUNT_DELETED") {
+          // Showing notification as a toast
+          toast.error(responseData.message || "Your account has been deleted by an administrator. Logging you out...", {
+            duration: 4000,
+            position: "top-center",
+            style: { background: "#ef4444", color: "#fff" },  // Red theme for urgency
+          });
 
-          try {
-            const response = await axios.post(`${BACKEND_URL}/api/user-access/refresh-token-backend`, null, {
-              withCredentials: true,
+          // Delay logout to let user read the message
+          setTimeout(async () => {
+            await signOut({
+              callbackUrl: "/auth/restricted-access"  // Redirect to login
             });
+          }, 2000);
 
-            // ✅ Update token in session (NextAuth)
-            await update({ accessToken: response.data.accessToken });
+          return Promise.reject(new Error(responseData.message || "Account deleted"));
+        }
 
-            // ✅ Set new token in the retried request
-            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        // Regular 401 handling (token expiry refresh)
+        if (error?.response?.status === 401 && !prevRequest?._retry) {
+          prevRequest._retry = true; // Prevent infinite loop on retry
 
-            return axiosSecure(originalRequest);
+          // Coordinate: Start refresh only if not already in progress
+          if (!refreshingPromise) {
+            refreshingPromise = refreshToken().catch((err) => {
+              refreshingPromise = null;
+              throw err;
+            });
+          }
+
+          // Wait for the shared refresh to complete
+          try {
+            const newToken = await refreshingPromise;
+            // Update default header for all future requests (and this retry)
+            axiosPublic.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+            prevRequest.headers.Authorization = `Bearer ${newToken}`;
+            return axiosPublic(prevRequest);
           } catch (refreshError) {
-            console.error("❌ Refresh token failed", refreshError);
+            refreshingPromise = null;
+            // Refresh failed: Reject all (or sign out)
+            return Promise.reject(refreshError);
           }
         }
 
@@ -72,10 +84,13 @@ export const useAxiosSecure = () => {
       }
     );
 
+    // Cleanup (eject on unmount, but since it's global, optional)
     return () => {
-      axiosSecure.interceptors.response.eject(responseInterceptor);
+      axiosPublic.interceptors.response.eject(responseIntercept);
+      isInterceptorAdded.current = false;
+      refreshingPromise = null; // Reset if needed
     };
-  }, [status, update]);
+  }, [axiosPublic, refreshToken]); // Stable deps
 
-  return axiosSecure;
+  return axiosPublic;
 };

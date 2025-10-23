@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import useHeroBannerImages from '@/app/hooks/useHeroBannerImages';
-import { useAuth } from '@/app/contexts/auth';
 import { Slider } from '@nextui-org/react';
 import Loading from '../../shared/Loading/Loading';
 import CustomSwitch from '../../shared/switch/CustomSwitch';
@@ -12,6 +11,7 @@ import LeftSlides from './LeftSlides';
 import CenterSlides from './CenterSlides';
 import RightSlides from './RightSlides';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Settings";
 
@@ -30,12 +30,8 @@ const HomepageContent = () => {
   const [dragging2, setDragging2] = useState(false);
   const [dragging3, setDragging3] = useState(false);
   const [status, setStatus] = useState(false);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   useEffect(() => {
     if (heroBannerImageList && heroBannerImageList.length > 0) {

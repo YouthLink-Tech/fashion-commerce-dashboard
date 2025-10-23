@@ -13,8 +13,8 @@ import { FaPlus } from 'react-icons/fa6';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
-import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Product Hub";
 
@@ -23,13 +23,9 @@ const VendorsPage = () => {
   const [vendorList, isVendorPending, refetchVendors] = useVendors();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   const handleDeleteVendor = async (vendorId) => {
     Swal.fire({

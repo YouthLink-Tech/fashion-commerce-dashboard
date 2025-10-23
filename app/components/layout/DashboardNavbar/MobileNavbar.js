@@ -2,7 +2,7 @@ import { CgMenuLeft } from "react-icons/cg";
 import AvatarDropdown from "./AvatarDropdown";
 import Notifications from "../../navbar/Notifications";
 
-const MobileNavbar = ({ isToggle, setIsToggle, session, status, existingUserData, handleLogout }) => (
+const MobileNavbar = ({ isToggle, setIsToggle, session, status, handleLogout }) => (
   <div className="flex items-center justify-between px-4 py-3 xl:hidden">
     <button className="duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
       {!isToggle && <CgMenuLeft size={20} />}
@@ -12,7 +12,6 @@ const MobileNavbar = ({ isToggle, setIsToggle, session, status, existingUserData
       {status === "authenticated" &&
         <AvatarDropdown
           session={session}
-          existingUserData={existingUserData}
           handleLogout={handleLogout}
         />
       }

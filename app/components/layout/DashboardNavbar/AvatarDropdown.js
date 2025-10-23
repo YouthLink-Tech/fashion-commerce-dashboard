@@ -3,7 +3,7 @@ import { PiSignOutLight } from "react-icons/pi";
 import { CiLock } from "react-icons/ci";
 import Link from "next/link";
 
-const AvatarDropdown = ({ session, existingUserData, handleLogout }) => (
+const AvatarDropdown = ({ session, handleLogout }) => (
   <Dropdown placement="bottom-end">
     <DropdownTrigger>
       <Avatar
@@ -16,7 +16,7 @@ const AvatarDropdown = ({ session, existingUserData, handleLogout }) => (
     <DropdownMenu aria-label="Profile Actions" variant="flat">
       <DropdownItem isReadOnly showDivider key="profile" className="h-14 gap-2">
         <p className="font-semibold">Logged in as</p>
-        <p className="font-semibold">{existingUserData?.email}</p>
+        <p className="font-semibold">{session?.user?.email}</p>
       </DropdownItem>
       {session && (
         <DropdownItem

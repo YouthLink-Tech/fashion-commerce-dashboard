@@ -15,8 +15,8 @@ import Swal from 'sweetalert2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Supply Chain";
 
@@ -25,13 +25,9 @@ const LocationsPage = () => {
   const [locationList, isLocationPending, refetch] = useLocations();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   const handleDeleteLocation = async (locationId) => {
     Swal.fire({

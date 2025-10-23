@@ -7,7 +7,6 @@ import useNotifications from '@/app/hooks/useNotifications';
 import { getTimeAgo } from './GetTimeAgo';
 import NotificationLoading from '../shared/Loading/NotificationLoading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
-import { useAuth } from '@/app/contexts/auth';
 import { useSession } from 'next-auth/react';
 
 const Notifications = () => {
@@ -22,7 +21,6 @@ const Notifications = () => {
   const [activeTab, setActiveTab] = useState("stock");
   const [filter, setFilter] = useState("all"); // 'all' or 'unread'
   const [filter2, setFilter2] = useState("all"); // 'all' or 'unread'
-  const { existingUserData, isUserLoading } = useAuth();
   const { data: session, status } = useSession();
 
   const displayedNotifications = useMemo(() => {
@@ -45,17 +43,17 @@ const Notifications = () => {
 
   const fetchCustomerSupportNotifications = useCallback(async () => {
     try {
-      const res = await axiosSecure.get(`/api/customer-support/assigned-notifications/${existingUserData._id}`);
+      const res = await axiosSecure.get(`/api/customer-support/assigned-notifications/${session?.user?._id}`);
       setExistingCustomerSupport(res.data);
     } catch (error) {
       console.error('Error fetching category:', error);
     }
-  }, [axiosSecure, existingUserData._id]); // Dependencies
+  }, [axiosSecure, session?.user?._id]); // Dependencies
 
   useEffect(() => {
-    if (!existingUserData._id || status !== "authenticated" || !session?.user?.accessToken) return;
+    if (!session?.user?._id || status !== "authenticated" || !session?.user?.accessToken) return;
     fetchCustomerSupportNotifications();
-  }, [existingUserData._id, status, session?.user?.accessToken, fetchCustomerSupportNotifications]);
+  }, [session?.user?._id, status, session?.user?.accessToken, fetchCustomerSupportNotifications]);
 
   const displayedInboxes = useMemo(() => {
     let baseList;
@@ -130,7 +128,7 @@ const Notifications = () => {
   const handleNotificationClick2 = async (detail) => {
     try {
       const res = await axiosSecure.patch(`/api/customer-support/mark-notification-read/${detail._id}`, {
-        userId: existingUserData?._id,
+        userId: session?.user?._id,
       });
 
       if (res.data.success === true) {
@@ -173,7 +171,7 @@ const Notifications = () => {
     fetchProductNames();
   }, [notificationList, axiosSecure]);
 
-  if (isNotificationPending || isUserLoading || status === "loading") return <NotificationLoading />;
+  if (isNotificationPending || status === "loading") return <NotificationLoading />;
 
   return (
     <Dropdown isOpen={isDropdownOpen} className='p-0' showArrow offset={10} placement="bottom-end"

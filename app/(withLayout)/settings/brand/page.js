@@ -3,7 +3,7 @@ import ColorPaletteSettings from '@/app/components/settings/brand/ColorPaletteSe
 import LogoSettings from '@/app/components/settings/brand/LogoSettings';
 import TabsForSettings from '@/app/components/settings/tabs/TabsForSetting';
 import Loading from '@/app/components/shared/Loading/Loading';
-import { useAuth } from '@/app/contexts/auth';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 import React, { useState } from 'react';
 
 const currentModule = "Settings";
@@ -12,12 +12,8 @@ const BrandPage = () => {
 
   const [activeTab, setActiveTab] = useState('Logo Settings');
   const tabs = ["Logo Settings", "Color Palette Settings"];
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   if (isUserLoading) {
     return <Loading />

@@ -15,11 +15,11 @@ import { CiDeliveryTruck } from "react-icons/ci";
 import { FiShoppingBag, FiBox, FiShoppingCart, FiTrendingDown, FiCreditCard } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { useAuth } from "@/app/contexts/auth";
 import { SidebarLoading } from "../../shared/Loading/SidebarLoading";
 import { MdSupportAgent } from "react-icons/md";
 import Logo from "./Logo";
 import SideNavbarList from "./SideNavbarList";
+import { useUserPermissions } from "@/app/hooks/useUserPermissions";
 
 const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isSidebarPinned, setIsSidebarPinned }) => {
   const pathname = usePathname();
@@ -27,15 +27,9 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
   const [isHoverEnabled, setIsHoverEnabled] = useState(true);
   const { data: session } = useSession();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const getUserRoleForModule = (moduleName) => {
-    return permissions.find(
-      (group) => group.modules?.[moduleName]?.access === true
-    )?.role;
-  };
-  const role1 = getUserRoleForModule("Product Hub");
-  const role2 = getUserRoleForModule("Supply Chain");
+  const { isUserLoading, getRoleForModule, permissions } = useUserPermissions();
+  const role1 = getRoleForModule("Product Hub");  // Returns "Viewer" or null
+  const role2 = getRoleForModule("Supply Chain");  // Same for multiple calls
   const isViewer1 = role1 === "Viewer";
   const isViewer2 = role2 === "Viewer";
 
@@ -267,7 +261,7 @@ const SideNavbar = ({ onClose, isCollapsed, setIsSidebarCollapsed, isToggle, isS
   }
 
   // Show loading state if data is not loaded yet
-  if (isUserLoading || !existingUserData) {
+  if (isUserLoading) {
     return <SidebarLoading />;
   };
 

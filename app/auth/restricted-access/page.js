@@ -281,7 +281,7 @@ const RestrictedAccessLoginPage = () => {
       localStorage.setItem("initialPage", resData?.initialPage || "/auth/restricted-access");
 
       // We expect success here: accessToken and _id present
-      if (resData.accessToken && resData._id) {
+      if (resData.email) {
         toast.custom((t) => (
           <div
             className={`${t.visible ? "animate-enter" : "animate-leave"} max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
@@ -318,6 +318,8 @@ const RestrictedAccessLoginPage = () => {
           redirect: false,
           accessToken: resData.accessToken,
           _id: resData._id,
+          email: resData.email,
+          permissions: JSON.stringify(resData.permissions),
         });
 
         if (result?.ok) {

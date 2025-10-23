@@ -2,7 +2,7 @@
 import Notifications from "../../navbar/Notifications";
 import AvatarDropdown from "./AvatarDropdown";
 
-const DesktopNavbar = ({ session, status, existingUserData, handleLogout }) => (
+const DesktopNavbar = ({ session, status, handleLogout }) => (
   <div className="mx-auto hidden xl:flex items-center justify-between px-6 pt-1">
     <div></div>
     <div className="flex items-center gap-6 rounded-md p-2">
@@ -10,7 +10,6 @@ const DesktopNavbar = ({ session, status, existingUserData, handleLogout }) => (
       {status === "authenticated" &&
         <AvatarDropdown
           session={session}
-          existingUserData={existingUserData}
           handleLogout={handleLogout}
         />
       }

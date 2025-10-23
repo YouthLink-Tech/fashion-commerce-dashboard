@@ -6,7 +6,7 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { useDisclosure } from '@nextui-org/react';
 import toast from 'react-hot-toast';
-import { FaCheck, FaUndo } from 'react-icons/fa';
+import { FaUndo } from 'react-icons/fa';
 import Barcode from '@/app/components/layout/Barcode/Barcode';
 import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
@@ -29,12 +29,12 @@ import ProductExpandedImageModalOrder from '@/app/components/layout/product/Prod
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from "react-icons/hi";
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
-import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import { useSearchParams } from 'next/navigation';
 import { placeShipmentOrder } from '@/app/utils/shipping/placeShipmentOrder';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const PrintButton = dynamic(() => import("@/app/components/orders/PrintButton"), { ssr: false });
 
@@ -95,13 +95,9 @@ const OrderContents = () => {
   const [selectedHandler, setSelectedHandler] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   // Load saved state from localStorage or use defaults
   useEffect(() => {

@@ -12,8 +12,8 @@ import usePaymentMethods from '@/app/hooks/usePaymentMethods';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { AiOutlineEdit } from 'react-icons/ai';
-import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Finances";
 
@@ -21,13 +21,9 @@ const PaymentMethods = () => {
 
   const [paymentMethodList, isPaymentMethodPending, refetch] = usePaymentMethods();
   const axiosSecure = useAxiosSecure();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   // Function to handle the status toggle
   const handleStatusChange = async (id, currentStatus) => {

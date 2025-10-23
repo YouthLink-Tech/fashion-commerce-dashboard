@@ -3,7 +3,6 @@ import { Oxygen } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
 import ReactTanstackProvider from "./utils/Provider/ReactTanstackProvider";
-import { AuthProvider } from "./contexts/auth";
 import SessionWrapper from "./utils/SessionWrapper/SessionWrapper";
 import { WEBSITE_NAME } from "@/app/config/config";
 import "./globals.css";
@@ -27,9 +26,7 @@ export default function RootLayout({ children }) {
         <SessionWrapper>
           <ReactTanstackProvider>
             <NextUIProvider>
-              <AuthProvider>
-                {children}
-              </AuthProvider>
+              {children}
             </NextUIProvider>
             <Toaster />
           </ReactTanstackProvider>

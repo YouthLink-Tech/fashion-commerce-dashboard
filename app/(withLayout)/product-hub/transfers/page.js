@@ -11,11 +11,11 @@ import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalF
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { FaPlus } from 'react-icons/fa6';
-import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import CustomPagination from '@/app/components/shared/pagination/CustomPagination';
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const transferStatusTabs = [
   'All',
@@ -39,12 +39,8 @@ const Transfers = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsTransferOrder'));

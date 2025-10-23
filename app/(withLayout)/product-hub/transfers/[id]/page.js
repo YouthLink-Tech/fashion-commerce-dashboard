@@ -10,7 +10,6 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import dynamic from 'next/dynamic';
-import { useAuth } from '@/app/contexts/auth';
 import Progressbar from '@/app/components/product/progress/Progressbar';
 import ExitConfirmationModalProduct from '@/app/components/product/modal/ExitConfirmationModalProduct';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
@@ -18,6 +17,7 @@ import { useSession } from 'next-auth/react';
 import HeadingText from '@/app/components/product/headingText/HeadingText';
 import { getProductTitleById } from '@/app/components/product/productTitle/getProductTitleById';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/product/pdf/TransferOrderPDFButton"), { ssr: false });
 
@@ -46,13 +46,9 @@ const EditTransferOrder = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [headingMessage, setHeadingMessage] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
   const { data: session, status } = useSession();
 
   // Format date to yyyy-mm-dd for date input field

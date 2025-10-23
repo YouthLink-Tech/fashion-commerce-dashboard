@@ -1,9 +1,9 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
-import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import useShippingZones from '@/app/hooks/useShippingZones';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -23,13 +23,9 @@ const ExistingZones = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('inside dhaka');
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
-  const isOwner = role === "Owner";
+  const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
+  const isOwner = isOwnerForModule(currentModule);
 
   const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 

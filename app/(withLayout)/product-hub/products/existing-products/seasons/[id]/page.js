@@ -17,7 +17,6 @@ import { TbBoxOff, TbColumnInsertRight } from 'react-icons/tb';
 import { BsGraphDownArrow } from 'react-icons/bs';
 import useLocations from '@/app/hooks/useLocations';
 import Loading from '@/app/components/shared/Loading/Loading';
-import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/shared/tabs/TabsOrder';
 import CustomPagination from '@/app/components/shared/pagination/CustomPagination';
 import PaginationSelect from '@/app/components/shared/pagination/PaginationSelect';
@@ -25,6 +24,7 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -60,12 +60,8 @@ const SeasonPage = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
   const { data: session, status } = useSession();
 
   useEffect(() => {

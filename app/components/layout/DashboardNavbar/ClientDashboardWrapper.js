@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/contexts/auth";
 import { signOut, useSession } from "next-auth/react";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config/config";
@@ -15,7 +14,6 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
   const [isToggle, setIsToggle] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { existingUserData, isUserLoading } = useAuth();
 
   const handleClose = () => setIsToggle(false);
 
@@ -56,7 +54,7 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
   }, [isToggle]);
 
   // Show loading state if data is not loaded yet
-  if (isUserLoading || !existingUserData || status === "loading") {
+  if (status === "loading") {
     return <DashboardWrapperLoading />;
   };
 
@@ -99,13 +97,11 @@ const ClientDashboardWrapper = ({ isSidebarCollapsed,
       <DesktopNavbar
         session={session}
         status={status}
-        existingUserData={existingUserData}
         handleLogout={handleLogout}
       />
       <MobileNavbar
         session={session}
         status={status}
-        existingUserData={existingUserData}
         handleLogout={handleLogout}
         isToggle={isToggle}
         setIsToggle={setIsToggle}

@@ -11,7 +11,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import useCategories from "@/app/hooks/useCategories";
 import { useEffect, useState } from "react";
 import useSeasons from "@/app/hooks/useSeasons";
-import { useAuth } from "@/app/contexts/auth";
+import { useUserPermissions } from "@/app/hooks/useUserPermissions";
 
 const currentModule = "Product Hub";
 
@@ -23,12 +23,8 @@ const EditProduct = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('category');
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isAuthorized = role === "Owner" || role === "Editor";
+  const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
+  const isAuthorized = isAuthorizedForModule(currentModule);
 
   // Scroll event listener to track when to add background color
   useEffect(() => {

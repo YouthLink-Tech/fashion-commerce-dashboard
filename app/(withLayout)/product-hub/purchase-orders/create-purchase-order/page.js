@@ -4,10 +4,10 @@ import LocationSelect from '@/app/components/product/select/LocationSelect';
 import VendorSelect from '@/app/components/product/select/VendorSelect';
 import { formatDate } from '@/app/components/shared/date-format/DateFormat';
 import Loading from '@/app/components/shared/Loading/Loading';
-import { useAuth } from '@/app/contexts/auth';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -40,12 +40,8 @@ const CreatePurchaseOrder = () => {
 	const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
 	const [file, setFile] = useState(null);
 	const fileInputRef = useRef(null);
-	const { existingUserData, isUserLoading } = useAuth();
-	const permissions = existingUserData?.permissions || [];
-	const role = permissions?.find(
-		(group) => group.modules?.[currentModule]?.access === true
-	)?.role;
-	const isOwner = role === "Owner";
+	const { isUserLoading, isOwnerForModule } = useUserPermissions();
+	const isOwner = isOwnerForModule(currentModule);
 
 	// Update handleVariantChange to initialize values if not set
 	const handleVariantChange = (index, field, value, productId, size, colorName, colorCode) => {

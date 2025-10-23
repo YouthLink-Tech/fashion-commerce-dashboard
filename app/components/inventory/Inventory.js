@@ -23,8 +23,8 @@ import { BiTransferAlt, BiMinusCircle } from "react-icons/bi";
 import toast from 'react-hot-toast';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { FaHistory } from 'react-icons/fa';
-import { useAuth } from '@/app/contexts/auth';
 import Swal from 'sweetalert2';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Product Hub";
 
@@ -51,12 +51,8 @@ const Inventory = () => {
   const [showOutOfStock, setShowOutOfStock] = useState(false);
   const [selectedReturnInfos, setSelectedReturnInfos] = useState([]);
   const [selectedForfeitedInfos, setSelectedForfeitedInfos] = useState([]);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isOwner = role === "Owner";
+  const { isUserLoading, isOwnerForModule } = useUserPermissions();
+  const isOwner = isOwnerForModule(currentModule);
 
   useEffect(() => {
     if (searchQuery) {

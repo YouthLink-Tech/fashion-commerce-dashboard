@@ -1,17 +1,17 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "../contexts/auth";
 import { useAxiosSecure } from "./useAxiosSecure";
+import { useSession } from "next-auth/react";
 
 const useNotifications = () => {
 
   const axiosSecure = useAxiosSecure();
-  const { existingUserData } = useAuth();
-  const userEmail = existingUserData?.email;
+  const { data: session, status } = useSession();
+  const userEmail = session?.user?.email;
 
   const { data: notificationList, isPending: isNotificationPending, refetch } = useQuery({
     queryKey: ["notificationList"],
-    enabled: !!userEmail,
+    enabled: status === "authenticated" && !!userEmail,
     queryFn: async () => {
       const res = await axiosSecure.get(`/api/notifications/merged-all?email=${userEmail}`);
       return res?.data;

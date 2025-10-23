@@ -1,7 +1,6 @@
 "use client";
 import { cities } from '@/app/data/cities';
 import Loading from '@/app/components/shared/Loading/Loading';
-import { useAuth } from '@/app/contexts/auth';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,6 +17,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const currentModule = "Supply Chain";
 
@@ -35,12 +35,8 @@ const AddShippingZone = () => {
   const [cityError, setCityError] = useState(false);
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const suggestionsRefCity = useRef(null);
-  const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isOwner = role === "Owner";
+  const { isUserLoading, isOwnerForModule } = useUserPermissions();
+  const isOwner = isOwnerForModule(currentModule);
   const { data: session, status } = useSession();
 
   const { register, handleSubmit, resetField, watch, setValue, formState: { errors } } = useForm();
