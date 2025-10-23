@@ -42,18 +42,20 @@ const Notifications = () => {
   }, [showAll, notificationList, filter]);
 
   const fetchCustomerSupportNotifications = useCallback(async () => {
+    if (status !== "authenticated") return;
     try {
       const res = await axiosSecure.get(`/api/customer-support/assigned-notifications/${session?.user?._id}`);
       setExistingCustomerSupport(res.data);
     } catch (error) {
       console.error('Error fetching category:', error);
     }
-  }, [axiosSecure, session?.user?._id]); // Dependencies
+  }, [axiosSecure, session?.user?._id, status]); // Dependencies
 
   useEffect(() => {
-    if (!session?.user?._id || status !== "authenticated" || !session?.user?.accessToken) return;
-    fetchCustomerSupportNotifications();
-  }, [session?.user?._id, status, session?.user?.accessToken, fetchCustomerSupportNotifications]);
+    if (status === "authenticated") {
+      fetchCustomerSupportNotifications();
+    }
+  }, [status, fetchCustomerSupportNotifications]);
 
   const displayedInboxes = useMemo(() => {
     let baseList;

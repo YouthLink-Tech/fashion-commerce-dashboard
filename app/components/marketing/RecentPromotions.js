@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import useOrders from '@/app/hooks/useOrders';
@@ -9,7 +8,6 @@ import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { FaRegClone } from "react-icons/fa6";
-import Swal from 'sweetalert2';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import * as XLSX from 'xlsx';
@@ -18,6 +16,7 @@ import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from 'react-icons/hi';
 import CustomSwitch from '../shared/switch/CustomSwitch';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
+import { useUserPermissions } from '@/app/hooks/useUserPermissions';
 
 const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
 
