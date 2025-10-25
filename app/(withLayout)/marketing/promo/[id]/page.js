@@ -3,7 +3,7 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import { Checkbox, Tab, Tabs } from '@nextui-org/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -36,6 +36,7 @@ const EditPromo = () => {
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+  const hasFetched = useRef(false);
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
@@ -51,40 +52,44 @@ const EditPromo = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const fetchPromoCode = useCallback(async () => {
+    try {
+      const response = await axiosSecure.get(`/api/promo-code/single-by-id/${id}`);
+      const promo = response.data;
+
+      // Ensure the expiry date is set to midnight to avoid timezone issues
+      const fetchedExpiryDate = formatDateForInput(promo.expiryDate);
+
+      // Set form fields with fetched promo data
+      setValue('promoCode', promo?.promoCode);
+      setValue('promoDiscountValue', promo?.promoDiscountValue);
+      setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
+      setValue('maxAmount', promo?.maxAmount || 0);
+      setValue('minAmount', promo?.minAmount || 0);
+      setIsSelected(promo?.isWelcomeEmailPromoCode);
+
+      setPromoDiscountType(promo?.promoDiscountType);
+      setPromoDescription(promo?.promoDescription || "");
+      setImage(promo?.imageUrl || null);
+      setIsLoading(false);
+    } catch (err) {
+      // console.error(err); // Log error to the console for debugging
+      // toast.error("Failed to fetch promo code details!");
+      router.push('/marketing');
+    }
+  }, [axiosSecure, id, router, setValue]);
+
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchPromoCode = async () => {
-      try {
-        const response = await axiosSecure.get(`/api/promo-code/single-by-id/${id}`);
-        const promo = response.data;
+    if (!hasFetched.current) {
+      fetchPromoCode();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        // Ensure the expiry date is set to midnight to avoid timezone issues
-        const fetchedExpiryDate = formatDateForInput(promo.expiryDate);
-
-        // Set form fields with fetched promo data
-        setValue('promoCode', promo?.promoCode);
-        setValue('promoDiscountValue', promo?.promoDiscountValue);
-        setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
-        setValue('maxAmount', promo?.maxAmount || 0);
-        setValue('minAmount', promo?.minAmount || 0);
-        setIsSelected(promo?.isWelcomeEmailPromoCode);
-
-        setPromoDiscountType(promo?.promoDiscountType);
-        setPromoDescription(promo?.promoDescription || "");
-        setImage(promo?.imageUrl || null);
-        setIsLoading(false);
-      } catch (err) {
-        // console.error(err); // Log error to the console for debugging
-        // toast.error("Failed to fetch promo code details!");
-        router.push('/marketing');
-      }
-    };
-
-    fetchPromoCode();
-  }, [id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
+  }, [id, fetchPromoCode, status]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {
@@ -244,7 +249,7 @@ const EditPromo = () => {
     }
   };
 
-  if (isLoading || status === "loading") {
+  if (isLoading) {
     return <Loading />;
   }
 
