@@ -30,7 +30,7 @@ const EditPromo = () => {
   const [promoDescription, setPromoDescription] = useState("");
   const [image, setImage] = useState(null);
   const [dateError, setDateError] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isSelected, setIsSelected] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [imageError, setImageError] = useState("");
@@ -249,7 +249,7 @@ const EditPromo = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || status === "loading") {
     return <Loading />;
   }
 

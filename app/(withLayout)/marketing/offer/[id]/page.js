@@ -4,7 +4,7 @@ import { Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -47,11 +47,12 @@ const EditOffer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [dragging, setDragging] = useState(false);
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+  const hasFetched = useRef(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -91,53 +92,57 @@ const EditOffer = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const fetchOfferData = useCallback(async () => {
+    try {
+      const response = await axiosSecure.get(`/api/special-offer/single/${id}`);
+      const offer = response.data;
+
+      // Ensure the expiry date is set to midnight to avoid timezone issues
+      const fetchedExpiryDate = formatDateForInput(offer.expiryDate);
+
+      // Set form fields with fetched offer data
+      setValue('offerTitle', offer?.offerTitle);
+      setValue('badgeTitle', offer?.badgeTitle);
+      setValue('offerDiscountValue', offer?.offerDiscountValue);
+      setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
+      setValue('maxAmount', offer?.maxAmount || 0);
+      setValue('minAmount', offer?.minAmount || 0);
+      setOfferDiscountType(offer?.offerDiscountType);
+
+      setOfferDescription(offer?.offerDescription || "");
+      setImage(offer?.imageUrl || null);
+
+      setSelectedCategories(offer?.selectedCategories || []);
+      setSelectedProductIds(offer?.selectedProductIds || []);
+
+      // Determine which tab to show based on the fetched data
+      if (offer?.selectedCategories?.length > 0) {
+        setSelectedTab('Categories');
+      } else if (offer?.selectedProductIds?.length > 0) {
+        setSelectedTab('Products');
+      } else {
+        setSelectedTab('Products'); // Default tab if both are empty
+      }
+      setIsLoading(false);
+    } catch (err) {
+      // console.error(err); // Log error to the console for debugging
+      // toast.error("Failed to fetch offer code details!");
+      router.push('/marketing');
+    }
+  }, [axiosSecure, id, router, setValue]);
+
   useEffect(() => {
 
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchOfferData = async () => {
-      try {
-        const response = await axiosSecure.get(`/api/special-offer/single/${id}`);
-        const offer = response.data;
+    if (!hasFetched.current) {
+      fetchOfferData();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        // Ensure the expiry date is set to midnight to avoid timezone issues
-        const fetchedExpiryDate = formatDateForInput(offer.expiryDate);
-
-        // Set form fields with fetched offer data
-        setValue('offerTitle', offer?.offerTitle);
-        setValue('badgeTitle', offer?.badgeTitle);
-        setValue('offerDiscountValue', offer?.offerDiscountValue);
-        setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
-        setValue('maxAmount', offer?.maxAmount || 0);
-        setValue('minAmount', offer?.minAmount || 0);
-        setOfferDiscountType(offer?.offerDiscountType);
-
-        setOfferDescription(offer?.offerDescription || "");
-        setImage(offer?.imageUrl || null);
-
-        setSelectedCategories(offer?.selectedCategories || []);
-        setSelectedProductIds(offer?.selectedProductIds || []);
-
-        // Determine which tab to show based on the fetched data
-        if (offer?.selectedCategories?.length > 0) {
-          setSelectedTab('Categories');
-        } else if (offer?.selectedProductIds?.length > 0) {
-          setSelectedTab('Products');
-        } else {
-          setSelectedTab('Products'); // Default tab if both are empty
-        }
-        setIsLoading(false);
-      } catch (err) {
-        // console.error(err); // Log error to the console for debugging
-        // toast.error("Failed to fetch offer code details!");
-        router.push('/marketing');
-      }
-    };
-
-    fetchOfferData();
-  }, [id, axiosSecure, setValue, categoryList, session?.user?.accessToken, status, router]);
+  }, [id, fetchOfferData, status]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {

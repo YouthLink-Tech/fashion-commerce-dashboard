@@ -5,7 +5,7 @@ import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHea
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -20,40 +20,45 @@ const EditLocation = () => {
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isSelected, setIsSelected] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [originalIsPrimary, setOriginalIsPrimary] = useState(false); // store original status
   const [otherLocations, setOtherLocations] = useState([]); // to list in modal
   const [newPrimaryId, setNewPrimaryId] = useState(null); // user must select one
   const [newPrimaryName, setNewPrimaryName] = useState("");
+  const hasFetched = useRef(false);
+
+  const fetchLocationDetails = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/location/single/${id}`);
+      const otherRes = await axiosSecure.get(`/api/location/all-other/${id}`);
+
+      setValue('locationName', data?.locationName);
+      setValue('contactPersonName', data?.contactPersonName);
+      setValue('contactPersonNumber', data?.contactPersonNumber);
+      setValue('locationAddress', data?.locationAddress);
+      setValue('cityName', data?.cityName);
+      setValue('postalCode', data?.postalCode);
+      setIsSelected(data?.isPrimaryLocation);
+
+      setOriginalIsPrimary(data?.isPrimaryLocation);
+      setOtherLocations(otherRes?.data || []);
+
+    } catch (error) {
+      router.push("/supply-chain/locations");
+    }
+  }, [axiosSecure, id, router, setValue]);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchLocationDetails = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/location/single/${id}`);
-        const otherRes = await axiosSecure.get(`/api/location/all-other/${id}`);
+    if (!hasFetched.current) {
+      fetchLocationDetails();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        setValue('locationName', data?.locationName);
-        setValue('contactPersonName', data?.contactPersonName);
-        setValue('contactPersonNumber', data?.contactPersonNumber);
-        setValue('locationAddress', data?.locationAddress);
-        setValue('cityName', data?.cityName);
-        setValue('postalCode', data?.postalCode);
-        setIsSelected(data?.isPrimaryLocation);
-
-        setOriginalIsPrimary(data?.isPrimaryLocation);
-        setOtherLocations(otherRes?.data || []);
-
-      } catch (error) {
-        router.push("/supply-chain/locations");
-      }
-    };
-
-    fetchLocationDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [id, fetchLocationDetails, status]);
 
   const onSubmit = async (data) => {
     try {

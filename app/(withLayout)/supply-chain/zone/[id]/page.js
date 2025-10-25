@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -29,77 +29,82 @@ export default function EditShippingZone() {
   const [cityError, setCityError] = useState(false);
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const suggestionsRefCity = useRef(null);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const hasFetched = useRef(false);
 
   const {
     register, handleSubmit, setValue, formState: { errors, isSubmitting }
   } = useForm();
 
+  const fetchShippingZone = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/shipping-zone/single/${params.id}`);
+
+      setValue('shippingZone', data?.shippingZone);
+      setSelectedCities(data?.selectedCity);
+      setSelectedShipmentHandlerId(data?.selectedShipmentHandlerId);
+      setShippingCharges(data?.shippingCharges);
+      setShippingDurations(data?.shippingDurations);
+
+      // Set shipping charges based on delivery types
+      if (data?.shippingCharges) {
+        const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
+
+        if (deliveryTypes) {
+          if (deliveryTypes.length === 1) {
+            // Only one delivery type, set the single shipping charge
+            const deliveryType = deliveryTypes[0];
+            setValue('shippingCharge', data.shippingCharges[deliveryType]);
+          } else if (deliveryTypes.length > 1) {
+            // Set values for both STANDARD and EXPRESS charges
+            if (data.shippingCharges.STANDARD) {
+              setValue('shippingChargeStandard', data.shippingCharges.STANDARD);
+            }
+            if (data.shippingCharges.EXPRESS) {
+              setValue('shippingChargeExpress', data.shippingCharges.EXPRESS);
+            }
+          }
+        }
+      }
+
+      // Set shipping durations based on delivery types
+      if (data?.shippingDurations) {
+        const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
+
+        if (deliveryTypes) {
+          if (deliveryTypes.length === 1) {
+            // Only one delivery type, set the single shipping duration
+            const deliveryType = deliveryTypes[0];
+            setValue('shippingTime', data.shippingDurations[deliveryType]);
+          } else if (deliveryTypes.length > 1) {
+            // Set values for both STANDARD and EXPRESS durations
+            if (data.shippingDurations.STANDARD) {
+              setValue('shippingDaysStandard', data.shippingDurations.STANDARD);
+            }
+            if (data.shippingDurations.EXPRESS) {
+              setValue('shippingHourExpress', data.shippingDurations.EXPRESS);
+            }
+          }
+        }
+      }
+
+    } catch (error) {
+      // toast.error("Failed to load shipping zone details.");
+      router.push('/supply-chain/zone/existing-zones');
+    }
+  }, [axiosSecure, params.id, router, setValue]);
+
   useEffect(() => {
     if (!params.id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchShippingZone = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/shipping-zone/single/${params.id}`);
+    if (!hasFetched.current) {
+      fetchShippingZone();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        setValue('shippingZone', data?.shippingZone);
-        setSelectedCities(data?.selectedCity);
-        setSelectedShipmentHandlerId(data?.selectedShipmentHandlerId);
-        setShippingCharges(data?.shippingCharges);
-        setShippingDurations(data?.shippingDurations);
-
-        // Set shipping charges based on delivery types
-        if (data?.shippingCharges) {
-          const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
-
-          if (deliveryTypes) {
-            if (deliveryTypes.length === 1) {
-              // Only one delivery type, set the single shipping charge
-              const deliveryType = deliveryTypes[0];
-              setValue('shippingCharge', data.shippingCharges[deliveryType]);
-            } else if (deliveryTypes.length > 1) {
-              // Set values for both STANDARD and EXPRESS charges
-              if (data.shippingCharges.STANDARD) {
-                setValue('shippingChargeStandard', data.shippingCharges.STANDARD);
-              }
-              if (data.shippingCharges.EXPRESS) {
-                setValue('shippingChargeExpress', data.shippingCharges.EXPRESS);
-              }
-            }
-          }
-        }
-
-        // Set shipping durations based on delivery types
-        if (data?.shippingDurations) {
-          const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
-
-          if (deliveryTypes) {
-            if (deliveryTypes.length === 1) {
-              // Only one delivery type, set the single shipping duration
-              const deliveryType = deliveryTypes[0];
-              setValue('shippingTime', data.shippingDurations[deliveryType]);
-            } else if (deliveryTypes.length > 1) {
-              // Set values for both STANDARD and EXPRESS durations
-              if (data.shippingDurations.STANDARD) {
-                setValue('shippingDaysStandard', data.shippingDurations.STANDARD);
-              }
-              if (data.shippingDurations.EXPRESS) {
-                setValue('shippingHourExpress', data.shippingDurations.EXPRESS);
-              }
-            }
-          }
-        }
-
-      } catch (error) {
-        // toast.error("Failed to load shipping zone details.");
-        router.push('/supply-chain/zone/existing-zones');
-      }
-    };
-
-    fetchShippingZone();
-  }, [params.id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [params.id, fetchShippingZone, status]);
 
   // Filter cities based on the search term and exclude selected cities
   const filteredCities = cities.filter((city) => city.toLowerCase().includes(searchTerm.toLowerCase()) &&
