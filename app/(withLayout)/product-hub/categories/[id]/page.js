@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -49,10 +49,10 @@ export default function EditCategory() {
   const [sizeGuideImageError, setSizeGuideImageError] = useState("");
   const [sizeRangeError, setSizeRangeError] = useState("");
   const [subCategoryError, setSubCategoryError] = useState("");
-
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { category: '', sizes: [{ size: '' }], subCategories: [{ subCategory: '' }] }
   });
+  const hasFetched = useRef(false);
 
   // Fetch all unique sizes from categoryList
   useEffect(() => {
@@ -86,29 +86,34 @@ export default function EditCategory() {
     setFetchedSubCategories(allSubCategories); // Set the state with fetched subcategories
   }, [categoryList]);
 
+  const fetchCategory = useCallback(async () => {
+    try {
+      const res = await axiosSecure.get(`/api/category/single/${params.id}`);
+      const category = res.data;
+      setValue('category', category?.label);
+      setCategoryKey(category?.key);
+      setSelectedSizes(category?.sizes);
+      setSelectedSubCategories(category?.subCategories.map(sub => sub.label));
+      setImage(category?.imageUrl || null);
+      setCategoryDetails(category);
+    } catch (error) {
+      // console.error('Error fetching category:', error);
+      // toast.error('Error fetching category data.');
+      router.push('/product-hub/categories');
+    }
+  }, [axiosSecure, params.id, router, setValue]);
+
   useEffect(() => {
     if (!params.id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchCategory = async () => {
-      try {
-        const res = await axiosSecure.get(`/api/category/single/${params.id}`);
-        const category = res.data;
-        setValue('category', category?.label);
-        setCategoryKey(category?.key);
-        setSelectedSizes(category?.sizes);
-        setSelectedSubCategories(category?.subCategories.map(sub => sub.label));
-        setImage(category?.imageUrl || null);
-        setCategoryDetails(category);
-      } catch (error) {
-        // console.error('Error fetching category:', error);
-        // toast.error('Error fetching category data.');
-        router.push('/product-hub/categories');
-      }
-    };
-    fetchCategory();
-  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
+    if (!hasFetched.current) {
+      fetchCategory();
+      hasFetched.current = true; // mark as fetched
+    }
+
+  }, [params.id, fetchCategory, status]);
 
   // Close suggestions if clicking outside the input or suggestions
   useEffect(() => {

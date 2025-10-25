@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -28,6 +28,7 @@ const EditShipmentHandler = () => {
   const [imageError, setImageError] = useState("");
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const VALID_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+  const hasFetched = useRef(false);
 
   const { register, handleSubmit, setValue, trigger, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
@@ -41,31 +42,35 @@ const EditShipmentHandler = () => {
     }
   });
 
+  const fetchShipmentHandler = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/shipment-handler/single/${id}`);
+      setValue('shipmentHandlerName', data?.shipmentHandlerName);
+      setValue('contactPersonName', data?.contactPersonName);
+      setValue('contactPersonNumber', data?.contactPersonNumber);
+      setValue('officeAddress', data?.officeAddress);
+      setValue('trackingUrl', data?.trackingUrl);
+      setDeliveryType(data?.deliveryType || []);
+      setValue('deliveryType', data?.deliveryType || []);
+      setImage(data?.imageUrl);
+    } catch (error) {
+      // toast.error("Failed to load shipping zone details.");
+      router.push('/supply-chain/zone/add-shipping-zone');
+    }
+  }, [axiosSecure, id, router, setValue]);
+
   useEffect(() => {
 
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchShipmentHandler = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/shipment-handler/single/${id}`);
-        setValue('shipmentHandlerName', data?.shipmentHandlerName);
-        setValue('contactPersonName', data?.contactPersonName);
-        setValue('contactPersonNumber', data?.contactPersonNumber);
-        setValue('officeAddress', data?.officeAddress);
-        setValue('trackingUrl', data?.trackingUrl);
-        setDeliveryType(data?.deliveryType || []);
-        setValue('deliveryType', data?.deliveryType || []);
-        setImage(data?.imageUrl);
-      } catch (error) {
-        // toast.error("Failed to load shipping zone details.");
-        router.push('/supply-chain/zone/add-shipping-zone');
-      }
-    };
+    if (!hasFetched.current) {
+      fetchShipmentHandler();
+      hasFetched.current = true; // mark as fetched
+    }
 
-    fetchShipmentHandler();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [id, fetchShipmentHandler, status]);
 
   const handleDeliveryType = (option) => {
     let deliveryTypes;

@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -18,31 +18,36 @@ export default function EditSeason() {
   const params = useParams();
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [dragging, setDragging] = useState(false);
   const [imageError, setImageError] = useState("");
-
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const hasFetched = useRef(false);
+
+  const fetchSeason = useCallback(async () => {
+    try {
+      const res = await axiosSecure.get(`/api/season/single/${params.id}`);
+      const season = res.data;
+      setValue('seasonName', season?.seasonName);
+      setImage(season?.imageUrl || null);
+    } catch (error) {
+      // console.error('Error fetching season:', error);
+      // toast.error('Error fetching season data.');
+      router.push('/product-hub/seasons');
+    }
+  }, [axiosSecure, params.id, router, setValue]);
 
   useEffect(() => {
     if (!params.id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchSeason = async () => {
-      try {
-        const res = await axiosSecure.get(`/api/season/single/${params.id}`);
-        const season = res.data;
-        setValue('seasonName', season?.seasonName);
-        setImage(season?.imageUrl || null);
-      } catch (error) {
-        // console.error('Error fetching season:', error);
-        // toast.error('Error fetching season data.');
-        router.push('/product-hub/seasons');
-      }
-    };
-    fetchSeason();
-  }, [params.id, axiosSecure, setValue, session?.user?.accessToken, status, router]);
+    if (!hasFetched.current) {
+      fetchSeason();
+      hasFetched.current = true; // mark as fetched
+    }
+
+  }, [params.id, fetchSeason, status]);
 
   const uploadSingleFileToGCS = async (file) => {
     try {

@@ -5,7 +5,7 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
@@ -21,13 +21,14 @@ import toast from "react-hot-toast";
 import { HiOutlineDownload } from "react-icons/hi";
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import Loading from "@/app/components/shared/Loading/Loading";
 
 const initialColumns = ['Expense Category', 'Sub-Category', 'Tags', 'Amount', 'Date of Expense', 'Payment Method', 'Paid To', 'Notes', 'Invoice ID / Transaction ID', 'Attachment'];
 
 const ExpenseEntries = () => {
 
   const { id } = useParams();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const [expenseCategoryName, setExpenseCategoryName] = useState('');
@@ -50,26 +51,31 @@ const ExpenseEntries = () => {
   const dropdownRef = useRef(null);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openDropdown2, setOpenDropdown2] = useState(false);
+  const hasFetched = useRef(false);
+
+  const fetchExpenseEntries = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/expenses/entry/category/${id}`);
+      setExpenseCategoryName(data?.expenseCategoryName);
+      setExpenseEntries(data?.expenseEntries);
+    } catch (error) {
+      // console.error(error);
+      // toast.error("Failed to load payment method details.");
+      router.push('/finances/expenses');
+    }
+  }, [axiosSecure, id, router]);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchExpenseEntries = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/expenses/entry/category/${id}`);
-        setExpenseCategoryName(data?.expenseCategoryName);
-        setExpenseEntries(data?.expenseEntries);
-      } catch (error) {
-        // console.error(error);
-        // toast.error("Failed to load payment method details.");
-        router.push('/finances/expenses');
-      }
+    if (!hasFetched.current) {
+      fetchExpenseEntries();
+      hasFetched.current = true; // mark as fetched
     };
 
-    fetchExpenseEntries();
-  }, [id, axiosSecure, status, session, router]);
+  }, [id, fetchExpenseEntries, status]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsExpenseEntries'));
@@ -533,6 +539,8 @@ const ExpenseEntries = () => {
       setPage(0); // Reset to the first page if no data
     }
   }, [paginatedEntries]);
+
+  if (status === "loading") return <Loading />;
 
   return (
     <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50 px-6'>

@@ -4,7 +4,7 @@ import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -16,8 +16,7 @@ const EditVendor = () => {
   const { id } = useParams();
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
-  const { data: session, status } = useSession();
-
+  const { status } = useSession();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       value: '',
@@ -27,28 +26,33 @@ const EditVendor = () => {
       contactPersonName: ''
     }
   });
+  const hasFetched = useRef(false);
+
+  const fetchVendorDetails = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/vendor/single/${id}`);
+
+      setValue('vendorName', data?.value);
+      setValue('contactPersonName', data?.contactPersonName);
+      setValue('contactPersonNumber', data?.contactPersonNumber);
+      setValue('vendorAddress', data?.vendorAddress);
+    } catch (error) {
+      // toast.error("Failed to load this vendor details.");
+      router.push('/product-hub/vendors');
+    }
+  }, [axiosSecure, id, router, setValue]);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchVendorDetails = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/vendor/single/${id}`);
+    if (!hasFetched.current) {
+      fetchVendorDetails();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        setValue('vendorName', data?.value);
-        setValue('contactPersonName', data?.contactPersonName);
-        setValue('contactPersonNumber', data?.contactPersonNumber);
-        setValue('vendorAddress', data?.vendorAddress);
-      } catch (error) {
-        // toast.error("Failed to load this vendor details.");
-        router.push('/product-hub/vendors');
-      }
-    };
-
-    fetchVendorDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [id, fetchVendorDetails, status]);
 
   const onSubmit = async (data) => {
     try {

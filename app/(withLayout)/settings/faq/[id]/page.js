@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { FaArrowLeft, FaPlus } from 'react-icons/fa6';
 import arrowSvgImage from "/public/card-images/arrow.svg";
@@ -27,32 +27,37 @@ const EditFAQPage = () => {
   const { fields, append, remove } = useFieldArray({ control, name: "faqs" });
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const hasFetched = useRef(false);
+
+  const fetchFAQDetails = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/faq/single/${id}`);
+
+      setValue('pageTitle', data?.pageTitle);
+      setValue('faqDescription', data?.faqDescription);
+
+      if (data?.faqs?.length > 0) {
+        setValue('faqs', data.faqs);
+      }
+
+    } catch (error) {
+      // toast.error("Failed to load FAQ details.");
+      router.push("/settings/faq");
+    }
+  }, [axiosSecure, id, router, setValue]);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchFAQDetails = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/faq/single/${id}`);
+    if (!hasFetched.current) {
+      fetchFAQDetails();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        setValue('pageTitle', data?.pageTitle);
-        setValue('faqDescription', data?.faqDescription);
-
-        if (data?.faqs?.length > 0) {
-          setValue('faqs', data.faqs);
-        }
-
-      } catch (error) {
-        // toast.error("Failed to load FAQ details.");
-        router.push("/settings/faq");
-      }
-    };
-
-    fetchFAQDetails();
-  }, [id, setValue, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [id, fetchFAQDetails, status]);
 
   const onSubmit = async (data) => {
 

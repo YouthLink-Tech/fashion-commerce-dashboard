@@ -3,7 +3,7 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -49,7 +49,8 @@ const EditTransferOrder = () => {
   const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
   const isAuthorized = isAuthorizedForModule(currentModule);
   const isOwner = isOwnerForModule(currentModule);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const hasFetched = useRef(false);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -63,10 +64,6 @@ const EditTransferOrder = () => {
   // Memoized function to fetch transfer order data
   const fetchTransferOrderData = useCallback(async () => {
     try {
-      if (!id || typeof window === "undefined") return;
-
-      if (status !== "authenticated" || !session?.user?.accessToken) return;
-
       const response = await axiosSecure.get(`/api/transfer-order/single/${id}`);
       const order = response?.data;
       const fetchedEstimatedArrival = formatDateForInput(order?.estimatedArrival);
@@ -88,12 +85,20 @@ const EditTransferOrder = () => {
       // toast.error("Failed to fetch transfer order details!");
       router.push("/product-hub/transfers")
     }
-  }, [id, axiosSecure, session?.user?.accessToken, status, router]);
+  }, [id, axiosSecure, router]);
 
   // Initial load useEffect
   useEffect(() => {
-    fetchTransferOrderData();
-  }, [fetchTransferOrderData]);
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated") return;
+
+    if (!hasFetched.current) {
+      fetchTransferOrderData();
+      hasFetched.current = true; // mark as fetched
+    }
+
+  }, [id, fetchTransferOrderData, status]);
 
   const totalAcceptRejectValues = useMemo(() =>
     transferOrderVariants?.reduce(

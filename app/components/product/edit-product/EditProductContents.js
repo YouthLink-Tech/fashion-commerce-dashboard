@@ -120,6 +120,7 @@ const EditProductContents = () => {
   const { isUserLoading, isOwnerForModule } = useUserPermissions();
   const isOwner = isOwnerForModule(currentModule);
   const { data: session, status } = useSession();
+  const hasFetched = useRef(false);
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) => season.seasonName.toLowerCase().includes(searchTerm.toLowerCase())).sort((a, b) => a.seasonName.localeCompare(b.seasonName)); // Sorting A → Z
@@ -699,61 +700,65 @@ const EditProductContents = () => {
     selectedCategoryRef.current = selectedCategory;
   }, [selectedCategory]);
 
+  const fetchProductDetails = useCallback(async () => {
+    try {
+      const { data } = await axiosPublic.get(`/api/products/single/${id}`);
+
+      setValue('productTitle', data?.productTitle);
+      setValue('batchCode', data?.batchCode);
+      setValue('weight', data?.weight);
+      setValue('regularPrice', data?.regularPrice);
+      setValue('discountValue', data?.discountValue);
+      setValue('productDetails', data?.productDetails);
+      setImage(data?.thumbnailImageUrl);
+      setDiscountType(data?.discountType);
+      setProductDetails(data?.productDetails);
+      setMaterialCare(data?.materialCare);
+      setSizeFit(data?.sizeFit);
+      setSelectedCategory(data?.category);
+      setValue('category', data?.category);
+      setSelectedSubCategories(data?.subCategories);
+      setGroupSelected(data?.groupOfSizes);
+      setGroupSelected2(data?.allSizes);
+      setSelectedAvailableColors(data?.availableColors);
+      setSelectedNewArrival(data?.newArrival);
+      setIsTrending(data?.trending);
+      setSelectedVendors(data?.vendors);
+      setSelectedTags(data?.tags);
+      initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
+      setProductId(data?.productId);
+      setProductStatus(data?.status);
+      setSelectedSeasons(data?.season || []);
+      setSelectedProductIds(data?.restOfOutfit || []);
+      setShowInventory(data?.isInventoryShown);
+      setSelectedShippingZoneIds(data?.selectedShippingZoneIds);
+
+      // Assuming existingData.productVariants contains variants for all locations
+      setExistingVariants(data?.productVariants); // Store all variants
+
+    } catch (error) {
+      // toast.error("Failed to load product details.");
+      if (decodedSeasonName) {
+        router.push(`/product-hub/products/existing-products/seasons/${decodedSeasonName}`);
+        return;
+      }
+      else {
+        router.push(`/product-hub/products/existing-products/${selectedCategoryRef.current || 'default'}`);
+      }
+    }
+  }, [axiosPublic, decodedSeasonName, id, initializeVariants, router, setValue]);
+
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchProductDetails = async () => {
-      try {
-        const { data } = await axiosPublic.get(`/api/products/single/${id}`);
+    if (!hasFetched.current) {
+      fetchProductDetails();
+      hasFetched.current = true; // mark as fetched
+    }
 
-        setValue('productTitle', data?.productTitle);
-        setValue('batchCode', data?.batchCode);
-        setValue('weight', data?.weight);
-        setValue('regularPrice', data?.regularPrice);
-        setValue('discountValue', data?.discountValue);
-        setValue('productDetails', data?.productDetails);
-        setImage(data?.thumbnailImageUrl);
-        setDiscountType(data?.discountType);
-        setProductDetails(data?.productDetails);
-        setMaterialCare(data?.materialCare);
-        setSizeFit(data?.sizeFit);
-        setSelectedCategory(data?.category);
-        setValue('category', data?.category);
-        setSelectedSubCategories(data?.subCategories);
-        setGroupSelected(data?.groupOfSizes);
-        setGroupSelected2(data?.allSizes);
-        setSelectedAvailableColors(data?.availableColors);
-        setSelectedNewArrival(data?.newArrival);
-        setIsTrending(data?.trending);
-        setSelectedVendors(data?.vendors);
-        setSelectedTags(data?.tags);
-        initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
-        setProductId(data?.productId);
-        setProductStatus(data?.status);
-        setSelectedSeasons(data?.season || []);
-        setSelectedProductIds(data?.restOfOutfit || []);
-        setShowInventory(data?.isInventoryShown);
-        setSelectedShippingZoneIds(data?.selectedShippingZoneIds);
-
-        // Assuming existingData.productVariants contains variants for all locations
-        setExistingVariants(data?.productVariants); // Store all variants
-
-      } catch (error) {
-        // toast.error("Failed to load product details.");
-        if (decodedSeasonName) {
-          router.push(`/product-hub/products/existing-products/seasons/${decodedSeasonName}`);
-          return;
-        }
-        else {
-          router.push(`/product-hub/products/existing-products/${selectedCategoryRef.current || 'default'}`);
-        }
-      }
-    };
-
-    fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName, session?.user?.accessToken, status, router, decodedSeasonName]);
+  }, [id, fetchProductDetails, status]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {

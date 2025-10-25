@@ -2,10 +2,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
@@ -28,6 +27,7 @@ const EditPaymentMethod = () => {
   const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748164462517_default-payment-image.jpg";
   const [dragging, setDragging] = useState(false);
   const [imageError, setImageError] = useState("");
+  const hasFetched = useRef(false);
 
   const {
     register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm({
@@ -38,26 +38,30 @@ const EditPaymentMethod = () => {
       }
     });
 
+  const fetchShipmentHandler = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/payment-method/single/${id}`);
+      setValue('paymentMethodName', data?.paymentMethodName);
+      setPaymentDetails(data?.paymentDetails);
+      setImage(data?.imageUrl);
+    } catch (error) {
+      // console.error(error);
+      // toast.error("Failed to load payment method details.");
+      router.push('/finances/payment-methods');
+    }
+  }, [axiosSecure, id, router, setValue]);
+
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchShipmentHandler = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/payment-method/single/${id}`);
-        setValue('paymentMethodName', data?.paymentMethodName);
-        setPaymentDetails(data?.paymentDetails);
-        setImage(data?.imageUrl);
-      } catch (error) {
-        // console.error(error);
-        // toast.error("Failed to load payment method details.");
-        router.push('/finances/payment-methods');
-      }
-    };
+    if (!hasFetched.current) {
+      fetchShipmentHandler();
+      hasFetched.current = true; // mark as fetched
+    }
 
-    fetchShipmentHandler();
-  }, [id, setValue, axiosSecure, status, session, router]);
+  }, [id, fetchShipmentHandler, status]);
 
   const uploadSingleFileToGCS = async (image) => {
     try {

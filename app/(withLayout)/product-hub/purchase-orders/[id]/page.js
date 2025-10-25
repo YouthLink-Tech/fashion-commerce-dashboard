@@ -2,7 +2,7 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -60,7 +60,8 @@ const EditPurchaseOrderPage = () => {
   const { isUserLoading, isAuthorizedForModule, isOwnerForModule } = useUserPermissions();
   const isAuthorized = isAuthorizedForModule(currentModule);
   const isOwner = isOwnerForModule(currentModule);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const hasFetched = useRef(false);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -111,10 +112,6 @@ const EditPurchaseOrderPage = () => {
 
   // Memoized function to fetch purchase order data
   const fetchPurchaseOrderData = useCallback(async () => {
-    if (!id || typeof window === "undefined") return;
-
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
-
     try {
       const response = await axiosSecure.get(`/api/purchase-order/single/${id}`);
       const order = response?.data;
@@ -156,12 +153,20 @@ const EditPurchaseOrderPage = () => {
       router.push("/product-hub/purchase-orders")
       return null;
     }
-  }, [id, setValue, axiosSecure, reset, session?.user?.accessToken, status, router]);
+  }, [id, setValue, axiosSecure, reset, router]);
 
   // Initial load useEffect
   useEffect(() => {
-    fetchPurchaseOrderData();
-  }, [fetchPurchaseOrderData]);
+    if (!id || typeof window === "undefined") return;
+
+    if (status !== "authenticated") return;
+
+    if (!hasFetched.current) {
+      fetchPurchaseOrderData();
+      hasFetched.current = true; // mark as fetched
+    }
+
+  }, [id, fetchPurchaseOrderData, status]);
 
   const handlePaymentTerms = (value) => {
     setPaymentTerms(value);
