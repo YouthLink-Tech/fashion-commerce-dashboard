@@ -14,12 +14,12 @@ import { Checkbox, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Ta
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LuImagePlus } from "react-icons/lu";
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdCancel, MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-icons/md';
+import { MdCancel, MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import ReactSelect from 'react-select';
 import toast from 'react-hot-toast';
@@ -106,7 +106,6 @@ const EditProductContents = () => {
   const selectedCategoryRef = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
   const [activeTab, setActiveTab] = useState('product');
-  const [existingVariants, setExistingVariants] = useState([]);
   const [productList, isProductPending] = useProductsInformation();
   const [searchTermForCompleteOutfit, setSearchTermForCompleteOutfit] = useState('');
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -114,12 +113,13 @@ const EditProductContents = () => {
   const dropdownRefForCompleteOutfit = useRef(null);
   const [activeTab2, setActiveTab2] = useState('Inside Dhaka');
   const [tabSelections, setTabSelections] = useState({});
+  const [originalVariants, setOriginalVariants] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [image, setImage] = useState(null);
   const [showInventory, setShowInventory] = useState(false);
   const { isUserLoading, isOwnerForModule } = useUserPermissions();
   const isOwner = isOwnerForModule(currentModule);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const hasFetched = useRef(false);
 
   // Filter categories based on search input and remove already selected categories
@@ -652,12 +652,12 @@ const EditProductContents = () => {
     setDiscountType(key);
   };
 
-  // Memoize the primary location name based on locationList changes
-  const primaryLocationName = useMemo(() => {
-    return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
-  }, [locationList]);
-
   const initializeVariants = useCallback((colors, sizes, savedVariants) => {
+
+    // NEW: Guard if locationList not ready
+    if (!locationList?.length) {
+      return;
+    }
 
     // Filter active locations and find the primary location's name
     const activeLocations = locationList?.filter(location => location.status) || [];
@@ -725,7 +725,6 @@ const EditProductContents = () => {
       setIsTrending(data?.trending);
       setSelectedVendors(data?.vendors);
       setSelectedTags(data?.tags);
-      initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
       setProductId(data?.productId);
       setProductStatus(data?.status);
       setSelectedSeasons(data?.season || []);
@@ -733,8 +732,8 @@ const EditProductContents = () => {
       setShowInventory(data?.isInventoryShown);
       setSelectedShippingZoneIds(data?.selectedShippingZoneIds);
 
-      // Assuming existingData.productVariants contains variants for all locations
-      setExistingVariants(data?.productVariants); // Store all variants
+      // Storing all variants
+      setOriginalVariants(data?.productVariants || []);
 
     } catch (error) {
       // toast.error("Failed to load product details.");
@@ -746,7 +745,7 @@ const EditProductContents = () => {
         router.push(`/product-hub/products/existing-products/${selectedCategoryRef.current || 'default'}`);
       }
     }
-  }, [axiosPublic, decodedSeasonName, id, initializeVariants, router, setValue]);
+  }, [axiosPublic, decodedSeasonName, id, router, setValue]);
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
@@ -760,26 +759,19 @@ const EditProductContents = () => {
 
   }, [id, fetchProductDetails, status]);
 
-  // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {
-    if (selectedAvailableColors.length > 0 && groupSelected2.length > 0) {
-      initializeVariants(selectedAvailableColors, groupSelected2, productVariants);
+    // Skip if not all deps ready (prevents partial/empty init)
+    if (
+      selectedAvailableColors.length === 0 ||
+      groupSelected2.length === 0 ||
+      !locationList?.length ||
+      originalVariants.length === 0
+    ) {
+      return;
     }
-  }, [selectedAvailableColors, groupSelected2, initializeVariants, productVariants]);
 
-  // const handleVariantChange = (index, field, value) => {
-  //   const updatedVariants = [...productVariants];
-
-  //   // Update the field value
-  //   updatedVariants[index][field] = value;
-
-  //   // If the field is 'sku', update 'onHandSku' with the same value
-  //   if (field === "sku") {
-  //     updatedVariants[index]["onHandSku"] = value;
-  //   }
-
-  //   setProductVariants(updatedVariants);
-  // };
+    initializeVariants(selectedAvailableColors, groupSelected2, originalVariants);
+  }, [selectedAvailableColors, groupSelected2, locationList, originalVariants, initializeVariants]);
 
   const handleColorChange = (newValue) => {
     setSelectedAvailableColors(newValue);
@@ -994,7 +986,7 @@ const EditProductContents = () => {
         // Process active locations
         activeLocations.forEach(location => {
           // Check if this variant already exists for this location
-          const existingVariant = existingVariants?.find(existing =>
+          const existingVariant = originalVariants?.find(existing =>
             existing.color.value === variant.color.value &&
             existing.size === variant.size &&
             existing.location === location.locationName
@@ -1034,8 +1026,8 @@ const EditProductContents = () => {
       // Handle non-active locations
       const nonActiveLocations = locationList?.filter(location => !location.status) || [];
 
-      // Iterate over existingVariants to check for non-active locations
-      existingVariants?.forEach(existing => {
+      // Iterate over originalVariants to check for non-active locations
+      originalVariants?.forEach(existing => {
         // Check if the existing variant is for a non-active location
         const isNonActiveLocation = nonActiveLocations.some(location =>
           existing.location === location.locationName
