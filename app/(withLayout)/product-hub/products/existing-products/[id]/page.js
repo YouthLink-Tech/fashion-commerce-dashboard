@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import arrowSvgImage from "/public/card-images/arrow.svg";
@@ -62,7 +62,8 @@ const ProductPage = () => {
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const { isUserLoading, isAuthorizedForModule } = useUserPermissions();
   const isAuthorized = isAuthorizedForModule(currentModule);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
@@ -113,24 +114,28 @@ const ProductPage = () => {
     setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
+  const fetchProductDetails = useCallback(async () => {
+    try {
+      const { data } = await axiosSecure.get(`/api/products/from-category/${decodedCategoryName}`);
+      setProductDetails(data);
+    } catch (error) {
+      toast.error("Failed to load product category details.");
+    } finally {
+      setIsLoading(false); // End loading state
+    }
+  }, [axiosSecure, decodedCategoryName]);
+
   useEffect(() => {
     if (!decodedCategoryName || typeof window === "undefined") return;
 
-    if (status !== "authenticated" || !session?.user?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    const fetchProductDetails = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/api/products/from-category/${decodedCategoryName}`);
-        setProductDetails(data);
-      } catch (error) {
-        toast.error("Failed to load product category details.");
-      } finally {
-        setIsLoading(false); // End loading state
-      }
-    };
+    if (!hasFetched.current) {
+      fetchProductDetails();
+      hasFetched.current = true; // mark as fetched
+    }
 
-    fetchProductDetails();
-  }, [decodedCategoryName, axiosSecure, session?.user?.accessToken, status]);
+  }, [decodedCategoryName, fetchProductDetails, status]);
 
   // Convert dateTime string to Date object
   const parseDate = (dateString) => {
