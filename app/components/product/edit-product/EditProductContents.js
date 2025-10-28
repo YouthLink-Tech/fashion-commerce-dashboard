@@ -764,8 +764,7 @@ const EditProductContents = () => {
     if (
       selectedAvailableColors.length === 0 ||
       groupSelected2.length === 0 ||
-      !locationList?.length ||
-      originalVariants.length === 0
+      !locationList?.length
     ) {
       return;
     }
@@ -1039,18 +1038,21 @@ const EditProductContents = () => {
         }
       });
       const selectedShippingZoneIds = selectedShipmentHandler.map(zone => zone._id);
+      const weightValue = parseFloat(data?.weight);
+      const discountValue = parseFloat(data?.discountValue);
+      const regularPriceValue = parseFloat(data?.regularPrice);
 
       const updatedProductData = {
         productTitle: data?.productTitle,
-        regularPrice: data?.regularPrice,
-        weight: data?.weight,
+        regularPrice: isNaN(regularPriceValue) ? 0 : regularPriceValue,
+        weight: isNaN(weightValue) ? 0 : weightValue,
         batchCode: data?.batchCode,
         thumbnailImageUrl: image,
         discountType: discountType,
-        discountValue: data?.discountValue,
+        discountValue: isNaN(discountValue) ? 0 : discountValue,
         productDetails: productDetails,
-        materialCare: materialCare,
-        sizeFit: sizeFit,
+        materialCare: materialCare ? materialCare : "",
+        sizeFit: sizeFit ? sizeFit : "",
         category: selectedCategory,
         subCategories: selectedSubCategories,
         groupOfSizes: groupSelected,
@@ -1067,6 +1069,8 @@ const EditProductContents = () => {
         sizeGuideImageUrl: selectedImageUrl,
         restOfOutfit: selectedProductIds,
         isInventoryShown: showInventory,
+        mode: "edit",
+        page: 3
       };
 
       const res = await axiosSecure.put(`/api/products/edit/${id}`, updatedProductData);
@@ -1121,7 +1125,23 @@ const EditProductContents = () => {
       }
 
     } catch (err) {
-      toast.error("Failed to publish product details!");
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error("Failed to edit product information");
+      }
     }
   };
 

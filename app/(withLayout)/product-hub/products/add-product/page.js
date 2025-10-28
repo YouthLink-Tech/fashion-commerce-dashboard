@@ -722,8 +722,14 @@ const FirstStepOfAddProduct = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     const publishDate = currentDate.toLocaleDateString('en-US', options);
     const productId = generateProductID(selectedCategory);
+    const weightValue = parseFloat(formData?.weight);
+    const discountValue = parseFloat(formData?.discountValue);
+    const regularPriceValue = parseFloat(formData?.regularPrice);
     const productData = {
       ...formData,
+      weight: isNaN(weightValue) ? 0 : weightValue,
+      regularPrice: isNaN(regularPriceValue) ? 0 : regularPriceValue,
+      discountValue: isNaN(discountValue) ? 0 : discountValue,
       thumbnailImageUrl: image,
       discountType,
       publishDate,
@@ -734,8 +740,10 @@ const FirstStepOfAddProduct = () => {
       sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
       restOfOutfit: selectedProductIds,
-      materialCare,
-      sizeFit
+      materialCare: materialCare ? materialCare : "",
+      sizeFit: sizeFit ? sizeFit : "",
+      mode: "create",  // or "edit" when editing
+      page: 1,
     };
 
     try {
@@ -800,7 +808,23 @@ const FirstStepOfAddProduct = () => {
         router.push("/product-hub/products/existing-products");
       }
     } catch (err) {
-      toast.error("Failed to save product information");
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error("Failed to save product information");
+      }
     }
   };
 

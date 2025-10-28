@@ -369,18 +369,22 @@ const SecondStepOfAddProduct = () => {
       return;
     }
 
+    const weightValue = parseFloat(storedProductWeight);
+    const discountValue = parseFloat(storedDiscountValue);
+    const regularPriceValue = parseFloat(storedRegularPrice);
+
     const productData = {
       publishDate: storedFormattedDate,
       productTitle: storedProductTitle,
-      weight: storedProductWeight,
+      weight: isNaN(weightValue) ? 0 : weightValue,
       batchCode: storedProductBatchCode,
-      regularPrice: storedRegularPrice,
+      regularPrice: isNaN(regularPriceValue) ? 0 : regularPriceValue,
+      discountValue: isNaN(discountValue) ? 0 : discountValue,
       thumbnailImageUrl: storedUploadedImageUrl,
       discountType: storedDiscountType,
-      discountValue: storedDiscountValue,
       productDetails: storedProductDetails,
-      materialCare: storedMaterialCare,
-      sizeFit: storedSizeFit,
+      materialCare: storedMaterialCare ? storedMaterialCare : "",
+      sizeFit: storedSizeFit ? storedSizeFit : "",
       category: storedCategory,
       subCategories: storedSubCategories,
       groupOfSizes: storedGroupOfSizes,
@@ -396,7 +400,9 @@ const SecondStepOfAddProduct = () => {
       status: "draft",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
-      isInventoryShown: storedShowInventory,
+      isInventoryShown: !!storedShowInventory,
+      mode: "create",  // or "edit" when editing
+      page: 2,
     };
 
     try {
@@ -463,7 +469,23 @@ const SecondStepOfAddProduct = () => {
         router.push("/product-hub/products/existing-products");
       }
     } catch (err) {
-      toast.error("Failed to save product information");
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error("Failed to save product information");
+      }
     }
   };
 
