@@ -208,7 +208,7 @@ const ThirdStepOfAddProduct = () => {
       isInventoryShown: !!storedShowInventory,
       mode: "create",  // or "edit" when editing
       page: 3,
-    }
+    };
 
     try {
       // Post the entire selectedShipmentHandler array, which contains full shipping details
