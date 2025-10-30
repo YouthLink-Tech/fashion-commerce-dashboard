@@ -71,16 +71,26 @@ const AddLocation = () => {
         })
         router.push("/supply-chain/locations")
       }
-    } catch (error) {
-      setIsSubmitting(false);
-      console.error("Error deleting location:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to delete location. Please try again.",
-        {
-          position: "bottom-right",
-          duration: 5000,
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
         }
-      );
+      } else {
+        toast.error("Failed to add location. Please try again later.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

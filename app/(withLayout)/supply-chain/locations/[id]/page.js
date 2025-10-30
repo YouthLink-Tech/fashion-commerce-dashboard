@@ -1,7 +1,7 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAxiosSecure } from '@/app/hooks/useAxiosSecure';
-import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Checkbox } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -18,19 +18,14 @@ const EditLocation = () => {
   const axiosSecure = useAxiosSecure();
   const router = useRouter();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isSelected, setIsSelected] = useState(false);
   const { status } = useSession();
   const [originalIsPrimary, setOriginalIsPrimary] = useState(false); // store original status
-  const [otherLocations, setOtherLocations] = useState([]); // to list in modal
-  const [newPrimaryId, setNewPrimaryId] = useState(null); // user must select one
-  const [newPrimaryName, setNewPrimaryName] = useState("");
   const hasFetched = useRef(false);
 
   const fetchLocationDetails = useCallback(async () => {
     try {
       const { data } = await axiosSecure.get(`/api/location/single/${id}`);
-      const otherRes = await axiosSecure.get(`/api/location/all-other/${id}`);
 
       setValue('locationName', data?.locationName);
       setValue('contactPersonName', data?.contactPersonName);
@@ -41,7 +36,6 @@ const EditLocation = () => {
       setIsSelected(data?.isPrimaryLocation);
 
       setOriginalIsPrimary(data?.isPrimaryLocation);
-      setOtherLocations(otherRes?.data || []);
 
     } catch (error) {
       router.push("/supply-chain/locations");
@@ -74,10 +68,6 @@ const EditLocation = () => {
         postalCode,
         isPrimaryLocation: isSelected,
       };
-
-      if (!isSelected && newPrimaryId) {
-        locationData.newPrimaryId = newPrimaryId;
-      }
 
       const res = await axiosSecure.put(`/api/location/edit/${id}`, locationData);
       if (res.data.modifiedCount > 0) {
@@ -118,9 +108,24 @@ const EditLocation = () => {
       } else {
         toast.error('No changes detected.');
       }
-    } catch (error) {
-      console.error('Error editing location:', error);
-      toast.error('There was an error editing the location. Please try again.');
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error("There was an error editing the location. Please try again.");
+      }
     }
   };
 
@@ -239,21 +244,20 @@ const EditLocation = () => {
           </div>
 
           <div className="flex justify-between items-center gap-2">
-            <Checkbox isSelected={isSelected} color="success"
+            <Checkbox
+              isSelected={isSelected}
+              isDisabled={originalIsPrimary} // ✅ disable checkbox if already primary
+              color="success"
               onValueChange={(val) => {
-                if (!val && originalIsPrimary) {
-                  onOpen(); // open modal to force new selection
-                } else {
-                  setIsSelected(val); // normal behavior
-                }
+                // ✅ prevent modal trigger if already primary
+                if (originalIsPrimary) return;
+                setIsSelected(val); // normal behavior
               }}>
               Set as Primary Location
             </Checkbox>
-            {!isSelected && newPrimaryName && (
-              <p className="text-sm text-green-600 font-semibold">
-                ✅ You selected <span className="font-bold">{newPrimaryName}</span> as the new Primary Location.
-              </p>
-            )}
+            <label className={`text-sm font-semibold text-green-600`}>
+              {isSelected ? "✅ This is your Primary Location" : ""}
+            </label>
           </div>
 
           {/* Submit Button */}
@@ -270,69 +274,6 @@ const EditLocation = () => {
         </div>
 
       </form>
-
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="bg-gray-200">
-                <p className="text-sm text-gray-600">
-                  You are unchecking the current primary location. You must select another one.
-                </p>
-              </ModalHeader>
-              <ModalBody className="modal-body-scroll">
-                <div className="pt-3 flex flex-col gap-3">
-                  {otherLocations?.map((loc) => (
-                    <Checkbox
-                      key={loc._id}
-                      color="success"
-                      isSelected={newPrimaryId === loc._id}
-                      onValueChange={(checked) => {
-                        if (checked) {
-                          setNewPrimaryId(loc._id);
-                          setNewPrimaryName(loc.locationName); // 👈 ADD THIS
-                        } else {
-                          setNewPrimaryId(null);
-                          setNewPrimaryName(""); // 👈 CLEAR if unchecked
-                        }
-                      }}
-                    >
-                      {loc.locationName}
-                    </Checkbox>
-                  ))}
-                </div>
-              </ModalBody>
-              <ModalFooter className='flex justify-end items-center border'>
-                <div className='flex gap-4 items-center'>
-                  <Button size='sm' color='danger' variant="flat" onPress={() => {
-                    // Reset new primary selection
-                    setNewPrimaryId(null);
-                    setNewPrimaryName("");
-                    onClose(); // Close the modal
-                  }}>
-                    Cancel
-                  </Button>
-                  <Button
-                    size="sm"
-                    className='bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-900 font-medium'
-                    onPress={() => {
-                      if (!newPrimaryId) {
-                        toast.error("You must select a new primary location.");
-                        return;
-                      }
-
-                      setIsSelected(false); // Uncheck current
-                      onOpenChange(); // Close modal
-                    }}
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
 
     </div>
   );
