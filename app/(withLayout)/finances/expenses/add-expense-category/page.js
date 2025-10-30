@@ -117,8 +117,24 @@ const AddExpenseCategory = () => {
       } else {
         throw new Error('Failed to add expense category');
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add expense category. Please try again.');
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to add expense category. Please try again.');
+      }
     } finally {
       setIsSubmitting(false); // Reset submit state at the end of submission
     }

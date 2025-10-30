@@ -276,8 +276,24 @@ const AddExpenseEntry = () => {
         })
         router.push("/finances/expenses");
       }
-    } catch (error) {
-      toast.error('Failed to add expense entry. Please try again!');
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to add expense entry. Please try again.');
+      }
     } finally {
       setIsSubmitting(false); // Reset submit state at the end of submission
     }
@@ -414,7 +430,7 @@ const AddExpenseEntry = () => {
 
           </div>
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full z-[50]'>
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
 
