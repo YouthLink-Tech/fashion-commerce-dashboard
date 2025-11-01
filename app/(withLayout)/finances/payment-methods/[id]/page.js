@@ -19,7 +19,7 @@ const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false }
 const EditPaymentMethod = () => {
 
   const { id } = useParams();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const axiosSecure = useAxiosSecure();
   const [image, setImage] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState([]);
@@ -140,9 +140,24 @@ const EditPaymentMethod = () => {
       } else {
         toast.error('No changes detected.');
       }
-    } catch (error) {
-      console.error('Error editing Payment Method:', error);
-      toast.error('There was an error editing the Payment Method. Please try again.');
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
+      } else {
+        toast.error(err.response?.data?.message || 'There was an error editing the Payment Method. Please try again.');
+      }
     }
   };
 
