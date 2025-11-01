@@ -221,10 +221,22 @@ const AddPromo = () => {
         router.push("/marketing");
       }
     } catch (err) {
-      if (err.response && err.response.status === 400) {
-        toast.error(err.response.data.message || "Promo code already exists!");
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
       } else {
-        toast.error("Failed to publish promo!");
+        toast.error("Failed to add this promo. Please try again later.");
       }
     } finally {
       setIsSubmitting(false);

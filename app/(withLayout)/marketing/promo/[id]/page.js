@@ -237,12 +237,23 @@ const EditPromo = () => {
         toast.error('No changes detected.');
         setIsSubmitting(false);
       }
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        toast.error(error.response.data.message || "Promo code already exists!");
+    } catch (err) {
+      // Check if it's an Axios error with response
+      if (err.response?.data?.error?.message) {
+        try {
+          // Zod errors are usually JSON strings, parse them
+          const zodErrors = JSON.parse(err.response.data.error.message);
+
+          // Iterate over each error and show toast
+          zodErrors.forEach(e => {
+            toast.error(`${e.path.join(".")}: ${e.message}`);
+          });
+        } catch (parseErr) {
+          // If parsing fails, fallback to showing raw message
+          toast.error(err.response.data.error.message);
+        }
       } else {
-        console.error('Error editing promo:', error);
-        toast.error('Failed to update promo. Please try again!');
+        toast.error("Failed to edit this promo. Please try again later.");
       }
     } finally {
       setIsSubmitting(false);
